@@ -51,9 +51,9 @@ namespace SimpleSurvival
 
             if (status == ConverterStatus.CONVERTING)
             {
-                part.RequestResource("ElectricCharge", minElectric);
-                part.RequestResource("Consumables", minConsum);
-                part.RequestResource("LifeSupport", -minLS);
+                part.RequestResource("ElectricCharge", minElectric * TimeWarp.fixedDeltaTime);
+                part.RequestResource("Consumables", minConsum * TimeWarp.fixedDeltaTime);
+                part.RequestResource("LifeSupport", -minLS * TimeWarp.fixedDeltaTime);
             }
         }
 
