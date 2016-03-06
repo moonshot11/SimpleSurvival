@@ -12,7 +12,8 @@ namespace SimpleSurvival
         CONVERTING,
         NO_ELECTRICITY,
         NO_CONSUMABLES,
-        LS_FULL
+        LS_FULL,
+        UNMANNED
     }
 
     public class Cons2LSModule : PartModule
@@ -24,12 +25,13 @@ namespace SimpleSurvival
         const double minConsum = test_value;
         const double minLS = test_value;
 
-        [KSPField(guiActive = true, guiName = "Converter Status")]
+        [KSPField(guiActive = true, guiName = "Converter")]
         string str_status = "";
 
         ConverterStatus status = ConverterStatus.READY;
 
-        [KSPEvent(guiActive = true, guiActiveEditor = false, guiName = "Convert Consumables")]
+        [KSPEvent(guiActive = true, guiActiveEditor = false,
+            guiName = "Convert Consumables", guiActiveUncommand = true)]
         public void ToggleStatus()
         {
             switch (status)
@@ -64,7 +66,9 @@ namespace SimpleSurvival
         {
             bool deficient = true;
 
-            if (!Util.ResourceAvailable(part, "LifeSupport", -minLS, ResourceFlowMode.ALL_VESSEL))
+            if (vessel.GetCrewCount() == 0)
+                status = ConverterStatus.UNMANNED;
+            else if (!Util.ResourceAvailable(part, "LifeSupport", -minLS, ResourceFlowMode.ALL_VESSEL))
                 status = ConverterStatus.LS_FULL;
             else if (!Util.ResourceAvailable(part, "Consumables", minConsum))
                 status = ConverterStatus.NO_CONSUMABLES;
@@ -88,9 +92,9 @@ namespace SimpleSurvival
             base.OnUpdate();
         }
 
-        public string StatusToString(ConverterStatus st)
+        public string StatusToString(ConverterStatus status)
         {
-            switch(st)
+            switch(status)
             {
                 case ConverterStatus.CONVERTING:
                     return "Converting";
@@ -101,7 +105,9 @@ namespace SimpleSurvival
                 case ConverterStatus.READY:
                     return "Ready";
                 case ConverterStatus.LS_FULL:
-                    return "LifeSupport full!";
+                    return "LifeSupport Full";
+                case ConverterStatus.UNMANNED:
+                    return "Ship Unmanned";
                 default:
                     return "ERROR ConverterStatus";
             }
