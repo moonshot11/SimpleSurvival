@@ -24,10 +24,10 @@ namespace SimpleSurvival
         const double minConsum = test_value;
         const double minLS = test_value;
 
-        [KSPField(guiActive = true, guiName = "Status")]
+        [KSPField(guiActive = true, guiName = "Converter Status")]
         string str_status = "";
 
-        ConverterStatus status = ConverterStatus.CONVERTING;
+        ConverterStatus status = ConverterStatus.READY;
 
         [KSPEvent(guiActive = true, guiActiveEditor = false, guiName = "Convert Consumables")]
         public void ToggleStatus()
