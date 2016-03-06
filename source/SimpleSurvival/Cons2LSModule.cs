@@ -17,12 +17,12 @@ namespace SimpleSurvival
 
     public class Cons2LSModule : PartModule
     {
-        const float test_value = 0.1f;
+        const double test_value = 0.1f;
 
         // -- Minimum values for Consumable->LifeSupport conversion
-        const float minElectric = test_value;
-        const float minConsum = test_value;
-        const float minLS = test_value;
+        const double minElectric = test_value;
+        const double minConsum = test_value;
+        const double minLS = test_value;
 
         [KSPField(guiActive = true, guiName = "Status")]
         string str_status = "";
@@ -62,7 +62,7 @@ namespace SimpleSurvival
         /// </summary>
         public void CheckConverterResources()
         {
-            float obt_elec = part.RequestResource("ElectricCharge", minElectric);
+            double obt_elec = part.RequestResource("ElectricCharge", minElectric);
             bool deficient = false;
 
             if (obt_elec < minElectric)
@@ -71,7 +71,7 @@ namespace SimpleSurvival
                 deficient = true;
             }
 
-            float obt_consum = part.RequestResource("Consumables", minConsum);
+            double obt_consum = part.RequestResource("Consumables", minConsum);
 
             if (obt_consum < minConsum)
             {
@@ -79,15 +79,20 @@ namespace SimpleSurvival
                 deficient = true;
             }
 
-            float obt_ls = part.RequestResource("LifeSupport", -minLS);
+            // This value is negative!
+            double obt_ls = part.RequestResource("LifeSupport", -minLS, ResourceFlowMode.ALL_VESSEL);
 
             if (-obt_ls < minLS)
+            {
                 status = ConverterStatus.LS_FULL;
+                deficient = true;
+            }
 
             // Restore resources - this is only a check
             // Better way to check resources than requesting negative amounts?
-            part.RequestResource("Consumables", -minConsum);
-            part.RequestResource("ElectricCharge", -minElectric);
+            part.RequestResource("Consumables", -obt_consum);
+            part.RequestResource("ElectricCharge", -obt_elec);
+            part.RequestResource("LifeSupport", -obt_ls, ResourceFlowMode.ALL_VESSEL);
 
             if (!deficient && status != ConverterStatus.READY && status != ConverterStatus.CONVERTING)
             {
