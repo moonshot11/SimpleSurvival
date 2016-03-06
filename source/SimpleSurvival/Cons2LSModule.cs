@@ -62,37 +62,16 @@ namespace SimpleSurvival
         /// </summary>
         public void CheckConverterResources()
         {
-            double obt_elec = part.RequestResource("ElectricCharge", minElectric);
-            bool deficient = false;
+            bool deficient = true;
 
-            if (obt_elec < minElectric)
-            {
-                status = ConverterStatus.NO_ELECTRICITY;
-                deficient = true;
-            }
-
-            double obt_consum = part.RequestResource("Consumables", minConsum);
-
-            if (obt_consum < minConsum)
-            {
-                status = ConverterStatus.NO_CONSUMABLES;
-                deficient = true;
-            }
-
-            // This value is negative!
-            double obt_ls = part.RequestResource("LifeSupport", -minLS, ResourceFlowMode.ALL_VESSEL);
-
-            if (-obt_ls < minLS)
-            {
+            if (!Util.ResourceAvailable(part, "LifeSupport", -minLS, ResourceFlowMode.ALL_VESSEL))
                 status = ConverterStatus.LS_FULL;
-                deficient = true;
-            }
-
-            // Restore resources - this is only a check
-            // Better way to check resources than requesting negative amounts?
-            part.RequestResource("Consumables", -obt_consum);
-            part.RequestResource("ElectricCharge", -obt_elec);
-            part.RequestResource("LifeSupport", -obt_ls, ResourceFlowMode.ALL_VESSEL);
+            else if (!Util.ResourceAvailable(part, "Consumables", minConsum))
+                status = ConverterStatus.NO_CONSUMABLES;
+            else if (!Util.ResourceAvailable(part, "ElectricCharge", minElectric))
+                status = ConverterStatus.NO_ELECTRICITY;
+            else
+                deficient = false;
 
             if (!deficient && status != ConverterStatus.READY && status != ConverterStatus.CONVERTING)
             {
