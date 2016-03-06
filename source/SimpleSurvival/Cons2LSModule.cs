@@ -11,11 +11,19 @@ namespace SimpleSurvival
         READY,
         CONVERTING,
         NO_ELECTRICITY,
-        NO_CONSUMABLES
+        NO_CONSUMABLES,
+        LS_FULL
     }
 
     public class Cons2LSModule : PartModule
     {
+        const float test_value = 0.1f;
+
+        // -- Minimum values for Consumable->LifeSupport conversion
+        const float minElectric = test_value;
+        const float minConsum = test_value;
+        const float minLS = test_value;
+
         [KSPField(guiActive = true, guiName = "Status")]
         string str_status = "";
 
@@ -24,12 +32,67 @@ namespace SimpleSurvival
         [KSPEvent(guiActive = true, guiActiveEditor = false, guiName = "Convert Consumables")]
         public void ToggleStatus()
         {
-            status = status == ConverterStatus.NO_CONSUMABLES ? ConverterStatus.NO_ELECTRICITY : ConverterStatus.NO_CONSUMABLES;
+            switch (status)
+            {
+                case ConverterStatus.CONVERTING:
+                    status = ConverterStatus.READY;
+                    break;
+
+                case ConverterStatus.READY:
+                    status = ConverterStatus.CONVERTING;
+                    break;
+            }
         }
 
         public void FixedUpdate()
         {
-            //
+            // First, check resources
+            CheckConverterResources();
+
+            if (status == ConverterStatus.CONVERTING)
+            {
+                part.RequestResource("ElectricCharge", minElectric);
+                part.RequestResource("Consumables", minConsum);
+                part.RequestResource("LifeSupport", -minLS);
+            }
+        }
+
+        /// <summary>
+        /// Check whether converter has enough resources to run
+        /// </summary>
+        public void CheckConverterResources()
+        {
+            float obt_elec = part.RequestResource("ElectricCharge", minElectric);
+            bool deficient = false;
+
+            if (obt_elec < minElectric)
+            {
+                status = ConverterStatus.NO_ELECTRICITY;
+                deficient = true;
+            }
+
+            float obt_consum = part.RequestResource("Consumables", minConsum);
+
+            if (obt_consum < minConsum)
+            {
+                status = ConverterStatus.NO_CONSUMABLES;
+                deficient = true;
+            }
+
+            float obt_ls = part.RequestResource("LifeSupport", -minLS);
+
+            if (-obt_ls < minLS)
+                status = ConverterStatus.LS_FULL;
+
+            // Restore resources - this is only a check
+            // Better way to check resources than requesting negative amounts?
+            part.RequestResource("Consumables", -minConsum);
+            part.RequestResource("ElectricCharge", -minElectric);
+
+            if (!deficient && status != ConverterStatus.READY && status != ConverterStatus.CONVERTING)
+            {
+                status = ConverterStatus.READY;
+            }
         }
 
         /// <summary>
@@ -53,6 +116,8 @@ namespace SimpleSurvival
                     return "Insufficient Electricity";
                 case ConverterStatus.READY:
                     return "Ready";
+                case ConverterStatus.LS_FULL:
+                    return "LifeSupport full!";
                 default:
                     return "ERROR ConverterStatus";
             }
