@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SimpleSurvival
 {
-    public class SimpleSurvivalModule : PartModule
+    public class LifeSupportModule : PartModule
     {
         public void FixedUpdate()
         {
