@@ -16,7 +16,8 @@ namespace SimpleSurvival
         /// <param name="request">The amount of resource requested</param>
         /// <param name="flowmode">The FlowMode</param>
         /// <returns></returns>
-        public static bool ResourceAvailable(Part part, string resource, double request, ResourceFlowMode flowmode = ResourceFlowMode.NULL)
+        public static bool ResourceAvailable(Part part, string resource, double request,
+            ResourceFlowMode flowmode = ResourceFlowMode.NULL)
         {
             // Will hold the value of the resource obtained
             double obtained = 0.0;
