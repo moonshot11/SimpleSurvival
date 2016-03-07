@@ -34,6 +34,8 @@ namespace SimpleSurvival
             guiName = "Convert Consumables", guiActiveUncommand = true)]
         public void ToggleStatus()
         {
+            Util.Log("Toggling Converter status from " + status);
+
             switch (status)
             {
                 case ConverterStatus.CONVERTING:
@@ -44,6 +46,8 @@ namespace SimpleSurvival
                     status = ConverterStatus.CONVERTING;
                     break;
             }
+
+            Util.Log(" to " + status);
         }
 
         public void FixedUpdate()

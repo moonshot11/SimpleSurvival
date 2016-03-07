@@ -41,5 +41,10 @@ namespace SimpleSurvival
 
             return result;
         }
+
+        public static void Log(string message)
+        {
+            KSPLog.print("SimpleSurvival: " + message);
+        }
     }
 }
