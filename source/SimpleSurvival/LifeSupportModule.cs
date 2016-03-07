@@ -11,8 +11,9 @@ namespace SimpleSurvival
         public void FixedUpdate()
         {
             // 10 unit(s) = 1 Kerbal for 1 day
-            float RATE = 10f / 3600f / 6f;
-            float ret_rs = part.RequestResource("LifeSupport", part.protoModuleCrew.Count * RATE * TimeWarp.fixedDeltaTime);
+            double RATE = 10.0 / 3600.0 / 6.0;
+            double DEATH_CREDIT = -1.0;
+            double ret_rs = part.RequestResource("LifeSupport", part.protoModuleCrew.Count * RATE * TimeWarp.fixedDeltaTime);
 
             List<ProtoCrewMember> part_crew = part.protoModuleCrew;
 
@@ -27,6 +28,7 @@ namespace SimpleSurvival
 
                     // Kerbal must be removed from part BEFORE calling Die()
                     part.RemoveCrewmember(kerbal);
+
                     // ...for some reason
                     kerbal.Die();
 
@@ -34,7 +36,8 @@ namespace SimpleSurvival
                     if (respawn_flag)
                         kerbal.StartRespawnPeriod();
 
-                    
+                    // Credit part that lost Kerbal passed in
+                    part.RequestResource("LifeSupport", DEATH_CREDIT);
                 }
             }
         }
