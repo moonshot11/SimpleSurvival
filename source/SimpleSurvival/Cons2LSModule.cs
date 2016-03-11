@@ -69,7 +69,7 @@ namespace SimpleSurvival
         public void CheckConverterResources()
         {
             bool deficient = true;
-
+            
             if (vessel.GetCrewCount() == 0)
                 status = ConverterStatus.UNMANNED;
             else if (!Util.ResourceAvailable(part, "LifeSupport", -minLS, ResourceFlowMode.ALL_VESSEL))

@@ -42,9 +42,21 @@ namespace SimpleSurvival
             return result;
         }
 
+        /// <summary>
+        /// Print a line to the KSP log with a "SimpleSurvival:" prefix.
+        /// </summary>
+        /// <param name="message">Contents of log message</param>
         public static void Log(string message)
         {
             KSPLog.print("SimpleSurvival: " + message);
+        }
+
+        /// <summary>
+        /// Print an empty log line.
+        /// </summary>
+        public static void Log()
+        {
+            KSPLog.print("");
         }
     }
 }
