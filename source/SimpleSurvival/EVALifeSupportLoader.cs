@@ -26,6 +26,9 @@ namespace SimpleSurvival
                 }
             );
 
+            ConfigNode mod_node = new ConfigNode("MODULE");
+            mod_node.AddValue("name", "EVALifeSupportModule");
+
             foreach (AvailablePart part in part_list)
             {
                 string name = part.name;
@@ -35,10 +38,17 @@ namespace SimpleSurvival
                 {
                     Util.Log("Adding EVALifeSupportModule to " + name);
 
-                    ConfigNode mod_node = new ConfigNode("MODULE");
-                    mod_node.AddValue("name", "EVALifeSupportModule");
-
-                    part.partPrefab.AddModule(mod_node);
+                    // Necessary to guarantee that this code block operates
+                    // on kerbalEVA and kerbalEVAfemale
+                    try
+                    {
+                        part.partPrefab.AddModule(mod_node);
+                    }
+                    catch (NullReferenceException e)
+                    {
+                        Util.Log("Catching exception, doesn't seem to affect game:");
+                        Util.Log("  " + e.ToString());
+                    }
                 }
             }
 
