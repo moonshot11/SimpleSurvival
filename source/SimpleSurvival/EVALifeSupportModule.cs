@@ -42,7 +42,24 @@ namespace SimpleSurvival
             if (retd == 0.0)
             {
                 Util.KillKerbals(this);
-                vessel.Die();
+                part.explode();
+                vessel.Die(); // Is this necessary?
+
+                #region FlightResultsDialog
+                // string kerbal_name = part.protoModuleCrew[0].name; // Move to top of code block
+
+                // These values persist if user switches to another craft
+                //
+                // FlightResultsDialog.showExitControls = true;
+                // FlightResultsDialog.allowClosingDialog = true;
+
+                // Prints log with this message at the top,
+                // where flight status is typically displayed
+                //
+                // If user leaves focus immediately, Kerbal is not registered as dead
+                //
+                // FlightResultsDialog.Display(kerbal_name + " ran out of EVA LifeSupport!");
+                #endregion
             }
         }
     }
