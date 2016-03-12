@@ -17,10 +17,8 @@ namespace SimpleSurvival
 
             List<ProtoCrewMember> part_crew = part.protoModuleCrew;
 
-            if (ret_rs == 0f)
+            if (ret_rs == 0.0)
             {
-                List<ProtoCrewMember> remove_kerbs = new List<ProtoCrewMember>();
-
                 while (part_crew.Count > 0)
                 {
                     ProtoCrewMember kerbal = part_crew[0];
