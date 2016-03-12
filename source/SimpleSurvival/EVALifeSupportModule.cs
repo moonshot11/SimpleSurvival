@@ -36,7 +36,14 @@ namespace SimpleSurvival
             }
 
             // -- Reduce resource, game logic --
-            part.RequestResource("EVA LifeSupport", 0.05 * TimeWarp.fixedDeltaTime);
+            double retd = part.RequestResource("EVA LifeSupport", 0.5 * TimeWarp.fixedDeltaTime);
+
+            // Necessary to check if crew count > 0?
+            if (retd == 0.0)
+            {
+                Util.KillKerbals(this);
+                vessel.Die();
+            }
         }
     }
 }

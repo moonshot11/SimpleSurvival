@@ -58,5 +58,30 @@ namespace SimpleSurvival
         {
             KSPLog.print("");
         }
+
+        /// <summary>
+        /// Kill all Kerbals attached to this specific PartModule
+        /// </summary>
+        /// <param name="module"></param>
+        public static void KillKerbals(PartModule module)
+        {
+            List<ProtoCrewMember> part_crew = module.part.protoModuleCrew;
+
+            while (part_crew.Count > 0)
+            {
+                ProtoCrewMember kerbal = part_crew[0];
+                bool respawn_flag = HighLogic.CurrentGame.Parameters.Difficulty.MissingCrewsRespawn;
+
+                // Kerbal must be removed from part BEFORE calling Die()
+                module.part.RemoveCrewmember(kerbal);
+
+                // ...for some reason
+                kerbal.Die();
+
+                // Put Kerbal in Missing queue
+                if (respawn_flag)
+                    kerbal.StartRespawnPeriod();
+            }
+        }
     }
 }
