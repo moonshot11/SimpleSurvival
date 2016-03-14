@@ -8,6 +8,11 @@ namespace SimpleSurvival
 {
     public class EVALifeSupportModule : PartModule
     {
+        public override void OnStart(StartState state)
+        {
+            Util.StartupRequest(this, C.NAME_EVA_LS);
+            base.OnStart(state);
+        }
         public void FixedUpdate()
         {
             // -- First, check if resource is already added to part --

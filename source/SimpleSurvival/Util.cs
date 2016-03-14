@@ -81,5 +81,30 @@ namespace SimpleSurvival
                     kerbal.StartRespawnPeriod();
             }
         }
+
+        /// <summary>
+        /// Deduct the appropriate life support
+        /// when first loading a vessel
+        /// </summary>
+        /// <param name="part">The Part with the life support PartModule</param>
+        /// <param name="resource_name">The resource to drain</param>
+        public static void StartupRequest(PartModule module, string resource_name)
+        {
+            // Universal Time in seconds
+            double lastUT = module.vessel.lastUT;
+            double currUT = HighLogic.CurrentGame.UniversalTime;
+
+            // Integer logic could overflow after 233 Kerbin years,
+            // so maintain double values for arithmetic
+            double delta = currUT - lastUT;
+            double request = module.part.protoModuleCrew.Count * C.LS_DRAIN_PER_SEC * delta;
+
+            Util.Log("LastUT = " + lastUT + " (" + KSPUtil.PrintDate((int)lastUT, true, true) + ")");
+            Util.Log("CurrUT = " + currUT + " (" + KSPUtil.PrintDate((int)currUT, true, true) + ")");
+            Util.Log("Time elapsed: " + delta + " (" + KSPUtil.PrintDateDelta((int)delta, true, true) + ")");
+            Util.Log("Initial resource request (" + resource_name + "): " + request);
+
+            module.part.RequestResource(resource_name, request);
+        }
     }
 }

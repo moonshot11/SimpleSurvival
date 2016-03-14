@@ -31,7 +31,7 @@ namespace SimpleSurvival
         ConverterStatus status = ConverterStatus.READY;
 
         [KSPEvent(guiActive = true, guiActiveEditor = false,
-            guiName = "Convert Consumables", guiActiveUncommand = true)]
+            guiName = "Convert " + C.NAME_CN, guiActiveUncommand = true)]
         public void ToggleStatus()
         {
             Util.Log("Toggling Converter status from " + status);
@@ -58,7 +58,7 @@ namespace SimpleSurvival
             if (status == ConverterStatus.CONVERTING)
             {
                 part.RequestResource("ElectricCharge", minElectric * TimeWarp.fixedDeltaTime);
-                part.RequestResource("Consumables", minConsum * TimeWarp.fixedDeltaTime);
+                part.RequestResource(C.NAME_CN, minConsum * TimeWarp.fixedDeltaTime);
                 part.RequestResource(C.NAME_LS, -minLS * TimeWarp.fixedDeltaTime);
             }
         }
@@ -74,7 +74,7 @@ namespace SimpleSurvival
                 status = ConverterStatus.UNMANNED;
             else if (!Util.ResourceAvailable(part, C.NAME_LS, -minLS, ResourceFlowMode.ALL_VESSEL))
                 status = ConverterStatus.LS_FULL;
-            else if (!Util.ResourceAvailable(part, "Consumables", minConsum))
+            else if (!Util.ResourceAvailable(part, C.NAME_CN, minConsum))
                 status = ConverterStatus.NO_CONSUMABLES;
             else if (!Util.ResourceAvailable(part, "ElectricCharge", minElectric))
                 status = ConverterStatus.NO_ELECTRICITY;
@@ -103,7 +103,7 @@ namespace SimpleSurvival
                 case ConverterStatus.CONVERTING:
                     return "Converting";
                 case ConverterStatus.NO_CONSUMABLES:
-                    return "Insufficient Consumables";
+                    return "Insufficient " + C.NAME_CN;
                 case ConverterStatus.NO_ELECTRICITY:
                     return "Insufficient Electricity";
                 case ConverterStatus.READY:
