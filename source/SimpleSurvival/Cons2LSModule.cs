@@ -35,7 +35,6 @@ namespace SimpleSurvival
         public void ToggleStatus()
         {
             Util.Log("Toggling Converter status from " + status);
-
             switch (status)
             {
                 case ConverterStatus.CONVERTING:
@@ -52,14 +51,14 @@ namespace SimpleSurvival
 
         public void FixedUpdate()
         {
-            // First, check resources
             CheckConverterResources();
 
             if (status == ConverterStatus.CONVERTING)
             {
-                part.RequestResource("ElectricCharge", minElectric * TimeWarp.fixedDeltaTime);
-                part.RequestResource(C.NAME_CN, minConsum * TimeWarp.fixedDeltaTime);
-                part.RequestResource(C.NAME_LS, -minLS * TimeWarp.fixedDeltaTime);
+                part.RequestResource("ElectricCharge", C.ELECTRICITY_DRAINED_PER_SEC * TimeWarp.fixedDeltaTime);
+                part.RequestResource(C.NAME_CN, C.CONSUMABLES_DRAINED_PER_SEC * TimeWarp.fixedDeltaTime);
+                part.RequestResource(C.NAME_LS, C.LIFESUPPORT_ADDED_PER_CONS * TimeWarp.fixedDeltaTime,
+                    ResourceFlowMode.ALL_VESSEL);
             }
         }
 

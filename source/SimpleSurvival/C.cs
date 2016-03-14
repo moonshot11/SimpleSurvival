@@ -63,5 +63,10 @@ namespace SimpleSurvival
         // Must be negative since it's a credit
         public const double LS_DEATH_CREDIT = -1.0;
 
+        // -- Converter rates --
+        public const double CONSUMABLES_DRAINED_PER_SEC = 0.1;
+        public const double ELECTRICITY_DRAINED_PER_SEC = 0.1;
+        public const double LIFESUPPORT_ADDED_PER_CONS = -0.1;
+
     }
 }
