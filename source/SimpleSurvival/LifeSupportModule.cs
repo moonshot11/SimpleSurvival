@@ -8,6 +8,21 @@ namespace SimpleSurvival
 {
     public class LifeSupportModule : PartModule
     {
+        public override void OnStart(StartState state)
+        {
+            // Universal Time in seconds
+            int lastUT = (int)vessel.lastUT;
+            int currUT = (int)HighLogic.CurrentGame.UniversalTime;
+
+            // Integer logic could overflow after 233 Kerbin years
+            int delta = lastUT - currUT;
+
+            Util.Log("LastUT = " + lastUT + " (" + KSPUtil.PrintDate(lastUT, true, true) + ")");
+            Util.Log("CurrUT = " + currUT + " (" + KSPUtil.PrintDate(currUT, true, true) + ")");
+            Util.Log("Time elapsed: " + delta + " (" + KSPUtil.PrintDateDelta(delta, true, true) + ")");
+
+            base.OnStart(state);
+        }
         public void FixedUpdate()
         {
             int crew_count = part.protoModuleCrew.Count;
