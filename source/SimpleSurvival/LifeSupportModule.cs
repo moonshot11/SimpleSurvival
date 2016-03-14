@@ -10,7 +10,18 @@ namespace SimpleSurvival
     {
         public override void OnStart(StartState state)
         {
-            Util.StartupRequest(this, C.NAME_LS);
+            StartState[] valid_states = new StartState[]
+            {
+                StartState.Flying,
+                StartState.Landed,
+                StartState.Orbital,
+                StartState.Splashed,
+                StartState.SubOrbital,
+                StartState.Docked
+            };
+
+            if (valid_states.Contains(state))
+                Util.StartupRequest(this, C.NAME_LS);
             base.OnStart(state);
         }
 

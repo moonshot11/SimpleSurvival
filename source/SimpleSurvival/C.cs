@@ -15,6 +15,7 @@ namespace SimpleSurvival
         /// The margin for double equality
         /// </summary>
         public const double DOUBLE_MARGIN = 0.000001;
+        public const double DOUBLE_ALMOST_ONE = 1.0 - DOUBLE_MARGIN;
 
         // -- Resource names --
         

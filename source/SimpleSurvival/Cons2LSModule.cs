@@ -51,15 +51,69 @@ namespace SimpleSurvival
 
         public void FixedUpdate()
         {
-            CheckConverterResources();
-
+            // Consider keeping this to check if vehicle is unmanned
+            // Or, add another warning message
+            // CheckConverterResources();
             if (status == ConverterStatus.CONVERTING)
             {
-                part.RequestResource("ElectricCharge", C.ELECTRICITY_DRAINED_PER_SEC * TimeWarp.fixedDeltaTime);
-                part.RequestResource(C.NAME_CN, C.CONSUMABLES_DRAINED_PER_SEC * TimeWarp.fixedDeltaTime);
-                part.RequestResource(C.NAME_LS, C.LIFESUPPORT_ADDED_PER_CONS * TimeWarp.fixedDeltaTime,
+                double frac_elec = PullResource("ElectricCharge", C.ELECTRICITY_DRAINED_PER_SEC);
+                double frac_cons = PullResource(C.NAME_CN, C.CONSUMABLES_DRAINED_PER_SEC);
+                double frac_ls = PullResource(C.NAME_LS, C.LIFESUPPORT_ADDED_PER_CONS,
                     ResourceFlowMode.ALL_VESSEL);
+
+                double min_frac = Math.Min(Math.Min(frac_elec, frac_cons), frac_ls);
+
+                // If not all resources could be obtained,
+                // proportionally return the excess resources
+                if (min_frac < C.DOUBLE_ALMOST_ONE)
+                {
+                    // Factor (min_frac - frac_*) will be <= 0,
+                    // negating the sign of the original request in PullResource
+                    part.RequestResource("ElectricCharge",
+                        (min_frac - frac_elec) * C.ELECTRICITY_DRAINED_PER_SEC * TimeWarp.fixedDeltaTime);
+                    part.RequestResource(C.NAME_CN,
+                        (min_frac - frac_cons) * C.CONSUMABLES_DRAINED_PER_SEC * TimeWarp.fixedDeltaTime);
+                    part.RequestResource(C.NAME_LS,
+                        (min_frac - frac_ls) * C.LIFESUPPORT_ADDED_PER_CONS * TimeWarp.fixedDeltaTime,
+                        ResourceFlowMode.ALL_VESSEL);
+
+                    status = ConverterStatus.READY;
+                }
             }
+        }
+
+        /// <summary>
+        /// Request resource for Converter, print message
+        /// </summary>
+        /// <param name="resource">Name of the resource to request</param>
+        /// <param name="amount">Amount of the resource to request</param>
+        /// <param name="flowmode">Flowmode. Defaults to resource default</param>
+        /// <returns>Returns the fraction of resource obtained to resource requested</returns>
+        public double PullResource(string resource, double amount, ResourceFlowMode flowmode = ResourceFlowMode.NULL)
+        {
+            double req = amount * TimeWarp.fixedDeltaTime;
+            double obtained;
+
+            if (flowmode == ResourceFlowMode.NULL)
+                obtained = part.RequestResource(resource, amount);
+            else
+                obtained = part.RequestResource(resource, amount, flowmode);
+
+            double frac = Math.Abs(obtained / req);
+
+            if (frac < C.DOUBLE_ALMOST_ONE)
+            {
+                string message;
+
+                if (req >= 0)
+                    message = "Not enough " + resource + " to use Converter!";
+                else
+                    message = "Cannot proceed, " + resource + " is full!";
+
+                ScreenMessages.PostScreenMessage(message, 3.0f, ScreenMessageStyle.UPPER_CENTER);
+            }
+
+            return frac;
         }
 
         /// <summary>
