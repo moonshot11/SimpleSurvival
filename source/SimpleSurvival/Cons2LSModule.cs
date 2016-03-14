@@ -18,7 +18,7 @@ namespace SimpleSurvival
 
     public class Cons2LSModule : PartModule
     {
-        const double test_value = 0.1f;
+        const double test_value = C.DOUBLE_MARGIN;
 
         // -- Minimum values for Consumable->LifeSupport conversion
         const double minElectric = test_value;
