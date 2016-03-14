@@ -59,7 +59,7 @@ namespace SimpleSurvival
             {
                 part.RequestResource("ElectricCharge", minElectric * TimeWarp.fixedDeltaTime);
                 part.RequestResource("Consumables", minConsum * TimeWarp.fixedDeltaTime);
-                part.RequestResource("LifeSupport", -minLS * TimeWarp.fixedDeltaTime);
+                part.RequestResource(C.NAME_LS, -minLS * TimeWarp.fixedDeltaTime);
             }
         }
 
@@ -72,7 +72,7 @@ namespace SimpleSurvival
             
             if (vessel.GetCrewCount() == 0)
                 status = ConverterStatus.UNMANNED;
-            else if (!Util.ResourceAvailable(part, "LifeSupport", -minLS, ResourceFlowMode.ALL_VESSEL))
+            else if (!Util.ResourceAvailable(part, C.NAME_LS, -minLS, ResourceFlowMode.ALL_VESSEL))
                 status = ConverterStatus.LS_FULL;
             else if (!Util.ResourceAvailable(part, "Consumables", minConsum))
                 status = ConverterStatus.NO_CONSUMABLES;
@@ -109,7 +109,7 @@ namespace SimpleSurvival
                 case ConverterStatus.READY:
                     return "Ready";
                 case ConverterStatus.LS_FULL:
-                    return "LifeSupport Full";
+                    return C.NAME_LS + " Full";
                 case ConverterStatus.UNMANNED:
                     return "Ship Unmanned";
                 default:

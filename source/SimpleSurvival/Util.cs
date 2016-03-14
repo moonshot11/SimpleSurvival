@@ -21,8 +21,6 @@ namespace SimpleSurvival
         {
             // Will hold the value of the resource obtained
             double obtained = 0.0;
-            // The margin for declaring double equality
-            double margin = 0.000001;
             
             // Check resource availability by 
             if (flowmode == ResourceFlowMode.NULL)
@@ -31,7 +29,7 @@ namespace SimpleSurvival
                 obtained = part.RequestResource(resource, request, flowmode);
 
             // Store result if amount obtained is "close enough" to original request
-            bool result = (Math.Abs(request - obtained) < margin);
+            bool result = (Math.Abs(request - obtained) < C.DOUBLE_MARGIN);
 
             // Restore resource that was obtained
             if (flowmode == ResourceFlowMode.NULL)

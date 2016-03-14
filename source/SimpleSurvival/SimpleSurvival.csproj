@@ -47,6 +47,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="C.cs" />
     <Compile Include="Cons2LSModule.cs" />
     <Compile Include="EVALifeSupportLoader.cs" />
     <Compile Include="EVALifeSupportModule.cs" />

@@ -16,7 +16,7 @@ namespace SimpleSurvival
 
             foreach (PartResource pr in part.Resources)
             {
-                if (pr.resourceName == "EVA LifeSupport")
+                if (pr.resourceName == C.NAME_EVA_LS)
                 {
                     found_resource = true;
                     break;
@@ -26,9 +26,9 @@ namespace SimpleSurvival
             if (!found_resource)
             {
                 ConfigNode resource_node = new ConfigNode("RESOURCE");
-                resource_node.AddValue("name", "EVA LifeSupport");
-                resource_node.AddValue("amount", "5");
-                resource_node.AddValue("maxAmount", "5");
+                resource_node.AddValue("name", C.NAME_EVA_LS);
+                resource_node.AddValue("amount", C.EVA_LS_MAX);
+                resource_node.AddValue("maxAmount", C.EVA_LS_MAX);
 
                 part.AddResource(resource_node);
 
@@ -36,7 +36,7 @@ namespace SimpleSurvival
             }
 
             // -- Reduce resource, game logic --
-            double retd = part.RequestResource("EVA LifeSupport", 0.5 * TimeWarp.fixedDeltaTime);
+            double retd = part.RequestResource(C.NAME_EVA_LS, C.EVA_LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime);
 
             // Necessary to check if crew count > 0?
             if (retd == 0.0)
