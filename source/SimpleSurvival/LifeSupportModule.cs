@@ -22,6 +22,9 @@ namespace SimpleSurvival
 
             if (valid_states.Contains(state))
                 Util.StartupRequest(this, C.NAME_LIFESUPPORT);
+            else
+                Util.Log("State = " + state.ToString() + ", ignoring startup LifeSupport request");
+
             base.OnStart(state);
         }
 
