@@ -34,6 +34,13 @@ namespace SimpleSurvival
             guiName = "Convert " + C.NAME_CONSUMABLES, guiActiveUncommand = true)]
         public void ToggleStatus()
         {
+            if (status == ConverterStatus.READY && vessel.GetCrewCount() == 0)
+            {
+                ScreenMessages.PostScreenMessage("Ship must be manned to operate Converter",
+                    3f, ScreenMessageStyle.UPPER_CENTER);
+                return;
+            }
+
             Util.Log("Toggling Converter status from " + status);
             switch (status)
             {
@@ -51,9 +58,6 @@ namespace SimpleSurvival
 
         public void FixedUpdate()
         {
-            // Consider keeping this to check if vehicle is unmanned
-            // Or, add another warning message
-            // CheckConverterResources();
             if (status == ConverterStatus.CONVERTING)
             {
                 double frac_elec = PullResource("ElectricCharge", C.ELECTRICITY_DRAINED_PER_SEC);
