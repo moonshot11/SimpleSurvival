@@ -9,11 +9,7 @@ namespace SimpleSurvival
     public enum ConverterStatus
     {
         READY,
-        CONVERTING,
-        NO_ELECTRICITY,
-        NO_CONSUMABLES,
-        LS_FULL,
-        UNMANNED
+        CONVERTING
     }
 
     public class Cons2LSModule : PartModule
@@ -121,30 +117,6 @@ namespace SimpleSurvival
         }
 
         /// <summary>
-        /// Check whether converter has enough resources to run
-        /// </summary>
-        public void CheckConverterResources()
-        {
-            bool deficient = true;
-            
-            if (vessel.GetCrewCount() == 0)
-                status = ConverterStatus.UNMANNED;
-            else if (!Util.ResourceAvailable(part, C.NAME_LIFESUPPORT, -minLS, ResourceFlowMode.ALL_VESSEL))
-                status = ConverterStatus.LS_FULL;
-            else if (!Util.ResourceAvailable(part, C.NAME_CONSUMABLES, minConsum))
-                status = ConverterStatus.NO_CONSUMABLES;
-            else if (!Util.ResourceAvailable(part, "ElectricCharge", minElectric))
-                status = ConverterStatus.NO_ELECTRICITY;
-            else
-                deficient = false;
-
-            if (!deficient && status != ConverterStatus.READY && status != ConverterStatus.CONVERTING)
-            {
-                status = ConverterStatus.READY;
-            }
-        }
-
-        /// <summary>
         /// Generic part update. Handle part status.
         /// </summary>
         public override void OnUpdate()
@@ -159,16 +131,8 @@ namespace SimpleSurvival
             {
                 case ConverterStatus.CONVERTING:
                     return "Converting";
-                case ConverterStatus.NO_CONSUMABLES:
-                    return "Insufficient " + C.NAME_CONSUMABLES;
-                case ConverterStatus.NO_ELECTRICITY:
-                    return "Insufficient Electricity";
                 case ConverterStatus.READY:
                     return "Ready";
-                case ConverterStatus.LS_FULL:
-                    return C.NAME_LIFESUPPORT + " Full";
-                case ConverterStatus.UNMANNED:
-                    return "Ship Unmanned";
                 default:
                     return "ERROR ConverterStatus";
             }
