@@ -56,7 +56,8 @@ namespace SimpleSurvival
         /// </summary>
         /// <param name="part">The Part with the life support PartModule</param>
         /// <param name="resource_name">The resource to drain</param>
-        public static void StartupRequest(PartModule module, string resource_name)
+        /// <param name="resource_rate">The resource drain rate (per second)</param>
+        public static void StartupRequest(PartModule module, string resource_name, double resource_rate)
         {
             // Universal Time in seconds
             double lastUT = module.vessel.lastUT;
@@ -65,7 +66,7 @@ namespace SimpleSurvival
             // Integer logic could overflow after 233 Kerbin years,
             // so maintain double values for arithmetic
             double delta = currUT - lastUT;
-            double request = module.part.protoModuleCrew.Count * C.LS_DRAIN_PER_SEC * delta;
+            double request = module.part.protoModuleCrew.Count * resource_rate * delta;
 
             Util.Log("LastUT = " + lastUT + " (" + KSPUtil.PrintDate((int)lastUT, true, true) + ")");
             Util.Log("CurrUT = " + currUT + " (" + KSPUtil.PrintDate((int)currUT, true, true) + ")");

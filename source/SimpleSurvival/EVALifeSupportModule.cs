@@ -10,7 +10,7 @@ namespace SimpleSurvival
     {
         public override void OnStart(StartState state)
         {
-            Util.StartupRequest(this, C.NAME_EVA_LIFESUPPORT);
+            Util.StartupRequest(this, C.NAME_EVA_LIFESUPPORT, C.EVA_LS_DRAIN_PER_SEC);
             base.OnStart(state);
         }
         public void FixedUpdate()

@@ -21,7 +21,7 @@ namespace SimpleSurvival
             };
 
             if (valid_states.Contains(state))
-                Util.StartupRequest(this, C.NAME_LIFESUPPORT);
+                Util.StartupRequest(this, C.NAME_LIFESUPPORT, C.LS_DRAIN_PER_SEC);
             else
                 Util.Log("State = " + state.ToString() + ", ignoring startup LifeSupport request");
 
