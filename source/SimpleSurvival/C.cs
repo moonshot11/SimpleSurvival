@@ -46,17 +46,17 @@ namespace SimpleSurvival
         /// <summary>
         /// EVA Life Support drain rate per day (game time)
         /// </summary>
-        private const double EVA_LS_PER_DAY = 1.0;
+        private const double EVA_LS_PER_MINUTE = 1.0;
         /// <summary>
         /// EVA Life Support drain rate per second
         /// </summary>
-        public const double EVA_LS_DRAIN_PER_SEC = EVA_LS_PER_DAY / 21600.0;
+        public const double EVA_LS_DRAIN_PER_SEC = EVA_LS_PER_MINUTE / 60.0;
 
         /// <summary>
         /// Max amount of EVA Life Support
         /// </summary>
         // String since it is first created via ConfigNode
-        public const string EVA_LS_MAX = "5";
+        public const string EVA_LS_MAX = "10";
 
         /// <summary>
         /// Amount of Life Support credited to a part when a Kerbal dies
