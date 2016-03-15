@@ -10,13 +10,7 @@ namespace SimpleSurvival
     {
         public override void OnStart(StartState state)
         {
-            Util.StartupRequest(this, C.NAME_EVA_LIFESUPPORT, C.EVA_LS_DRAIN_PER_SEC);
-            base.OnStart(state);
-        }
-        public void FixedUpdate()
-        {
-            // -- First, check if resource is already added to part --
-            // This check should be done once on part load, not each frame
+            // -- Check if resource is already added to part --
             bool found_resource = false;
 
             foreach (PartResource pr in part.Resources)
@@ -28,11 +22,18 @@ namespace SimpleSurvival
                 }
             }
 
-            if (!found_resource)
+            if (found_resource)
             {
+                // If found, this EVA is already active - deduct LS.
+                Util.StartupRequest(this, C.NAME_EVA_LIFESUPPORT, C.EVA_LS_DRAIN_PER_SEC);
+            }
+            else
+            {
+                // If not found, EVA has just been initialized.  Add LS to PartModule.
                 float astro_lvl = ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.AstronautComplex);
                 string eva_ls_max = "";
 
+                // If Astronaut Complex is fully upgraded, EVA LS gets higher value
                 if (astro_lvl == 1.0f)
                     eva_ls_max = C.EVA_LS_LVL_3;
                 else
@@ -47,10 +48,14 @@ namespace SimpleSurvival
 
                 part.AddResource(resource_node);
 
-                Util.Log("Adding resource to " + part.name);
+                Util.Log("Adding " + C.NAME_EVA_LIFESUPPORT + " resource to " + part.name);
             }
 
-            // -- Reduce resource, game logic --
+            base.OnStart(state);
+        }
+        public void FixedUpdate()
+        {
+            // -- Reduce resource --
             double retd = part.RequestResource(C.NAME_EVA_LIFESUPPORT, C.EVA_LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime);
 
             // Necessary to check if crew count > 0?
