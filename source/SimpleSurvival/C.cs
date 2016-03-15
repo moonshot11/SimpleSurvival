@@ -41,7 +41,7 @@ namespace SimpleSurvival
         /// <summary>
         /// Life Support drain rate per second
         /// </summary>
-        public const double LS_DRAIN_PER_SEC = LS_PER_DAY_PER_KERBAL / 216000.0;
+        public const double LS_DRAIN_PER_SEC = LS_PER_DAY_PER_KERBAL / 21600.0;
 
         /// <summary>
         /// EVA Life Support drain rate per day (game time)
@@ -50,7 +50,7 @@ namespace SimpleSurvival
         /// <summary>
         /// EVA Life Support drain rate per second
         /// </summary>
-        public const double EVA_LS_DRAIN_PER_SEC = EVA_LS_PER_DAY / 216000.0;
+        public const double EVA_LS_DRAIN_PER_SEC = EVA_LS_PER_DAY / 21600.0;
 
         /// <summary>
         /// Max amount of EVA Life Support
