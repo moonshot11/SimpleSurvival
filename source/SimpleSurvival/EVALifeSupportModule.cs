@@ -30,10 +30,20 @@ namespace SimpleSurvival
 
             if (!found_resource)
             {
+                float astro_lvl = ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.AstronautComplex);
+                string eva_ls_max = "";
+
+                if (astro_lvl == 1.0f)
+                    eva_ls_max = C.EVA_LS_LVL_3;
+                else
+                    eva_ls_max = C.EVA_LS_LVL_2;
+
+                Util.Log("Astronaut Complex Level " + astro_lvl + ", max EVA LS: " + eva_ls_max);
+
                 ConfigNode resource_node = new ConfigNode("RESOURCE");
                 resource_node.AddValue("name", C.NAME_EVA_LIFESUPPORT);
-                resource_node.AddValue("amount", C.EVA_LS_MAX);
-                resource_node.AddValue("maxAmount", C.EVA_LS_MAX);
+                resource_node.AddValue("amount", eva_ls_max);
+                resource_node.AddValue("maxAmount", eva_ls_max);
 
                 part.AddResource(resource_node);
 

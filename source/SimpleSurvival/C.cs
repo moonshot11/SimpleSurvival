@@ -53,10 +53,15 @@ namespace SimpleSurvival
         public const double EVA_LS_DRAIN_PER_SEC = EVA_LS_PER_MINUTE / 60.0;
 
         /// <summary>
-        /// Max amount of EVA Life Support
+        /// Max amount of EVA Life Support w/ Astronaut Complex Level 2
         /// </summary>
         // String since it is first created via ConfigNode
-        public const string EVA_LS_MAX = "10";
+        public const string EVA_LS_LVL_2 = "10";
+
+        /// <summary>
+        /// Max amount of EVA Life Support w/ Astronaut Complex Level 3
+        /// </summary>
+        public const string EVA_LS_LVL_3 = "300";
 
         /// <summary>
         /// Amount of Life Support credited to a part when a Kerbal dies
