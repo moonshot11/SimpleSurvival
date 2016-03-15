@@ -38,6 +38,9 @@ namespace SimpleSurvival
                 ProtoCrewMember kerbal = part_crew[0];
                 bool respawn_flag = HighLogic.CurrentGame.Parameters.Difficulty.MissingCrewsRespawn;
 
+                ScreenMessages.PostScreenMessage(kerbal.name + " ran out of LifeSupport and died!",
+                    6f, ScreenMessageStyle.UPPER_CENTER);
+
                 // Kerbal must be removed from part BEFORE calling Die()
                 module.part.RemoveCrewmember(kerbal);
 
