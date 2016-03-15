@@ -62,6 +62,13 @@ namespace SimpleSurvival
         /// <param name="resource_rate">The resource drain rate (per second)</param>
         public static void StartupRequest(PartModule module, string resource_name, double resource_rate)
         {
+            if (module.vessel.mainBody.atmosphereContainsOxygen && module.vessel.altitude < C.OXYGEN_CUTOFF_ALTITUDE)
+            {
+                Util.Log("Vessel " + module.vessel.name + " is O2 atmo at " + module.vessel.altitude);
+                Util.Log("Startup resource will not be drained");
+                return;
+            }
+
             // Universal Time in seconds
             double lastUT = module.vessel.lastUT;
             double currUT = HighLogic.CurrentGame.UniversalTime;

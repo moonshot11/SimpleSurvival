@@ -55,6 +55,11 @@ namespace SimpleSurvival
         }
         public void FixedUpdate()
         {
+            // If Kerbal is below this altitude in an atmosphere with oxygen,
+            // LifeSupport is irrelevant
+            if (vessel.mainBody.atmosphereContainsOxygen && vessel.altitude < C.OXYGEN_CUTOFF_ALTITUDE)
+                return;
+
             // -- Reduce resource --
             double retd = part.RequestResource(C.NAME_EVA_LIFESUPPORT, C.EVA_LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime);
 

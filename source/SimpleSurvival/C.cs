@@ -84,5 +84,10 @@ namespace SimpleSurvival
         /// </summary>
         public const double LIFESUPPORT_ADDED_PER_CONS = -0.1;
 
+        /// <summary>
+        /// Altitude under which LifeSupport is not needed in atmosphere with oxygen
+        /// </summary>
+        public const double OXYGEN_CUTOFF_ALTITUDE = 10000.0;
+
     }
 }
