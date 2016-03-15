@@ -22,15 +22,15 @@ namespace SimpleSurvival
         /// <summary>
         /// Name of the primary life support resource
         /// </summary>
-        public const string NAME_LS = "LifeSupport";
+        public const string NAME_LIFESUPPORT = "LifeSupport";
         /// <summary>
         /// Name of the EVA life Support resource
         /// </summary>
-        public const string NAME_EVA_LS = "EVA LifeSupport";
+        public const string NAME_EVA_LIFESUPPORT = "EVA LifeSupport";
         /// <summary>
         /// Name of consumables resource
         /// </summary>
-        public const string NAME_CN = "Consumables";
+        public const string NAME_CONSUMABLES = "Consumables";
 
         // -- Life Support Drain Rates --
 
@@ -65,8 +65,18 @@ namespace SimpleSurvival
         public const double LS_DEATH_CREDIT = -1.0;
 
         // -- Converter rates --
+
+        /// <summary>
+        /// Consumables drained per second to generate LifeSupport
+        /// </summary>
         public const double CONSUMABLES_DRAINED_PER_SEC = 0.1;
+        /// <summary>
+        /// ElectricCharge drained per second to generate LifeSupport
+        /// </summary>
         public const double ELECTRICITY_DRAINED_PER_SEC = 0.1;
+        /// <summary>
+        /// LifeSupport generated per second from Consumables
+        /// </summary>
         public const double LIFESUPPORT_ADDED_PER_CONS = -0.1;
 
     }

@@ -21,7 +21,7 @@ namespace SimpleSurvival
             };
 
             if (valid_states.Contains(state))
-                Util.StartupRequest(this, C.NAME_LS);
+                Util.StartupRequest(this, C.NAME_LIFESUPPORT);
             base.OnStart(state);
         }
 
@@ -30,14 +30,14 @@ namespace SimpleSurvival
             int crew_count = part.protoModuleCrew.Count;
 
             // Request resource based on rates defined by constants
-            double ret_rs = part.RequestResource(C.NAME_LS, crew_count * C.LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime);
+            double ret_rs = part.RequestResource(C.NAME_LIFESUPPORT, crew_count * C.LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime);
 
             if (crew_count > 0 && ret_rs == 0.0)
             {
                 Util.KillKerbals(this);
 
                 // Credit part that lost Kerbal passed in
-                part.RequestResource(C.NAME_LS, C.LS_DEATH_CREDIT);
+                part.RequestResource(C.NAME_LIFESUPPORT, C.LS_DEATH_CREDIT);
             }
         }
     }

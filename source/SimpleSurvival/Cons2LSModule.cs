@@ -31,7 +31,7 @@ namespace SimpleSurvival
         ConverterStatus status = ConverterStatus.READY;
 
         [KSPEvent(guiActive = true, guiActiveEditor = false,
-            guiName = "Convert " + C.NAME_CN, guiActiveUncommand = true)]
+            guiName = "Convert " + C.NAME_CONSUMABLES, guiActiveUncommand = true)]
         public void ToggleStatus()
         {
             Util.Log("Toggling Converter status from " + status);
@@ -57,8 +57,8 @@ namespace SimpleSurvival
             if (status == ConverterStatus.CONVERTING)
             {
                 double frac_elec = PullResource("ElectricCharge", C.ELECTRICITY_DRAINED_PER_SEC);
-                double frac_cons = PullResource(C.NAME_CN, C.CONSUMABLES_DRAINED_PER_SEC);
-                double frac_ls = PullResource(C.NAME_LS, C.LIFESUPPORT_ADDED_PER_CONS,
+                double frac_cons = PullResource(C.NAME_CONSUMABLES, C.CONSUMABLES_DRAINED_PER_SEC);
+                double frac_ls = PullResource(C.NAME_LIFESUPPORT, C.LIFESUPPORT_ADDED_PER_CONS,
                     ResourceFlowMode.ALL_VESSEL);
 
                 double min_frac = Math.Min(Math.Min(frac_elec, frac_cons), frac_ls);
@@ -71,9 +71,9 @@ namespace SimpleSurvival
                     // negating the sign of the original request in PullResource
                     part.RequestResource("ElectricCharge",
                         (min_frac - frac_elec) * C.ELECTRICITY_DRAINED_PER_SEC * TimeWarp.fixedDeltaTime);
-                    part.RequestResource(C.NAME_CN,
+                    part.RequestResource(C.NAME_CONSUMABLES,
                         (min_frac - frac_cons) * C.CONSUMABLES_DRAINED_PER_SEC * TimeWarp.fixedDeltaTime);
-                    part.RequestResource(C.NAME_LS,
+                    part.RequestResource(C.NAME_LIFESUPPORT,
                         (min_frac - frac_ls) * C.LIFESUPPORT_ADDED_PER_CONS * TimeWarp.fixedDeltaTime,
                         ResourceFlowMode.ALL_VESSEL);
 
@@ -125,9 +125,9 @@ namespace SimpleSurvival
             
             if (vessel.GetCrewCount() == 0)
                 status = ConverterStatus.UNMANNED;
-            else if (!Util.ResourceAvailable(part, C.NAME_LS, -minLS, ResourceFlowMode.ALL_VESSEL))
+            else if (!Util.ResourceAvailable(part, C.NAME_LIFESUPPORT, -minLS, ResourceFlowMode.ALL_VESSEL))
                 status = ConverterStatus.LS_FULL;
-            else if (!Util.ResourceAvailable(part, C.NAME_CN, minConsum))
+            else if (!Util.ResourceAvailable(part, C.NAME_CONSUMABLES, minConsum))
                 status = ConverterStatus.NO_CONSUMABLES;
             else if (!Util.ResourceAvailable(part, "ElectricCharge", minElectric))
                 status = ConverterStatus.NO_ELECTRICITY;
@@ -156,13 +156,13 @@ namespace SimpleSurvival
                 case ConverterStatus.CONVERTING:
                     return "Converting";
                 case ConverterStatus.NO_CONSUMABLES:
-                    return "Insufficient " + C.NAME_CN;
+                    return "Insufficient " + C.NAME_CONSUMABLES;
                 case ConverterStatus.NO_ELECTRICITY:
                     return "Insufficient Electricity";
                 case ConverterStatus.READY:
                     return "Ready";
                 case ConverterStatus.LS_FULL:
-                    return C.NAME_LS + " Full";
+                    return C.NAME_LIFESUPPORT + " Full";
                 case ConverterStatus.UNMANNED:
                     return "Ship Unmanned";
                 default:

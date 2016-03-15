@@ -10,7 +10,7 @@ namespace SimpleSurvival
     {
         public override void OnStart(StartState state)
         {
-            Util.StartupRequest(this, C.NAME_EVA_LS);
+            Util.StartupRequest(this, C.NAME_EVA_LIFESUPPORT);
             base.OnStart(state);
         }
         public void FixedUpdate()
@@ -21,7 +21,7 @@ namespace SimpleSurvival
 
             foreach (PartResource pr in part.Resources)
             {
-                if (pr.resourceName == C.NAME_EVA_LS)
+                if (pr.resourceName == C.NAME_EVA_LIFESUPPORT)
                 {
                     found_resource = true;
                     break;
@@ -31,7 +31,7 @@ namespace SimpleSurvival
             if (!found_resource)
             {
                 ConfigNode resource_node = new ConfigNode("RESOURCE");
-                resource_node.AddValue("name", C.NAME_EVA_LS);
+                resource_node.AddValue("name", C.NAME_EVA_LIFESUPPORT);
                 resource_node.AddValue("amount", C.EVA_LS_MAX);
                 resource_node.AddValue("maxAmount", C.EVA_LS_MAX);
 
@@ -41,7 +41,7 @@ namespace SimpleSurvival
             }
 
             // -- Reduce resource, game logic --
-            double retd = part.RequestResource(C.NAME_EVA_LS, C.EVA_LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime);
+            double retd = part.RequestResource(C.NAME_EVA_LIFESUPPORT, C.EVA_LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime);
 
             // Necessary to check if crew count > 0?
             if (retd == 0.0)
