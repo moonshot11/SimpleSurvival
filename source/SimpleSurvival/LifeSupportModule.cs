@@ -28,6 +28,19 @@ namespace SimpleSurvival
             base.OnStart(state);
         }
 
+        public override string GetInfo()
+        {
+            // NOTE: This method is called ONCE during initial part loading,
+            // so performance is not a concern
+
+            string info = "Active only when manned.\n\n" +
+            "<b><color=#99ff00>Requires</color></b>\n" +
+            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatValueForGetInfo(C.LS_PER_DAY_PER_KERBAL) + "/day/Kerbal.\n" +
+            "- " + C.NAME_ELECTRICITY + ": " + Util.FormatValueForGetInfo(part.CrewCapacity * C.ELEC_LS_PER_SEC) + "/sec.";
+            
+            return info;
+        }
+
         public void FixedUpdate()
         {
             // If part is unmanned, nothing to do

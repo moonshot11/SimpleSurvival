@@ -41,7 +41,7 @@ namespace SimpleSurvival
         /// <summary>
         /// Life Support drain rate per day (game time)
         /// </summary>
-        private const double LS_PER_DAY_PER_KERBAL = 1.0;
+        public const double LS_PER_DAY_PER_KERBAL = 1.0;
         /// <summary>
         /// Life Support drain rate per second
         /// </summary>

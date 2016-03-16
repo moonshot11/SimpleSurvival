@@ -85,5 +85,20 @@ namespace SimpleSurvival
 
             module.part.RequestResource(resource_name, request);
         }
+
+        /// <summary>
+        /// Formats a double for the VAB
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string FormatValueForGetInfo(double value)
+        {
+            string s = Math.Round(value, 1).ToString();
+
+            if (!s.Contains('.'))
+                s += ".0";
+
+            return s;
+        }
     }
 }
