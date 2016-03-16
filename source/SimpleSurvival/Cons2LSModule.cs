@@ -137,5 +137,17 @@ namespace SimpleSurvival
                     return "ERROR ConverterStatus";
             }
         }
+
+        public override string GetInfo()
+        {
+            string info = "Ship must be manned\n\n" +
+            "<b><color=#99ff00>Requires</color></b>\n" +
+            "- " + C.NAME_CONSUMABLES + ": " + Util.FormatForGetInfo(C.CONSUMABLES_DRAINED_PER_SEC) + "/sec.\n" +
+            "- " + C.NAME_ELECTRICITY + ": " + Util.FormatForGetInfo(C.ELECTRICITY_DRAINED_PER_SEC) + "/sec.\n\n" +
+            "<b><color=#99ff00>Outputs:</color></b>\n" +
+            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(-C.LIFESUPPORT_ADDED_PER_CONS) + "/sec.";
+
+            return info;
+        }
     }
 }

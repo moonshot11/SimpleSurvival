@@ -35,8 +35,8 @@ namespace SimpleSurvival
 
             string info = "Active only when manned.\n\n" +
             "<b><color=#99ff00>Requires</color></b>\n" +
-            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatValueForGetInfo(C.LS_PER_DAY_PER_KERBAL) + "/day/Kerbal.\n" +
-            "- " + C.NAME_ELECTRICITY + ": " + Util.FormatValueForGetInfo(part.CrewCapacity * C.ELEC_LS_PER_SEC) + "/sec.";
+            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(C.LS_PER_DAY_PER_KERBAL) + "/day/Kerbal.\n" +
+            "- " + C.NAME_ELECTRICITY + ": " + Util.FormatForGetInfo(part.CrewCapacity * C.ELEC_LS_PER_SEC) + "/sec.";
             
             return info;
         }

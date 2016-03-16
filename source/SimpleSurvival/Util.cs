@@ -91,7 +91,7 @@ namespace SimpleSurvival
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static string FormatValueForGetInfo(double value)
+        public static string FormatForGetInfo(double value)
         {
             string s = Math.Round(value, 1).ToString();
 
