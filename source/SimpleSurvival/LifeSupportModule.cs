@@ -30,6 +30,10 @@ namespace SimpleSurvival
 
         public void FixedUpdate()
         {
+            // If part is unmanned, nothing to do
+            if (part.protoModuleCrew.Count == 0)
+                return;
+
             // If vessel is below this altitude in an atmosphere with oxygen,
             // LifeSupport is irrelevant
             if (vessel.mainBody.atmosphereContainsOxygen && vessel.altitude < C.OXYGEN_CUTOFF_ALTITUDE)
@@ -37,8 +41,15 @@ namespace SimpleSurvival
 
             int crew_count = part.protoModuleCrew.Count;
 
+            // First check electricity. This will always happen.
+            double ret_elec = part.RequestResource(C.NAME_ELECTRICITY, C.ELEC_LS_PER_SEC * TimeWarp.fixedDeltaTime);
+            // Set penalty if no electricity
+            double elec_factor = ret_elec > C.DOUBLE_MARGIN ? 1.0 : C.NO_ELEC_PENALTY_FACTOR;
+            // How much lifesupport to request
+            double ls_request = elec_factor * crew_count * C.LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime;
+
             // Request resource based on rates defined by constants
-            double ret_rs = part.RequestResource(C.NAME_LIFESUPPORT, crew_count * C.LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime);
+            double ret_rs = part.RequestResource(C.NAME_LIFESUPPORT, ls_request);
 
             if (crew_count > 0 && ret_rs == 0.0)
             {
