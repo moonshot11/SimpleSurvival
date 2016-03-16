@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SimpleSurvival
 {
+    [KSPModule("Life Support")]
     public class LifeSupportModule : PartModule
     {
         public override void OnStart(StartState state)
@@ -33,9 +34,11 @@ namespace SimpleSurvival
             // NOTE: This method is called ONCE during initial part loading,
             // so performance is not a concern
 
-            string info = "Active only when manned.\n\n" +
-            "<b><color=#99ff00>Requires</color></b>\n" +
-            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(C.LS_PER_DAY_PER_KERBAL) + "/day/Kerbal.\n" +
+            string info = "Active only when manned. " +
+                C.NO_ELEC_PENALTY_FACTOR + "x penalty to " + C.NAME_LIFESUPPORT +
+                " drain rate if " + C.NAME_ELECTRICITY + " runs out.\n\n" +
+            "<b><color=#99ff00>Requires:</color></b>\n" +
+            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(C.LS_PER_DAY_PER_KERBAL) + "/Kerbal/day.\n" +
             "- " + C.NAME_ELECTRICITY + ": " + Util.FormatForGetInfo(part.CrewCapacity * C.ELEC_LS_PER_SEC) + "/sec.";
             
             return info;

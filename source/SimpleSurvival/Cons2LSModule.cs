@@ -12,6 +12,7 @@ namespace SimpleSurvival
         CONVERTING
     }
 
+    [KSPModule("Converter")]
     public class Cons2LSModule : PartModule
     {
         const double test_value = C.DOUBLE_MARGIN;
@@ -140,8 +141,8 @@ namespace SimpleSurvival
 
         public override string GetInfo()
         {
-            string info = "Ship must be manned\n\n" +
-            "<b><color=#99ff00>Requires</color></b>\n" +
+            string info = "Converts " + C.NAME_CONSUMABLES + " to " + C.NAME_LIFESUPPORT + ". Ship must be manned.\n\n" +
+            "<b><color=#99ff00>Requires:</color></b>\n" +
             "- " + C.NAME_CONSUMABLES + ": " + Util.FormatForGetInfo(C.CONSUMABLES_DRAINED_PER_SEC) + "/sec.\n" +
             "- " + C.NAME_ELECTRICITY + ": " + Util.FormatForGetInfo(C.ELECTRICITY_DRAINED_PER_SEC) + "/sec.\n\n" +
             "<b><color=#99ff00>Outputs:</color></b>\n" +
