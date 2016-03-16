@@ -31,6 +31,10 @@ namespace SimpleSurvival
         /// Name of consumables resource
         /// </summary>
         public const string NAME_CONSUMABLES = "Consumables";
+        /// <summary>
+        /// Name of stock electricity resource
+        /// </summary>
+        public const string NAME_ELECTRICITY = "ElectricCharge";
 
         // -- Life Support Drain Rates --
 

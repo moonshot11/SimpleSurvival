@@ -56,7 +56,7 @@ namespace SimpleSurvival
         {
             if (status == ConverterStatus.CONVERTING)
             {
-                double frac_elec = PullResource("ElectricCharge", C.ELECTRICITY_DRAINED_PER_SEC);
+                double frac_elec = PullResource(C.NAME_ELECTRICITY, C.ELECTRICITY_DRAINED_PER_SEC);
                 double frac_cons = PullResource(C.NAME_CONSUMABLES, C.CONSUMABLES_DRAINED_PER_SEC);
                 double frac_ls = PullResource(C.NAME_LIFESUPPORT, C.LIFESUPPORT_ADDED_PER_CONS,
                     ResourceFlowMode.ALL_VESSEL);
@@ -69,7 +69,7 @@ namespace SimpleSurvival
                 {
                     // Factor (min_frac - frac_*) will be <= 0,
                     // negating the sign of the original request in PullResource
-                    part.RequestResource("ElectricCharge",
+                    part.RequestResource(C.NAME_ELECTRICITY,
                         (min_frac - frac_elec) * C.ELECTRICITY_DRAINED_PER_SEC * TimeWarp.fixedDeltaTime);
                     part.RequestResource(C.NAME_CONSUMABLES,
                         (min_frac - frac_cons) * C.CONSUMABLES_DRAINED_PER_SEC * TimeWarp.fixedDeltaTime);
