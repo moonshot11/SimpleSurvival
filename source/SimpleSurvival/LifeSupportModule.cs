@@ -41,11 +41,13 @@ namespace SimpleSurvival
             // NOTE: This method is called ONCE during initial part loading,
             // so performance is not a concern
 
+            string per_kerb = part.CrewCapacity > 1 ? "/Kerbal" : "";
+
             string info = "Active only when manned. " +
                 C.NO_ELEC_PENALTY_FACTOR + "x penalty to " + C.NAME_LIFESUPPORT +
                 " drain rate if " + C.NAME_ELECTRICITY + " runs out.\n\n" +
             "<b><color=#99ff00>Requires:</color></b>\n" +
-            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(C.LS_PER_DAY_PER_KERBAL) + "/Kerbal/day.\n" +
+            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(C.LS_PER_DAY_PER_KERBAL) + per_kerb + "/day.\n" +
             "- " + C.NAME_ELECTRICITY + ": " + Util.FormatForGetInfo(part.CrewCapacity * C.ELEC_LS_PER_SEC) + "/sec.";
             
             return info;
