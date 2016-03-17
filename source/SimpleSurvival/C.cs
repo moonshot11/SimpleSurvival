@@ -86,15 +86,15 @@ namespace SimpleSurvival
         /// <summary>
         /// Consumables drained per second to generate LifeSupport
         /// </summary>
-        public const double CONSUMABLES_DRAINED_PER_SEC = 0.1;
+        public const double CONV_CONS_PER_SEC = 0.1;
         /// <summary>
         /// ElectricCharge drained per second to generate LifeSupport
         /// </summary>
-        public const double ELECTRICITY_DRAINED_PER_SEC = 0.1;
+        public const double CONV_ELEC_PER_SEC = 0.1;
         /// <summary>
         /// LifeSupport generated per second from Consumables
         /// </summary>
-        public const double LIFESUPPORT_ADDED_PER_CONS = -0.1;
+        public const double CONV_LS_PER_SEC = -0.1;
 
         /// <summary>
         /// Altitude under which LifeSupport is not needed in atmosphere with oxygen

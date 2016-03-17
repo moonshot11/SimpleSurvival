@@ -57,9 +57,9 @@ namespace SimpleSurvival
         {
             if (status == ConverterStatus.CONVERTING)
             {
-                double frac_elec = PullResource(C.NAME_ELECTRICITY, C.ELECTRICITY_DRAINED_PER_SEC);
-                double frac_cons = PullResource(C.NAME_CONSUMABLES, C.CONSUMABLES_DRAINED_PER_SEC);
-                double frac_ls = PullResource(C.NAME_LIFESUPPORT, C.LIFESUPPORT_ADDED_PER_CONS,
+                double frac_elec = PullResource(C.NAME_ELECTRICITY, C.CONV_ELEC_PER_SEC);
+                double frac_cons = PullResource(C.NAME_CONSUMABLES, C.CONV_CONS_PER_SEC);
+                double frac_ls = PullResource(C.NAME_LIFESUPPORT, C.CONV_LS_PER_SEC,
                     ResourceFlowMode.ALL_VESSEL);
 
                 double min_frac = Math.Min(Math.Min(frac_elec, frac_cons), frac_ls);
@@ -71,11 +71,11 @@ namespace SimpleSurvival
                     // Factor (min_frac - frac_*) will be <= 0,
                     // negating the sign of the original request in PullResource
                     part.RequestResource(C.NAME_ELECTRICITY,
-                        (min_frac - frac_elec) * C.ELECTRICITY_DRAINED_PER_SEC * TimeWarp.fixedDeltaTime);
+                        (min_frac - frac_elec) * C.CONV_ELEC_PER_SEC * TimeWarp.fixedDeltaTime);
                     part.RequestResource(C.NAME_CONSUMABLES,
-                        (min_frac - frac_cons) * C.CONSUMABLES_DRAINED_PER_SEC * TimeWarp.fixedDeltaTime);
+                        (min_frac - frac_cons) * C.CONV_CONS_PER_SEC * TimeWarp.fixedDeltaTime);
                     part.RequestResource(C.NAME_LIFESUPPORT,
-                        (min_frac - frac_ls) * C.LIFESUPPORT_ADDED_PER_CONS * TimeWarp.fixedDeltaTime,
+                        (min_frac - frac_ls) * C.CONV_LS_PER_SEC * TimeWarp.fixedDeltaTime,
                         ResourceFlowMode.ALL_VESSEL);
 
                     status = ConverterStatus.READY;
@@ -143,10 +143,10 @@ namespace SimpleSurvival
         {
             string info = "Converts " + C.NAME_CONSUMABLES + " to " + C.NAME_LIFESUPPORT + ". Ship must be manned.\n\n" +
             "<b><color=#99ff00>Requires:</color></b>\n" +
-            "- " + C.NAME_CONSUMABLES + ": " + Util.FormatForGetInfo(C.CONSUMABLES_DRAINED_PER_SEC) + "/sec.\n" +
-            "- " + C.NAME_ELECTRICITY + ": " + Util.FormatForGetInfo(C.ELECTRICITY_DRAINED_PER_SEC) + "/sec.\n\n" +
+            "- " + C.NAME_CONSUMABLES + ": " + Util.FormatForGetInfo(C.CONV_CONS_PER_SEC) + "/sec.\n" +
+            "- " + C.NAME_ELECTRICITY + ": " + Util.FormatForGetInfo(C.CONV_ELEC_PER_SEC) + "/sec.\n\n" +
             "<b><color=#99ff00>Outputs:</color></b>\n" +
-            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(-C.LIFESUPPORT_ADDED_PER_CONS) + "/sec.";
+            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(-C.CONV_LS_PER_SEC) + "/sec.";
 
             return info;
         }
