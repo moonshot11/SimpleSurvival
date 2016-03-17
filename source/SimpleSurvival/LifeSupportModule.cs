@@ -22,9 +22,16 @@ namespace SimpleSurvival
             };
 
             if (valid_states.Contains(state))
-                Util.StartupRequest(this, C.NAME_LIFESUPPORT, C.LS_DRAIN_PER_SEC);
+            {
+                double req_elec = part.RequestResource(C.NAME_ELECTRICITY, C.ELEC_LS_PER_SEC);
+                double elec_factor = req_elec < C.DOUBLE_MARGIN ? C.NO_ELEC_PENALTY_FACTOR : 1.0;
+
+                Util.StartupRequest(this, C.NAME_LIFESUPPORT, elec_factor * C.LS_DRAIN_PER_SEC);
+            }
             else
+            {
                 Util.Log("State = " + state.ToString() + ", ignoring startup LifeSupport request");
+            }
 
             base.OnStart(state);
         }
