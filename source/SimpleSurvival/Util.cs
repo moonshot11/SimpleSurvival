@@ -38,7 +38,7 @@ namespace SimpleSurvival
                 ProtoCrewMember kerbal = part_crew[0];
                 bool respawn_flag = HighLogic.CurrentGame.Parameters.Difficulty.MissingCrewsRespawn;
 
-                ScreenMessages.PostScreenMessage(kerbal.name + " ran out of LifeSupport and died!",
+                ScreenMessages.PostScreenMessage("<color=#ff1100>" + kerbal.name + " ran out of LifeSupport and died!</color>",
                     6f, ScreenMessageStyle.UPPER_CENTER);
 
                 // Kerbal must be removed from part BEFORE calling Die()
@@ -60,13 +60,14 @@ namespace SimpleSurvival
         /// <param name="part">The Part with the life support PartModule</param>
         /// <param name="resource_name">The resource to drain</param>
         /// <param name="resource_rate">The resource drain rate (per second)</param>
-        public static void StartupRequest(PartModule module, string resource_name, double resource_rate)
+        /// <returns>Returns false if insufficient resources. Otherwise, returns true.</returns>
+        public static bool StartupRequest(PartModule module, string resource_name, double resource_rate)
         {
             if (module.vessel.mainBody.atmosphereContainsOxygen && module.vessel.altitude < C.OXYGEN_CUTOFF_ALTITUDE)
             {
                 Util.Log("Vessel " + module.vessel.name + " is O2 atmo at " + module.vessel.altitude);
                 Util.Log("Startup resource will not be drained");
-                return;
+                return true;
             }
 
             // Universal Time in seconds
@@ -83,7 +84,9 @@ namespace SimpleSurvival
             Util.Log("Time elapsed: " + delta + " (" + KSPUtil.PrintDateDelta((int)delta, true, true) + ")");
             Util.Log("Initial resource request (" + resource_name + "): " + request);
 
-            module.part.RequestResource(resource_name, request);
+            double obtained = module.part.RequestResource(resource_name, request);
+
+            return obtained > (request - C.STARTUP_KILL_MARGIN);
         }
 
         /// <summary>

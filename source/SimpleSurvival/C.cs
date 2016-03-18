@@ -15,7 +15,15 @@ namespace SimpleSurvival
         /// The margin for double equality
         /// </summary>
         public const double DOUBLE_MARGIN = 0.000001;
+        /// <summary>
+        /// The margin for equality compared to 1
+        /// </summary>
         public const double DOUBLE_ALMOST_ONE = 1.0 - DOUBLE_MARGIN;
+        /// <summary>
+        /// If part would have less than ~1/5 seconds of LS upon startup,
+        /// kill Kerbals.
+        /// </summary>
+        public const double STARTUP_KILL_MARGIN = 0.00001;
 
         // -- Resource names --
         
@@ -61,17 +69,15 @@ namespace SimpleSurvival
         /// </summary>
         // String since it is first created via ConfigNode
         public const string EVA_LS_LVL_2 = "10";
-
         /// <summary>
         /// Max amount of EVA Life Support w/ Astronaut Complex Level 3
         /// </summary>
         public const string EVA_LS_LVL_3 = "300";
 
         /// <summary>
-        /// Amount of Life Support credited to a part when a Kerbal dies
+        /// Seconds of grace period before empty LS module kills Kerbals
         /// </summary>
-        // Must be negative since it's a credit
-        public const double LS_DEATH_CREDIT = -1.0;
+        public const float GRACE_PERIOD = 30.0f;
 
         // -- Converter rates --
 

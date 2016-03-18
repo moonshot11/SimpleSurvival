@@ -9,6 +9,8 @@ namespace SimpleSurvival
     [KSPModule("Life Support")]
     public class LifeSupportModule : PartModule
     {
+        private float grace_timer = C.GRACE_PERIOD;
+
         public override void OnStart(StartState state)
         {
             StartState[] valid_states = new StartState[]
@@ -21,8 +23,15 @@ namespace SimpleSurvival
                 StartState.Docked
             };
 
+            grace_timer = C.GRACE_PERIOD;
+
             if (valid_states.Contains(state))
-                Util.StartupRequest(this, C.NAME_LIFESUPPORT, C.LS_DRAIN_PER_SEC);
+            {
+                bool enough = Util.StartupRequest(this, C.NAME_LIFESUPPORT, C.LS_DRAIN_PER_SEC);
+
+                if (!enough)
+                    grace_timer = 0f;
+            }
             else
                 Util.Log("State = " + state.ToString() + ", ignoring startup LifeSupport request");
 
@@ -47,7 +56,10 @@ namespace SimpleSurvival
         {
             // If part is unmanned, nothing to do
             if (part.protoModuleCrew.Count == 0)
+            {
+                grace_timer = C.GRACE_PERIOD;
                 return;
+            }
 
             // If vessel is below this altitude in an atmosphere with oxygen,
             // LifeSupport is irrelevant
@@ -62,12 +74,30 @@ namespace SimpleSurvival
             // Request resource based on rates defined by constants
             double ret_rs = part.RequestResource(C.NAME_LIFESUPPORT, ls_request);
 
-            if (crew_count > 0 && ret_rs == 0.0)
+            if (ret_rs > 0.0)
             {
-                Util.KillKerbals(this);
+                // If LifeSupport exists or is restored, reset grace period
+                grace_timer = C.GRACE_PERIOD;
+            }
+            else
+            {
+                // If timer hasn't run out, tick then return
+                if (grace_timer > 0f)
+                {
+                    // If this is the first tick, print warning
+                    if (grace_timer == C.GRACE_PERIOD)
+                    {
+                        TimeWarp.SetRate(0, true);
+                        string name = vessel.isActiveVessel ? part.partInfo.title : vessel.vesselName;
 
-                // Credit part that lost Kerbal passed in
-                part.RequestResource(C.NAME_LIFESUPPORT, C.LS_DEATH_CREDIT);
+                        ScreenMessages.PostScreenMessage("<color=#ff8800>Crew in " + name + "\nhas " + C.GRACE_PERIOD + " seconds to live!</color>", 8f, ScreenMessageStyle.UPPER_CENTER);
+                    }
+
+                    grace_timer -= 1.0f * TimeWarp.fixedDeltaTime;
+                    return;
+                }
+
+                Util.KillKerbals(this);
             }
         }
     }
