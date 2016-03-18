@@ -46,14 +46,6 @@ namespace SimpleSurvival
         /// Life Support drain rate per second
         /// </summary>
         public const double LS_DRAIN_PER_SEC = LS_PER_DAY_PER_KERBAL / 21600.0;
-        /// <summary>
-        /// ElectricCharge drained per second
-        /// </summary>
-        public const double ELEC_LS_PER_SEC = 0.1;
-        /// <summary>
-        /// Factor by which LifeSupport drain is multiplied if no electricity
-        /// </summary>
-        public const double NO_ELEC_PENALTY_FACTOR = 10.0;
 
         /// <summary>
         /// EVA Life Support drain rate per day (game time)

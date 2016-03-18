@@ -22,16 +22,9 @@ namespace SimpleSurvival
             };
 
             if (valid_states.Contains(state))
-            {
-                double req_elec = part.RequestResource(C.NAME_ELECTRICITY, C.ELEC_LS_PER_SEC);
-                double elec_factor = req_elec < C.DOUBLE_MARGIN ? C.NO_ELEC_PENALTY_FACTOR : 1.0;
-
-                Util.StartupRequest(this, C.NAME_LIFESUPPORT, elec_factor * C.LS_DRAIN_PER_SEC);
-            }
+                Util.StartupRequest(this, C.NAME_LIFESUPPORT, C.LS_DRAIN_PER_SEC);
             else
-            {
                 Util.Log("State = " + state.ToString() + ", ignoring startup LifeSupport request");
-            }
 
             base.OnStart(state);
         }
@@ -43,12 +36,9 @@ namespace SimpleSurvival
 
             string per_kerb = part.CrewCapacity > 1 ? "/Kerbal" : "";
 
-            string info = "Active only when manned. " +
-                C.NO_ELEC_PENALTY_FACTOR + "x penalty to " + C.NAME_LIFESUPPORT +
-                " drain rate if " + C.NAME_ELECTRICITY + " runs out.\n\n" +
+            string info = "Active only when manned.\n\n" +
             "<b><color=#99ff00>Requires:</color></b>\n" +
-            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(C.LS_PER_DAY_PER_KERBAL) + per_kerb + "/day.\n" +
-            "- " + C.NAME_ELECTRICITY + ": " + Util.FormatForGetInfo(part.CrewCapacity * C.ELEC_LS_PER_SEC) + "/sec.";
+            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(C.LS_PER_DAY_PER_KERBAL) + per_kerb + "/day.\n";
             
             return info;
         }
@@ -66,12 +56,8 @@ namespace SimpleSurvival
 
             int crew_count = part.protoModuleCrew.Count;
 
-            // First check electricity. This will always happen.
-            double ret_elec = part.RequestResource(C.NAME_ELECTRICITY, C.ELEC_LS_PER_SEC * TimeWarp.fixedDeltaTime);
-            // Set penalty if no electricity
-            double elec_factor = ret_elec > C.DOUBLE_MARGIN ? 1.0 : C.NO_ELEC_PENALTY_FACTOR;
             // How much lifesupport to request
-            double ls_request = elec_factor * crew_count * C.LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime;
+            double ls_request = crew_count * C.LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime;
 
             // Request resource based on rates defined by constants
             double ret_rs = part.RequestResource(C.NAME_LIFESUPPORT, ls_request);
