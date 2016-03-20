@@ -43,8 +43,8 @@ namespace SimpleSurvival
 
                 ConfigNode resource_node = new ConfigNode("RESOURCE");
                 resource_node.AddValue("name", C.NAME_EVA_LIFESUPPORT);
-                resource_node.AddValue("amount", eva_ls_max);
-                resource_node.AddValue("maxAmount", eva_ls_max);
+                resource_node.AddValue("amount", EVALifeSupportTracker.evals_info[part.protoModuleCrew[0].name].current);
+                resource_node.AddValue("maxAmount", EVALifeSupportTracker.evals_info[part.protoModuleCrew[0].name].max);
 
                 part.AddResource(resource_node);
 

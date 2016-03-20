@@ -51,6 +51,7 @@
     <Compile Include="Cons2LSModule.cs" />
     <Compile Include="EVALifeSupportLoader.cs" />
     <Compile Include="EVALifeSupportModule.cs" />
+    <Compile Include="EVALifeSupportTracker.cs" />
     <Compile Include="LifeSupportModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />
