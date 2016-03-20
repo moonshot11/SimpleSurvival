@@ -31,13 +31,6 @@ namespace SimpleSurvival
             guiName = "Convert " + C.NAME_CONSUMABLES, guiActiveUncommand = true)]
         public void ToggleStatus()
         {
-            if (status == ConverterStatus.READY && vessel.GetCrewCount() == 0)
-            {
-                ScreenMessages.PostScreenMessage("Ship must be manned to operate Converter",
-                    3f, ScreenMessageStyle.UPPER_CENTER);
-                return;
-            }
-
             Util.Log("Toggling Converter status from " + status);
             switch (status)
             {
@@ -57,6 +50,14 @@ namespace SimpleSurvival
         {
             if (status == ConverterStatus.CONVERTING)
             {
+                if (!ProperlyManned())
+                {
+                    ScreenMessages.PostScreenMessage("<color=#ff8800>Converter requires an Engineer to operate</color>",
+                        5f, ScreenMessageStyle.UPPER_CENTER);
+                    status = ConverterStatus.READY;
+                    return;
+                }
+
                 double frac_elec = PullResource(C.NAME_ELECTRICITY, C.CONV_ELEC_PER_SEC);
                 double frac_cons = PullResource(C.NAME_CONSUMABLES, C.CONV_CONS_PER_SEC);
                 double frac_ls = PullResource(C.NAME_LIFESUPPORT, C.CONV_LS_PER_SEC,
@@ -139,9 +140,26 @@ namespace SimpleSurvival
             }
         }
 
+        /// <summary>
+        /// Check if the converter has the proper crew to operate
+        /// </summary>
+        /// <returns></returns>
+        private bool ProperlyManned()
+        {
+            foreach (ProtoCrewMember kerbal in part.protoModuleCrew)
+            {
+                // kerbal.experienceTrait.Title also returns "Engineer"
+                // kerbal.experienceLevel [0..5] to add experience check
+                if (kerbal.experienceTrait.TypeName == "Engineer")
+                    return true;
+            }
+
+            return false;
+        }
+
         public override string GetInfo()
         {
-            string info = "Converts " + C.NAME_CONSUMABLES + " to " + C.NAME_LIFESUPPORT + ". Ship must be manned.\n\n" +
+            string info = "Converts " + C.NAME_CONSUMABLES + " to " + C.NAME_LIFESUPPORT + ". Part must be manned by an Engineer to operate.\n\n" +
             "<b><color=#99ff00>Requires:</color></b>\n" +
             "- " + C.NAME_CONSUMABLES + ": " + Util.FormatForGetInfo(C.CONV_CONS_PER_SEC) + "/sec.\n" +
             "- " + C.NAME_ELECTRICITY + ": " + Util.FormatForGetInfo(C.CONV_ELEC_PER_SEC) + "/sec.\n\n" +
