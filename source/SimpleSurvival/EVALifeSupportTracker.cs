@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SimpleSurvival
 {
-    [KSPAddon(KSPAddon.Startup.Flight, true)]
+    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class EVALifeSupportTracker : MonoBehaviour
     {
         public class EVALS_Info
@@ -26,26 +26,38 @@ namespace SimpleSurvival
 
         public void Awake()
         {
-            ConfigNode gamenode = HighLogic.CurrentGame.config;
+            Log("Call -> Awake(..)");
 
-            if (evals_info == null)
+            GameEvents.onGameStateSave.Add(OnSave);
+            GameEvents.onGameStateLoad.Add(OnLoad);
+        }
+
+        public void OnDestroy()
+        {
+            Log("Call -> OnDestroy(..)");
+
+            GameEvents.onGameStateSave.Remove(OnSave);
+            GameEvents.onGameStateLoad.Remove(OnLoad);
+        }
+
+        public void OnLoad(ConfigNode gamenode)
+        {
+            Log("Call -> OnLoad(..)");
+
+            evals_info = new Dictionary<string, EVALS_Info>();
+
+            if (gamenode.HasNode("SIMPLESURVIVAL_EVALS"))
             {
-                Log("Initializing evals_info");
-                evals_info = new Dictionary<string, EVALS_Info>();
-                
-                if (gamenode.HasNode("SIMPLESURVIVAL_EVALS"))
+                ConfigNode evals_node = gamenode.GetNode("SIMPLESURVIVAL_EVALS");
+
+                foreach (ConfigNode node in evals_node.GetNodes("KERBAL"))
                 {
-                    ConfigNode evals_node = gamenode.GetNode("SIMPLESURVIVAL_EVALS");
+                    string name = node.GetValue("name");
+                    double current = Convert.ToDouble(node.GetValue("amount"));
+                    double max = Convert.ToDouble(node.GetValue("maxAmount"));
 
-                    foreach (ConfigNode node in evals_node.GetNodes("KERBAL"))
-                    {
-                        string name = node.GetValue("name");
-                        double current = Convert.ToDouble(node.GetValue("amount"));
-                        double max = Convert.ToDouble(node.GetValue("maxAmount"));
-
-                        evals_info.Add(name, new EVALS_Info(current, max));
-                        Log("Adding " + name + ": [" + current + ", " + max + "]");
-                    }
+                    evals_info.Add(name, new EVALS_Info(current, max));
+                    Log("Adding " + name + ": [" + current + ", " + max + "]");
                 }
             }
 
@@ -64,12 +76,12 @@ namespace SimpleSurvival
                     evals_info.Remove(name);
                 }
             }
-
-            GameEvents.onGameStateSave.Add(OnSave);
         }
 
         public void OnSave(ConfigNode gamenode)
         {
+            Log("Call -> OnSave(..)");
+
             // Write back to confignode
             ConfigNode topnode = new ConfigNode("SIMPLESURVIVAL_EVALS");
 
@@ -87,8 +99,11 @@ namespace SimpleSurvival
             gamenode.AddNode(topnode);
         }
 
-        public void Update()
+        public void FixedUpdate()
         {
+            if (HighLogic.LoadedScene != GameScenes.FLIGHT)
+                return;
+
             Vessel vessel = FlightGlobals.ActiveVessel;
 
             // If EVA
