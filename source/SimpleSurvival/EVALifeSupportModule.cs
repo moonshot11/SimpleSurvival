@@ -34,16 +34,25 @@ namespace SimpleSurvival
                 // Assumes EVA Kerbals will always have exactly one ProtoCrewMember
                 string name = part.protoModuleCrew[0].name;
 
-                if (!EVALifeSupportTracker.evals_info.ContainsKey(name))
+                // Kerbals assigned after this mod's installation should already be tracked,
+                // but for Kerbals already in flight, add EVA LS according to current state
+                // of astronaut complex
+                if (EVALifeSupportTracker.InTracking(name))
                 {
-                    Util.Log("EVALifeSupportModule.OnStart(..)  Adding Kerbal to evals_info: " + name);
+                    Util.Log("Found Kerbal " + name + " in EVA LS tracking");
+                }
+                else
+                {
+                    Util.Log("EVALifeSupportModule.OnStart(..)  Adding Kerbal to EVA LS tracking: " + name);
                     EVALifeSupportTracker.AddKerbalToTracking(name);
                 }
 
+                var info = EVALifeSupportTracker.GetEVALSInfo(name);
+
                 ConfigNode resource_node = new ConfigNode("RESOURCE");
                 resource_node.AddValue("name", C.NAME_EVA_LIFESUPPORT);
-                resource_node.AddValue("amount", EVALifeSupportTracker.evals_info[name].current.ToString());
-                resource_node.AddValue("maxAmount", EVALifeSupportTracker.evals_info[name].max.ToString());
+                resource_node.AddValue("amount", info.current.ToString());
+                resource_node.AddValue("maxAmount", info.max.ToString());
 
                 part.AddResource(resource_node);
 
@@ -52,9 +61,10 @@ namespace SimpleSurvival
 
             base.OnStart(state);
         }
+
         public void FixedUpdate()
         {
-            EVALifeSupportTracker.evals_info[part.protoModuleCrew[0].name].current =
+            EVALifeSupportTracker.GetEVALSInfo(part.protoModuleCrew[0].name).current =
                 part.Resources[C.NAME_EVA_LIFESUPPORT].amount;
 
             // If Kerbal is below this altitude in an atmosphere with oxygen,

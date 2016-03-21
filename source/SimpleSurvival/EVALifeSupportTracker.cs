@@ -26,10 +26,22 @@ namespace SimpleSurvival
         }
 
         /// <summary>
+        /// Header for the ConfigNode section that will contain EVA LS tracking
+        /// </summary>
+        private static string NODE_HEADER = "SIMPLESURVIVAL_EVA_LS";
+        /// <summary>
+        /// Title of each individual node holding one Kerbal's info
+        /// </summary>
+        private static string NODE_INNER_TITLE = "KERBAL";
+
+        /// <summary>
         /// Stores the live EVA LS tracking info
         /// </summary>
-        public static Dictionary<string, EVALS_Info> evals_info = null;
+        private static Dictionary<string, EVALS_Info> evals_info = null;
 
+        /// <summary>
+        /// Run once on startup, set up hooks to rest of game
+        /// </summary>
         private void Awake()
         {
             Log("Call -> Awake(..) " + HighLogic.LoadedScene.ToString());
@@ -60,6 +72,8 @@ namespace SimpleSurvival
 
             double eva_max = Util.CurrentEVAMax();
 
+            // Assume that this Kerbal's info should be reset,
+            // but warn in the log file just in case.
             if (evals_info.ContainsKey(name))
             {
                 Log("Uh oh! " + name + "is already being tracked. Resetting...");
@@ -72,6 +86,35 @@ namespace SimpleSurvival
             evals_info.Add(name, info);
         }
 
+        /// <summary>
+        /// Returns true if the Kerbal's EVA LS is currently being tracked
+        /// </summary>
+        /// <param name="name">Name of Kerbal as defined by game</param>
+        /// <returns>True if tracked, false otherwise.</returns>
+        public static bool InTracking(string name)
+        {
+            return evals_info.ContainsKey(name);
+        }
+
+        /// <summary>
+        /// Returns a REFERENCE to this Kerbal's EVA LS info.
+        /// BE CAREFUL WHEN MODIFYING.
+        /// </summary>
+        /// <param name="name">Name of Kerbal</param>
+        /// <returns></returns>
+        public static EVALS_Info GetEVALSInfo(string name)
+        {
+            if (!evals_info.ContainsKey(name))
+                return null;
+
+            return evals_info[name];
+        }
+
+        /// <summary>
+        /// When the ship is "rolled out" from the VAB to the LaunchPad,
+        /// via the VAB or the Launch GUI
+        /// </summary>
+        /// <param name="ship"></param>
         private void OnVesselRollout(ShipConstruct ship)
         {
             Log("Call -> OnVesselRollout(..) for vessel: " + ship.shipName);
@@ -84,6 +127,7 @@ namespace SimpleSurvival
                 }
             }
         }
+
 
         private void OnVesselRecovered(ProtoVessel proto)
         {
@@ -102,6 +146,8 @@ namespace SimpleSurvival
         {
             Log("Call -> OnKerbalStatusChange(..) " + kerbal.name + ": " + old_status.ToString() + " -> " + new_status.ToString());
 
+            // Kerbals regularly change to Available, then back to Assigned
+            // when in space, so can't use this method to track Kerbals in service
             if (new_status == ProtoCrewMember.RosterStatus.Dead
                 || new_status == ProtoCrewMember.RosterStatus.Missing)
             {
@@ -110,6 +156,8 @@ namespace SimpleSurvival
             }
         }
 
+        // Currently only seems to track Kerbals removed entirely from roster,
+        // but keep in for the sake of completeness for now
         private void OnKerbalRemoved(ProtoCrewMember kerbal)
         {
             Log("Call -> OnKerbalRemoved(..) " + kerbal.name);
@@ -123,11 +171,11 @@ namespace SimpleSurvival
             evals_info = new Dictionary<string, EVALS_Info>();
 
             // -- Load from ConfigNode --
-            if (gamenode.HasNode("SIMPLESURVIVAL_EVALS"))
+            if (gamenode.HasNode(NODE_HEADER))
             {
-                ConfigNode evals_node = gamenode.GetNode("SIMPLESURVIVAL_EVALS");
+                ConfigNode evals_node = gamenode.GetNode(NODE_HEADER);
 
-                foreach (ConfigNode node in evals_node.GetNodes("KERBAL"))
+                foreach (ConfigNode node in evals_node.GetNodes(NODE_INNER_TITLE))
                 {
                     string name = node.GetValue("name");
                     double current = Convert.ToDouble(node.GetValue("amount"));
@@ -137,33 +185,6 @@ namespace SimpleSurvival
                     Log("Adding " + name + ": [" + current + ", " + max + "]");
                 }
             }
-
-            CheckInfoAgainstRoster();
-        }
-
-        private void CheckInfoAgainstRoster()
-        {
-            if (HighLogic.CurrentGame == null)
-                return;
-
-            // -- Check info against roster --
-            foreach (ProtoCrewMember c in HighLogic.CurrentGame.CrewRoster.Crew)
-            {
-                string name = c.name;
-
-                /*if (c.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && !evals_info.ContainsKey(name))
-                {
-                    //Log("Adding " + name + " and 20/20");
-                    //evals_info.Add(name, new EVALS_Info(20, 20));
-                }
-                else */
-                if (c.rosterStatus != ProtoCrewMember.RosterStatus.Assigned && evals_info.ContainsKey(name))
-                {
-                    Log("Removing " + name);
-                    evals_info.Remove(name);
-                }
-            }
-
         }
 
         private void OnSave(ConfigNode gamenode)
@@ -171,14 +192,18 @@ namespace SimpleSurvival
             Log("Call -> OnSave(..)");
 
             // Write back to confignode
-            ConfigNode topnode = new ConfigNode("SIMPLESURVIVAL_EVALS");
+            ConfigNode topnode = new ConfigNode(NODE_HEADER);
 
             foreach (string name in evals_info.Keys)
             {
-                Log("Adding " + name + " to ConfigNode");
                 var info = evals_info[name];
 
-                ConfigNode node = topnode.AddNode("KERBAL");
+                Log("Adding " + name + " to ConfigNode");
+                Log("  name      = " + name);
+                Log("  amount    = " + info.current);
+                Log("  maxAmount = " + info.max);
+
+                ConfigNode node = topnode.AddNode(NODE_INNER_TITLE);
                 node.AddValue("name", name);
                 node.AddValue("amount", info.current);
                 node.AddValue("maxAmount", info.max);
