@@ -23,6 +23,11 @@ namespace SimpleSurvival
                 this.current = current;
                 this.max = max;
             }
+
+            public EVALS_Info Copy()
+            {
+                return new EVALS_Info(current, max);
+            }
         }
 
         /// <summary>
@@ -97,8 +102,8 @@ namespace SimpleSurvival
         }
 
         /// <summary>
-        /// Returns a REFERENCE to this Kerbal's EVA LS info.
-        /// BE CAREFUL WHEN MODIFYING.
+        /// Returns a COPY to this Kerbal's EVA LS info.
+        /// Cannot modify in place.
         /// </summary>
         /// <param name="name">Name of Kerbal</param>
         /// <returns></returns>
@@ -107,7 +112,7 @@ namespace SimpleSurvival
             if (!evals_info.ContainsKey(name))
                 return null;
 
-            return evals_info[name];
+            return evals_info[name].Copy();
         }
 
         /// <summary>
@@ -128,6 +133,23 @@ namespace SimpleSurvival
             }
         }
 
+        /// <summary>
+        /// Update the amount of EVA LS a Kerbal currently has
+        /// </summary>
+        /// <param name="name">The Kerbal's name</param>
+        /// <param name="amount">The current amount</param>
+        public static void SetCurrentEVAAmount(string name, double amount)
+        {
+            try
+            {
+                evals_info[name].current = amount;
+            }
+            catch (KeyNotFoundException e)
+            {
+                Log("Exception thrown: Kerbal " + name + " not found to update tracking!");
+                Log(e.ToString());
+            }
+        }
 
         private void OnVesselRecovered(ProtoVessel proto)
         {

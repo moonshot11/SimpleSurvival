@@ -64,8 +64,8 @@ namespace SimpleSurvival
 
         public void FixedUpdate()
         {
-            EVALifeSupportTracker.GetEVALSInfo(part.protoModuleCrew[0].name).current =
-                part.Resources[C.NAME_EVA_LIFESUPPORT].amount;
+            EVALifeSupportTracker.SetCurrentEVAAmount(
+                part.protoModuleCrew[0].name, part.Resources[C.NAME_EVA_LIFESUPPORT].amount);
 
             // If Kerbal is below this altitude in an atmosphere with oxygen,
             // LifeSupport is irrelevant

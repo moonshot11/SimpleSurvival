@@ -95,6 +95,11 @@ namespace SimpleSurvival
         public const double CONV_LS_PER_SEC = -0.1;
 
         /// <summary>
+        /// Conversation rate of Consumables to EVA
+        /// </summary>
+        public const double CONS_TO_EVA = 1.0;
+
+        /// <summary>
         /// Altitude under which LifeSupport is not needed in atmosphere with oxygen
         /// </summary>
         public const double OXYGEN_CUTOFF_ALTITUDE = 10000.0;

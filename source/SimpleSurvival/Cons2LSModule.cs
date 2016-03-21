@@ -46,6 +46,47 @@ namespace SimpleSurvival
             Util.Log(" to " + status);
         }
 
+        [KSPEvent(guiActive = true, guiActiveEditor = false,
+            guiName = "Refill " + C.NAME_EVA_LIFESUPPORT, guiActiveUncommand = true,
+            guiActiveUnfocused = true, unfocusedRange = 3f, externalToEVAOnly = true)]
+        public void FillEVA()
+        {
+            Vessel active = FlightGlobals.ActiveVessel;
+
+            // Player is controlling ship
+            if (vessel == active)
+            {
+                Util.Log("FillEVA pressed for active vessel " + vessel.name);
+
+                foreach (ProtoCrewMember kerbal in active.GetVesselCrew())
+                {
+                    if (!EVALifeSupportTracker.InTracking(kerbal.name))
+                        continue;
+
+                    var info = EVALifeSupportTracker.GetEVALSInfo(kerbal.name);
+                    double request = info.max - info.current;
+
+                    part.RequestResource(C.NAME_CONSUMABLES, C.CONS_TO_EVA * request);
+                    EVALifeSupportTracker.SetCurrentEVAAmount(kerbal.name, info.max);
+                }
+            }
+            // Player is controlling EVA
+            else
+            {
+                Util.Log("FillEVA pressed for EVA: " + active.GetVesselCrew()[0].name);
+
+                string name = active.GetVesselCrew()[0].name;
+
+                // This works right now because the tracker updates live.
+                // May break in the future.
+                var info = EVALifeSupportTracker.GetEVALSInfo(name);
+                double request = info.max - info.current;
+
+                part.RequestResource(C.NAME_CONSUMABLES, C.CONS_TO_EVA * request);
+                active.rootPart.RequestResource(C.NAME_EVA_LIFESUPPORT, -info.max);
+            }
+        }
+
         public void FixedUpdate()
         {
             if (status == ConverterStatus.CONVERTING)
