@@ -7,9 +7,12 @@ using UnityEngine;
 
 namespace SimpleSurvival
 {
-    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class EVALifeSupportTracker : MonoBehaviour
     {
+        /// <summary>
+        /// Stores the EVA info for a Kerbal
+        /// </summary>
         public class EVALS_Info
         {
             public double current;
@@ -22,30 +25,104 @@ namespace SimpleSurvival
             }
         }
 
+        /// <summary>
+        /// Stores the live EVA LS tracking info
+        /// </summary>
         public static Dictionary<string, EVALS_Info> evals_info = null;
 
-        public void Awake()
+        private void Awake()
         {
-            Log("Call -> Awake(..)");
+            Log("Call -> Awake(..) " + HighLogic.LoadedScene.ToString());
 
             GameEvents.onGameStateSave.Add(OnSave);
             GameEvents.onGameStateLoad.Add(OnLoad);
+
+            // Kerbals will be added to tracking
+            GameEvents.OnVesselRollout.Add(OnVesselRollout);
+
+            // Cover all the situations when a Kerbal's EVA LS will be reset.
+            // Unfortunately, roster status changes can't be used exclusively,
+            // since the game moves ProtoCrewMembers from Assigned to Available,
+            // then back to Assigned when transferring between parts/vessels
+            // (e.g. "Transfer Crew" or EVA).
+            GameEvents.onVesselRecovered.Add(OnVesselRecovered);
+            GameEvents.onKerbalStatusChange.Add(OnKerbalStatusChange);
+            GameEvents.onKerbalRemoved.Add(OnKerbalRemoved);
         }
 
-        public void OnDestroy()
+        /// <summary>
+        /// Add a Kerbal to EVA LS tracking
+        /// </summary>
+        /// <param name="name">Name of the Kerbal to add to tracking</param>
+        public static void AddKerbalToTracking(string name)
         {
-            Log("Call -> OnDestroy(..)");
+            Log("Call -> AddKerbal(..) for " + name);
 
-            GameEvents.onGameStateSave.Remove(OnSave);
-            GameEvents.onGameStateLoad.Remove(OnLoad);
+            double eva_max = Util.CurrentEVAMax();
+
+            if (evals_info.ContainsKey(name))
+            {
+                Log("Uh oh! " + name + "is already being tracked. Resetting...");
+                evals_info.Remove(name);
+            }
+
+            Log("Adding current/max EVA LS of " + eva_max + " for " + name);
+
+            EVALS_Info info = new EVALS_Info(eva_max, eva_max);
+            evals_info.Add(name, info);
         }
 
-        public void OnLoad(ConfigNode gamenode)
+        private void OnVesselRollout(ShipConstruct ship)
+        {
+            Log("Call -> OnVesselRollout(..) for vessel: " + ship.shipName);
+
+            foreach (Part part in ship.Parts)
+            {
+                foreach (ProtoCrewMember kerbal in part.protoModuleCrew)
+                {
+                    AddKerbalToTracking(kerbal.name);
+                }
+            }
+        }
+
+        private void OnVesselRecovered(ProtoVessel proto)
+        {
+            Log("Call -> OnVesselRecovered(..) for vessel: " + proto.vesselName);
+
+            foreach (ProtoCrewMember kerbal in proto.GetVesselCrew())
+            {
+                Log("Clearing EVA LS data for: " + kerbal.name);
+                evals_info.Remove(kerbal.name);
+                Log("    Successful!");
+            }
+        }
+
+        private void OnKerbalStatusChange(ProtoCrewMember kerbal,
+            ProtoCrewMember.RosterStatus old_status, ProtoCrewMember.RosterStatus new_status)
+        {
+            Log("Call -> OnKerbalStatusChange(..) " + kerbal.name + ": " + old_status.ToString() + " -> " + new_status.ToString());
+
+            if (new_status == ProtoCrewMember.RosterStatus.Dead
+                || new_status == ProtoCrewMember.RosterStatus.Missing)
+            {
+                Log("Clearing EVA LS info for " + kerbal.name);
+                evals_info.Remove(kerbal.name);
+            }
+        }
+
+        private void OnKerbalRemoved(ProtoCrewMember kerbal)
+        {
+            Log("Call -> OnKerbalRemoved(..) " + kerbal.name);
+            evals_info.Remove(kerbal.name);
+        }
+
+        private void OnLoad(ConfigNode gamenode)
         {
             Log("Call -> OnLoad(..)");
 
             evals_info = new Dictionary<string, EVALS_Info>();
 
+            // -- Load from ConfigNode --
             if (gamenode.HasNode("SIMPLESURVIVAL_EVALS"))
             {
                 ConfigNode evals_node = gamenode.GetNode("SIMPLESURVIVAL_EVALS");
@@ -61,24 +138,35 @@ namespace SimpleSurvival
                 }
             }
 
+            CheckInfoAgainstRoster();
+        }
+
+        private void CheckInfoAgainstRoster()
+        {
+            if (HighLogic.CurrentGame == null)
+                return;
+
+            // -- Check info against roster --
             foreach (ProtoCrewMember c in HighLogic.CurrentGame.CrewRoster.Crew)
             {
                 string name = c.name;
 
-                if (c.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && !evals_info.ContainsKey(name))
+                /*if (c.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && !evals_info.ContainsKey(name))
                 {
-                    Log("Adding " + name + " and 20/20");
-                    evals_info.Add(name, new EVALS_Info(20, 20));
+                    //Log("Adding " + name + " and 20/20");
+                    //evals_info.Add(name, new EVALS_Info(20, 20));
                 }
-                else if (c.rosterStatus != ProtoCrewMember.RosterStatus.Assigned && evals_info.ContainsKey(name))
+                else */
+                if (c.rosterStatus != ProtoCrewMember.RosterStatus.Assigned && evals_info.ContainsKey(name))
                 {
                     Log("Removing " + name);
                     evals_info.Remove(name);
                 }
             }
+
         }
 
-        public void OnSave(ConfigNode gamenode)
+        private void OnSave(ConfigNode gamenode)
         {
             Log("Call -> OnSave(..)");
 
@@ -99,24 +187,8 @@ namespace SimpleSurvival
             gamenode.AddNode(topnode);
         }
 
-        public void FixedUpdate()
-        {
-            if (HighLogic.LoadedScene != GameScenes.FLIGHT)
-                return;
-
-            Vessel vessel = FlightGlobals.ActiveVessel;
-
-            // If EVA
-            if (vessel.isEVA)
-            {
-                string name = vessel.GetVesselCrew()[0].name;
-
-                evals_info[name].current = vessel.rootPart.Resources[C.NAME_EVA_LIFESUPPORT].amount;
-
-            }
-        }
-
-        private void Log(string message)
+        // This module needs its own logger
+        private static void Log(string message)
         {
             KSPLog.print("SimpleSurvival EVALifeSupportTracker: " + message);
         }

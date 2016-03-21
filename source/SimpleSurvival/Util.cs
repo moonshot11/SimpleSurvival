@@ -54,6 +54,24 @@ namespace SimpleSurvival
         }
 
         /// <summary>
+        /// Returns the current maximum EVA LifeSupport given the state
+        /// of the astronaut complex
+        /// </summary>
+        /// <returns></returns>
+        public static double CurrentEVAMax()
+        {
+            float astro_lvl = ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.AstronautComplex);
+
+            Util.Log("Astronaut Complex Level " + astro_lvl);
+
+            // If Astronaut Complex is fully upgraded, EVA LS gets higher value
+            if (astro_lvl == 1.0f)
+                return C.EVA_LS_LVL_3;
+            else
+                return C.EVA_LS_LVL_2;
+        }
+
+        /// <summary>
         /// Deduct the appropriate life support
         /// when first loading a vessel
         /// </summary>

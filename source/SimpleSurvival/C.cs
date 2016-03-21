@@ -68,11 +68,11 @@ namespace SimpleSurvival
         /// Max amount of EVA Life Support w/ Astronaut Complex Level 2
         /// </summary>
         // String since it is first created via ConfigNode
-        public const string EVA_LS_LVL_2 = "10";
+        public const double EVA_LS_LVL_2 = 10;
         /// <summary>
         /// Max amount of EVA Life Support w/ Astronaut Complex Level 3
         /// </summary>
-        public const string EVA_LS_LVL_3 = "300";
+        public const double EVA_LS_LVL_3 = 300;
 
         /// <summary>
         /// Seconds of grace period before empty LS module kills Kerbals

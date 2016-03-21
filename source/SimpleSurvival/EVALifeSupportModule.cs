@@ -29,32 +29,34 @@ namespace SimpleSurvival
             }
             else
             {
-                // If not found, EVA has just been initialized.  Add LS to PartModule.
-                float astro_lvl = ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.AstronautComplex);
-                string eva_ls_max = "";
+                Util.Log("Adding " + C.NAME_EVA_LIFESUPPORT + " resource to " + part.name);
 
-                // If Astronaut Complex is fully upgraded, EVA LS gets higher value
-                if (astro_lvl == 1.0f)
-                    eva_ls_max = C.EVA_LS_LVL_3;
-                else
-                    eva_ls_max = C.EVA_LS_LVL_2;
+                // Assumes EVA Kerbals will always have exactly one ProtoCrewMember
+                string name = part.protoModuleCrew[0].name;
 
-                Util.Log("Astronaut Complex Level " + astro_lvl + ", max EVA LS: " + eva_ls_max);
+                if (!EVALifeSupportTracker.evals_info.ContainsKey(name))
+                {
+                    Util.Log("EVALifeSupportModule.OnStart(..)  Adding Kerbal to evals_info: " + name);
+                    EVALifeSupportTracker.AddKerbalToTracking(name);
+                }
 
                 ConfigNode resource_node = new ConfigNode("RESOURCE");
                 resource_node.AddValue("name", C.NAME_EVA_LIFESUPPORT);
-                resource_node.AddValue("amount", EVALifeSupportTracker.evals_info[part.protoModuleCrew[0].name].current);
-                resource_node.AddValue("maxAmount", EVALifeSupportTracker.evals_info[part.protoModuleCrew[0].name].max);
+                resource_node.AddValue("amount", EVALifeSupportTracker.evals_info[name].current.ToString());
+                resource_node.AddValue("maxAmount", EVALifeSupportTracker.evals_info[name].max.ToString());
 
                 part.AddResource(resource_node);
 
-                Util.Log("Adding " + C.NAME_EVA_LIFESUPPORT + " resource to " + part.name);
+                Util.Log("Added EVA LS to " + part.name);
             }
 
             base.OnStart(state);
         }
         public void FixedUpdate()
         {
+            EVALifeSupportTracker.evals_info[part.protoModuleCrew[0].name].current =
+                part.Resources[C.NAME_EVA_LIFESUPPORT].amount;
+
             // If Kerbal is below this altitude in an atmosphere with oxygen,
             // LifeSupport is irrelevant
             if (vessel.mainBody.atmosphereContainsOxygen && vessel.altitude < C.OXYGEN_CUTOFF_ALTITUDE)
