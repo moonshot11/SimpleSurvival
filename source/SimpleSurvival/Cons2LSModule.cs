@@ -74,7 +74,16 @@ namespace SimpleSurvival
                     eva_request_total += request;
                     kerbal_requests.Add(kerbal.name, request);
 
-                    Util.Log("    Kerbal " + name + " has EVA need for " + request);
+                    Util.Log("    Kerbal " + kerbal.name + " has EVA need for " + request);
+                }
+
+                // If no EVA request, exit early
+                if (eva_request_total < C.DOUBLE_MARGIN)
+                {
+                    Util.Log("All crewmembers full! Skipping EVA refill");
+                    ScreenMessages.PostScreenMessage("EVA resources already full!",
+                        5f, ScreenMessageStyle.UPPER_LEFT);
+                    return;
                 }
 
                 // Deduct Consumables
@@ -94,6 +103,16 @@ namespace SimpleSurvival
 
                     Util.Log("    Adding " + add + " to " + name);
                 }
+
+                if (frac > C.DOUBLE_ALMOST_ONE)
+                    ScreenMessages.PostScreenMessage("EVA resources refilled!",
+                        5f, ScreenMessageStyle.UPPER_LEFT);
+                else if (frac < C.DOUBLE_MARGIN)
+                    ScreenMessages.PostScreenMessage("<color=#ff2200>" + C.NAME_CONSUMABLES + " are empty - could not refill!</color>",
+                        5f, ScreenMessageStyle.UPPER_CENTER);
+                else
+                    ScreenMessages.PostScreenMessage("<color=#ff7700>Partial refill - " + C.NAME_CONSUMABLES + " are empty!</color>",
+                        5f, ScreenMessageStyle.UPPER_CENTER);
             }
             // Player is controlling EVA
             else
@@ -108,13 +127,26 @@ namespace SimpleSurvival
                 double eva_request = info.max - info.current;
 
                 double obtained = part.RequestResource(C.NAME_CONSUMABLES, C.CONS_TO_EVA * eva_request);
-                active.rootPart.RequestResource(C.NAME_EVA_LIFESUPPORT, -obtained / C.CONS_TO_EVA);
+                double add = obtained / C.CONS_TO_EVA;
+                active.rootPart.RequestResource(C.NAME_EVA_LIFESUPPORT, -add);
 
                 Util.Log("    EVA Request  = " + eva_request);
                 Util.Log("    Amt Obtained = " + obtained);
 
                 // Fill EVA Propellant while we're at it
                 active.rootPart.RequestResource(C.NAME_EVA_PROPELLANT, -double.MaxValue);
+
+                // If enough resources were added
+                if (add > eva_request - C.DOUBLE_MARGIN)
+                    ScreenMessages.PostScreenMessage("EVA resources refilled!", 5f, ScreenMessageStyle.UPPER_LEFT);
+                // If Consumables are empty
+                else if (add < C.DOUBLE_MARGIN)
+                    ScreenMessages.PostScreenMessage("<color=#ff2200>" + C.NAME_CONSUMABLES + " are empty - could not refill!</color>",
+                        5f, ScreenMessageStyle.UPPER_CENTER);
+                // If Consumables are almost empty, partial refill
+                else
+                    ScreenMessages.PostScreenMessage("<color=#ff7700>Partial refill: " + C.NAME_CONSUMABLES + " are empty!</color>",
+                        5f, ScreenMessageStyle.UPPER_CENTER);
             }
         }
 
