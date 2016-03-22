@@ -9,6 +9,8 @@ my $LS_RESOURCE = "LifeSupport";
 my $LS_MODULE = "LifeSupportModule";
 my $CONV_MODULE = "Cons2LSModule";
 
+my $NL = "\r\n";
+
 # Input filename
 my $arg_file = "";
 
@@ -39,32 +41,32 @@ while (my $line = <$FILE>)
 
         next unless ($converter || $ls_amt);
 
-        print "\@PART[$name]\n";
-        print "{\n";
+        print "\@PART[$name]$NL";
+        print "{$NL";
 
         if ($ls_amt)
         {
-            print "    RESOURCE\n";
-            print "    {\n";
-            print "        name = $LS_RESOURCE\n";
-            print "        amount = $ls_amt\n";
-            print "        maxAmount = $ls_amt\n";
-            print "    }\n";
-            print "    MODULE\n";
-            print "    {\n";
-            print "        name = $LS_MODULE\n";
-            print "    }\n";
+            print "    RESOURCE$NL";
+            print "    {$NL";
+            print "        name = $LS_RESOURCE$NL";
+            print "        amount = $ls_amt$NL";
+            print "        maxAmount = $ls_amt$NL";
+            print "    }$NL";
+            print "    MODULE$NL";
+            print "    {$NL";
+            print "        name = $LS_MODULE$NL";
+            print "    }$NL";
         }
 
         if ($converter)
         {
-            print "    MODULE\n";
-            print "    {\n";
-            print "        name = $CONV_MODULE\n";
-            print "    }\n";
+            print "    MODULE$NL";
+            print "    {$NL";
+            print "        name = $CONV_MODULE$NL";
+            print "    }$NL";
         }
 
-        print "}\n\n";
+        print "}$NL$NL";
     }
 }
 
