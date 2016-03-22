@@ -43,6 +43,10 @@ namespace SimpleSurvival
         /// Name of stock electricity resource
         /// </summary>
         public const string NAME_ELECTRICITY = "ElectricCharge";
+        /// <summary>
+        /// Name of stock EVA propellant resource
+        /// </summary>
+        public const string NAME_EVA_PROPELLANT = "EVA Propellant";
 
         // -- Life Support Drain Rates --
 

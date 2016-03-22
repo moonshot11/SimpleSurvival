@@ -112,6 +112,9 @@ namespace SimpleSurvival
 
                 Util.Log("    EVA Request  = " + eva_request);
                 Util.Log("    Amt Obtained = " + obtained);
+
+                // Fill EVA Propellant while we're at it
+                active.rootPart.RequestResource(C.NAME_EVA_PROPELLANT, -double.MaxValue);
             }
         }
 
