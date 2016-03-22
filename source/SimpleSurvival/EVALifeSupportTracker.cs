@@ -33,11 +33,11 @@ namespace SimpleSurvival
         /// <summary>
         /// Header for the ConfigNode section that will contain EVA LS tracking
         /// </summary>
-        private static string NODE_HEADER = "SIMPLESURVIVAL_EVA_LS";
+        private static string NODE_HEADER = "SIMPLESURVIVAL_MOD";
         /// <summary>
         /// Title of each individual node holding one Kerbal's info
         /// </summary>
-        private static string NODE_INNER_TITLE = "KERBAL";
+        private static string NODE_INNER_TITLE = "KERBAL_EVA_LS";
 
         /// <summary>
         /// Stores the live EVA LS tracking info

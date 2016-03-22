@@ -43,11 +43,9 @@ namespace SimpleSurvival
             // NOTE: This method is called ONCE during initial part loading,
             // so performance is not a concern
 
-            string per_kerb = part.CrewCapacity > 1 ? "/Kerbal" : "";
-
             string info = "Active only when manned.\n\n" +
-            "<b><color=#99ff00>Requires:</color></b>\n" +
-            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(C.LS_PER_DAY_PER_KERBAL) + per_kerb + "/day.\n";
+            "<b>" + C.HTML_VAB_GREEN + "Requires:</color></b>\n" +
+            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(C.LS_PER_DAY_PER_KERBAL) + "/Kerbal/day.\n";
             
             return info;
         }
@@ -90,7 +88,7 @@ namespace SimpleSurvival
                         TimeWarp.SetRate(0, true);
                         string name = vessel.isActiveVessel ? part.partInfo.title : vessel.vesselName;
 
-                        ScreenMessages.PostScreenMessage("<color=#ff8800>Crew in " + name + "\nhas " + C.GRACE_PERIOD + " seconds to live!</color>", 8f, ScreenMessageStyle.UPPER_CENTER);
+                        ScreenMessages.PostScreenMessage(C.HTML_COLOR_WARNING + "Crew in " + name + "\nhas " + C.GRACE_PERIOD + " seconds to live!</color>", 8f, ScreenMessageStyle.UPPER_CENTER);
                     }
 
                     grace_timer -= 1.0f * TimeWarp.fixedDeltaTime;

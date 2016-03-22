@@ -108,5 +108,17 @@ namespace SimpleSurvival
         /// </summary>
         public const double OXYGEN_CUTOFF_ALTITUDE = 10000.0;
 
+        /// <summary>
+        /// Medium priority - Orange
+        /// </summary>
+        public const string HTML_COLOR_WARNING = "<color=#ff8800>";
+        /// <summary>
+        /// High priority - Red
+        /// </summary>
+        public const string HTML_COLOR_ALERT = "<color=#ff1100>";
+        /// <summary>
+        /// "VAB green"
+        /// </summary>
+        public const string HTML_VAB_GREEN = "<color=#99ff00>";
     }
 }

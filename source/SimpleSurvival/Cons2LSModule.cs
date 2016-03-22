@@ -108,10 +108,10 @@ namespace SimpleSurvival
                     ScreenMessages.PostScreenMessage("EVA resources refilled!",
                         5f, ScreenMessageStyle.UPPER_LEFT);
                 else if (frac < C.DOUBLE_MARGIN)
-                    ScreenMessages.PostScreenMessage("<color=#ff2200>" + C.NAME_CONSUMABLES + " are empty - could not refill!</color>",
+                    ScreenMessages.PostScreenMessage(C.HTML_COLOR_ALERT + C.NAME_CONSUMABLES + " are empty - could not refill!</color>",
                         5f, ScreenMessageStyle.UPPER_CENTER);
                 else
-                    ScreenMessages.PostScreenMessage("<color=#ff7700>Partial refill - " + C.NAME_CONSUMABLES + " are empty!</color>",
+                    ScreenMessages.PostScreenMessage(C.HTML_COLOR_ALERT + "Partial refill - " + C.NAME_CONSUMABLES + " are empty!</color>",
                         5f, ScreenMessageStyle.UPPER_CENTER);
             }
             // Player is controlling EVA
@@ -141,11 +141,11 @@ namespace SimpleSurvival
                     ScreenMessages.PostScreenMessage("EVA resources refilled!", 5f, ScreenMessageStyle.UPPER_LEFT);
                 // If Consumables are empty
                 else if (add < C.DOUBLE_MARGIN)
-                    ScreenMessages.PostScreenMessage("<color=#ff2200>" + C.NAME_CONSUMABLES + " are empty - could not refill!</color>",
+                    ScreenMessages.PostScreenMessage(C.HTML_COLOR_ALERT + C.NAME_CONSUMABLES + " are empty - could not refill!</color>",
                         5f, ScreenMessageStyle.UPPER_CENTER);
                 // If Consumables are almost empty, partial refill
                 else
-                    ScreenMessages.PostScreenMessage("<color=#ff7700>Partial refill: " + C.NAME_CONSUMABLES + " are empty!</color>",
+                    ScreenMessages.PostScreenMessage(C.HTML_COLOR_WARNING + "Partial refill: " + C.NAME_CONSUMABLES + " are empty!</color>",
                         5f, ScreenMessageStyle.UPPER_CENTER);
             }
         }
@@ -156,7 +156,7 @@ namespace SimpleSurvival
             {
                 if (!ProperlyManned())
                 {
-                    ScreenMessages.PostScreenMessage("<color=#ff8800>Converter requires an Engineer to operate</color>",
+                    ScreenMessages.PostScreenMessage("Converter requires an Engineer to operate!",
                         5f, ScreenMessageStyle.UPPER_CENTER);
                     status = ConverterStatus.READY;
                     return;
@@ -263,12 +263,19 @@ namespace SimpleSurvival
 
         public override string GetInfo()
         {
-            string info = "Converts " + C.NAME_CONSUMABLES + " to " + C.NAME_LIFESUPPORT + ". Part must be manned by an Engineer to operate.\n\n" +
-            "<b><color=#99ff00>Requires:</color></b>\n" +
+            string info = "Converts " + C.NAME_CONSUMABLES + " to " + C.NAME_LIFESUPPORT +
+                ". Part must be manned by an Engineer.\n\n" +
+
+            "<b>" + C.HTML_VAB_GREEN + "Requires:</color></b>\n" +
             "- " + C.NAME_CONSUMABLES + ": " + Util.FormatForGetInfo(C.CONV_CONS_PER_SEC) + "/sec.\n" +
-            "- " + C.NAME_ELECTRICITY + ": " + Util.FormatForGetInfo(C.CONV_ELEC_PER_SEC) + "/sec.\n\n" +
-            "<b><color=#99ff00>Outputs:</color></b>\n" +
-            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(-C.CONV_LS_PER_SEC) + "/sec.";
+            "- " + C.NAME_ELECTRICITY + ": " + Util.FormatForGetInfo(C.CONV_ELEC_PER_SEC) + "/sec.\n" +
+            "<b>" + C.HTML_VAB_GREEN + "Outputs:</color></b>\n" +
+            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(-C.CONV_LS_PER_SEC) + "/sec.\n\n" +
+
+            "EVA refill has no crew requirement and is instantaneous.\n\n" +
+            "<b>" + C.HTML_VAB_GREEN + "Conversion rate:</color></b>\n" +
+            "  " + Util.FormatForGetInfo(C.CONS_TO_EVA) + " " + C.NAME_CONSUMABLES +
+            "\n  = 1.0 " + C.NAME_EVA_LIFESUPPORT;
 
             return info;
         }
