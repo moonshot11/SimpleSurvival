@@ -146,7 +146,25 @@ namespace SimpleSurvival
             }
             catch (KeyNotFoundException e)
             {
-                Log("Exception thrown: Kerbal " + name + " not found to update tracking!");
+                Log("SetCurrentEVAAmount Exception thrown: Kerbal " + name + " not found to update tracking!");
+                Log(e.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Add to the current EVA amount
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="amount"></param>
+        public static void AddEVAAmount(string name, double amount)
+        {
+            try
+            {
+                evals_info[name].current += amount;
+            }
+            catch (KeyNotFoundException e)
+            {
+                Log("AddEVAAmount Exception thrown: Kerbal " + name + " not found to update tracking!");
                 Log(e.ToString());
             }
         }

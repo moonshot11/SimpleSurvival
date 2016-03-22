@@ -58,6 +58,11 @@ namespace SimpleSurvival
             {
                 Util.Log("FillEVA pressed for active vessel " + vessel.name);
 
+                double eva_request_total = 0;
+
+                // Map of kerbals in tracking, and how much they're requesting
+                Dictionary<string, double> kerbal_requests = new Dictionary<string, double>();
+
                 foreach (ProtoCrewMember kerbal in active.GetVesselCrew())
                 {
                     if (!EVALifeSupportTracker.InTracking(kerbal.name))
@@ -66,8 +71,28 @@ namespace SimpleSurvival
                     var info = EVALifeSupportTracker.GetEVALSInfo(kerbal.name);
                     double request = info.max - info.current;
 
-                    part.RequestResource(C.NAME_CONSUMABLES, C.CONS_TO_EVA * request);
-                    EVALifeSupportTracker.SetCurrentEVAAmount(kerbal.name, info.max);
+                    eva_request_total += request;
+                    kerbal_requests.Add(kerbal.name, request);
+
+                    Util.Log("    Kerbal " + name + " has EVA need for " + request);
+                }
+
+                // Deduct Consumables
+                double obtained = part.RequestResource(C.NAME_CONSUMABLES, C.CONS_TO_EVA * eva_request_total);
+                double frac = obtained / eva_request_total;
+
+                Util.Log("    EVA request total  = " + eva_request_total);
+                Util.Log("    Request * factor   = " + C.CONS_TO_EVA * eva_request_total);
+                Util.Log("    Obtained           = " + obtained);
+                Util.Log("    Fraction available = " + frac);
+
+                // Distribute EVA LS proportionally
+                foreach (string name in kerbal_requests.Keys)
+                {
+                    double add = kerbal_requests[name] * frac;
+                    EVALifeSupportTracker.AddEVAAmount(name, add);
+
+                    Util.Log("    Adding " + add + " to " + name);
                 }
             }
             // Player is controlling EVA
@@ -80,10 +105,13 @@ namespace SimpleSurvival
                 // This works right now because the tracker updates live.
                 // May break in the future.
                 var info = EVALifeSupportTracker.GetEVALSInfo(name);
-                double request = info.max - info.current;
+                double eva_request = info.max - info.current;
 
-                part.RequestResource(C.NAME_CONSUMABLES, C.CONS_TO_EVA * request);
-                active.rootPart.RequestResource(C.NAME_EVA_LIFESUPPORT, -info.max);
+                double obtained = part.RequestResource(C.NAME_CONSUMABLES, C.CONS_TO_EVA * eva_request);
+                active.rootPart.RequestResource(C.NAME_EVA_LIFESUPPORT, -obtained / C.CONS_TO_EVA);
+
+                Util.Log("    EVA Request  = " + eva_request);
+                Util.Log("    Amt Obtained = " + obtained);
             }
         }
 
