@@ -13,27 +13,15 @@ namespace SimpleSurvival
 
         public override void OnStart(StartState state)
         {
-            StartState[] valid_states = new StartState[]
+            if (HighLogic.LoadedScene == GameScenes.FLIGHT)
             {
-                StartState.Flying,
-                StartState.Landed,
-                StartState.Orbital,
-                StartState.Splashed,
-                StartState.SubOrbital,
-                StartState.Docked
-            };
+                grace_timer = C.GRACE_PERIOD;
 
-            grace_timer = C.GRACE_PERIOD;
-
-            if (valid_states.Contains(state))
-            {
                 bool enough = Util.StartupRequest(this, C.NAME_LIFESUPPORT, C.LS_DRAIN_PER_SEC);
 
                 if (!enough)
                     grace_timer = 0f;
             }
-            else
-                Util.Log("State = " + state.ToString() + ", ignoring startup LifeSupport request");
 
             base.OnStart(state);
         }

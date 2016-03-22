@@ -184,13 +184,12 @@ namespace SimpleSurvival
         private void OnKerbalStatusChange(ProtoCrewMember kerbal,
             ProtoCrewMember.RosterStatus old_status, ProtoCrewMember.RosterStatus new_status)
         {
-            Log("Call -> OnKerbalStatusChange(..) " + kerbal.name + ": " + old_status.ToString() + " -> " + new_status.ToString());
-
             // Kerbals regularly change to Available, then back to Assigned
             // when in space, so can't use this method to track Kerbals in service
             if (new_status == ProtoCrewMember.RosterStatus.Dead
                 || new_status == ProtoCrewMember.RosterStatus.Missing)
             {
+                Log("Call -> OnKerbalStatusChange(..) " + kerbal.name + ": " + old_status.ToString() + " -> " + new_status.ToString());
                 Log("Clearing EVA LS info for " + kerbal.name);
                 evals_info.Remove(kerbal.name);
             }
