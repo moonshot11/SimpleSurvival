@@ -272,7 +272,7 @@ namespace SimpleSurvival
             "<b>" + C.HTML_VAB_GREEN + "Outputs:</color></b>\n" +
             "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(-C.CONV_LS_PER_SEC) + "/sec.\n\n" +
 
-            "EVA refill has no crew requirement and is instantaneous.\n\n" +
+            "EVA refill has no crew requirement and is instantaneous. " + C.NAME_EVA_PROPELLANT + " is refilled for free.\n\n" +
             "<b>" + C.HTML_VAB_GREEN + "Conversion rate:</color></b>\n" +
             "  " + Util.FormatForGetInfo(C.CONS_TO_EVA) + " " + C.NAME_CONSUMABLES +
             "\n  = 1.0 " + C.NAME_EVA_LIFESUPPORT;
