@@ -230,8 +230,25 @@ namespace SimpleSurvival
         {
             Log("Call -> OnSave(..)");
 
+            if (gamenode == null)
+            {
+                Log("gamenode is null, aborting OnSave");
+                return;
+            }
+
+            if (evals_info == null)
+            {
+                Log("evals_info is null, aborting OnSave");
+                return;
+            }
+
             // Write back to confignode
-            ConfigNode topnode = new ConfigNode(NODE_HEADER);
+            ConfigNode topnode = null;
+
+            if (gamenode.HasNode(NODE_HEADER))
+                topnode = gamenode.GetNode(NODE_HEADER);
+            else
+                topnode = new ConfigNode(NODE_HEADER);
 
             foreach (string name in evals_info.Keys)
             {
