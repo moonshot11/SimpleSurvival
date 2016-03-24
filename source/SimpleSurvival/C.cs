@@ -87,6 +87,8 @@ namespace SimpleSurvival
         /// otherwise Rescue contracts won't register as failures.
         /// This number can be increased if large vessels trigger this erroneous behavior.
         /// </summary>
+        // Tested at 0.05 seconds on a 270 part behemoth, with an i5-4690 @ 3.5 GHz.
+        // This should be okay, but not sure how ultra low budget PCs would perform.
         public const float KILL_BUFFER = 1f;
 
         // -- Converter rates --
