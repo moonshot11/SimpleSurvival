@@ -49,11 +49,13 @@
   <ItemGroup>
     <Compile Include="C.cs" />
     <Compile Include="Cons2LSModule.cs" />
+    <Compile Include="ContractChecker.cs" />
     <Compile Include="EVALifeSupportLoader.cs" />
     <Compile Include="EVALifeSupportModule.cs" />
     <Compile Include="EVALifeSupportTracker.cs" />
     <Compile Include="LifeSupportModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimpleSurvivalLoader.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

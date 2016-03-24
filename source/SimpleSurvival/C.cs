@@ -120,5 +120,18 @@ namespace SimpleSurvival
         /// "VAB green"
         /// </summary>
         public const string HTML_VAB_GREEN = "<color=#99ff00>";
+
+        /// <summary>
+        /// Header for the ConfigNode section that will contain EVA LS tracking
+        /// </summary>
+        public static string NODE_SIMPLESURVIVAL = "SIMPLESURVIVAL_MOD";
+        /// <summary>
+        /// Title of each individual node holding one Kerbal's info
+        /// </summary>
+        public static string NODE_EVA_TRACK = "KERBAL_EVA_LS";
+        /// <summary>
+        /// Guid of a contract unaddressed by LifeSupportModule OnStart
+        /// </summary>
+        public static string NODE_RESCUE_CONTRACT_GUID = "CONTRACT_RECOVERASSET_UNHANDLED_GUID";
     }
 }

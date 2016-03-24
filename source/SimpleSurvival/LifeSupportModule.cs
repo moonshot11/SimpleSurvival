@@ -11,16 +11,41 @@ namespace SimpleSurvival
     {
         private float grace_timer = C.GRACE_PERIOD;
 
+        public override void OnAwake()
+        {
+        }
+
         public override void OnStart(StartState state)
         {
-            if (HighLogic.LoadedScene == GameScenes.FLIGHT)
+            if (HighLogic.LoadedSceneIsFlight)
             {
                 grace_timer = C.GRACE_PERIOD;
 
-                bool enough = Util.StartupRequest(this, C.NAME_LIFESUPPORT, C.LS_DRAIN_PER_SEC);
+                bool skip_startup_request = false;
 
-                if (!enough)
-                    grace_timer = 0f;
+                for (int i = 0; i < ContractChecker.Guids.Count; i++)
+                {
+                    string contract_guid = ContractChecker.Guids[i];
+                    if (part.flightID.ToString() == ContractChecker.GetPartID(contract_guid))
+                    {
+                        Util.Log("Found PartID " + part.flightID + ", skipping startup request");
+
+                        // Remove guid from tracking, vessel will only transition to Owned once
+                        ContractChecker.Guids.Remove(contract_guid);
+                        part.Resources[C.NAME_LIFESUPPORT].amount = part.Resources[C.NAME_LIFESUPPORT].maxAmount / 2.0;
+
+                        skip_startup_request = true;
+                        break;
+                    }
+                }
+
+                if (!skip_startup_request)
+                {
+                    bool enough = Util.StartupRequest(this, C.NAME_LIFESUPPORT, C.LS_DRAIN_PER_SEC);
+
+                    if (!enough)
+                        grace_timer = 0f;
+                }
             }
 
             base.OnStart(state);

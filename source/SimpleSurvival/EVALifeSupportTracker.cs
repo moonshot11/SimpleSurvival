@@ -31,15 +31,6 @@ namespace SimpleSurvival
         }
 
         /// <summary>
-        /// Header for the ConfigNode section that will contain EVA LS tracking
-        /// </summary>
-        private static string NODE_HEADER = "SIMPLESURVIVAL_MOD";
-        /// <summary>
-        /// Title of each individual node holding one Kerbal's info
-        /// </summary>
-        private static string NODE_INNER_TITLE = "KERBAL_EVA_LS";
-
-        /// <summary>
         /// Stores the live EVA LS tracking info
         /// </summary>
         private static Dictionary<string, EVALS_Info> evals_info = null;
@@ -51,8 +42,7 @@ namespace SimpleSurvival
         {
             Log("Call -> Awake(..) " + HighLogic.LoadedScene.ToString());
 
-            GameEvents.onGameStateSave.Add(OnSave);
-            GameEvents.onGameStateLoad.Add(OnLoad);
+            evals_info = new Dictionary<string, EVALS_Info>();
 
             // Kerbals will be added to tracking
             GameEvents.OnVesselRollout.Add(OnVesselRollout);
@@ -203,52 +193,32 @@ namespace SimpleSurvival
             evals_info.Remove(kerbal.name);
         }
 
-        private void OnLoad(ConfigNode gamenode)
+        public static void Load(ConfigNode scenario_node)
         {
             Log("Call -> OnLoad(..)");
 
-            evals_info = new Dictionary<string, EVALS_Info>();
+            evals_info.Clear();
 
-            // -- Load from ConfigNode --
-            if (gamenode.HasNode(NODE_HEADER))
+            foreach (ConfigNode node in scenario_node.GetNodes(C.NODE_EVA_TRACK))
             {
-                ConfigNode evals_node = gamenode.GetNode(NODE_HEADER);
+                string name = node.GetValue("name");
+                double current = Convert.ToDouble(node.GetValue("amount"));
+                double max = Convert.ToDouble(node.GetValue("maxAmount"));
 
-                foreach (ConfigNode node in evals_node.GetNodes(NODE_INNER_TITLE))
-                {
-                    string name = node.GetValue("name");
-                    double current = Convert.ToDouble(node.GetValue("amount"));
-                    double max = Convert.ToDouble(node.GetValue("maxAmount"));
-
-                    evals_info.Add(name, new EVALS_Info(current, max));
-                    Log("Adding " + name + ": [" + current + ", " + max + "]");
-                }
+                evals_info.Add(name, new EVALS_Info(current, max));
+                Log("Adding " + name + ": [" + current + ", " + max + "]");
             }
         }
 
-        private void OnSave(ConfigNode gamenode)
+        public static void Save(ConfigNode scenario_node)
         {
             Log("Call -> OnSave(..)");
-
-            if (gamenode == null)
-            {
-                Log("gamenode is null, aborting OnSave");
-                return;
-            }
 
             if (evals_info == null)
             {
                 Log("evals_info is null, aborting OnSave");
                 return;
             }
-
-            // Write back to confignode
-            ConfigNode topnode = null;
-
-            if (gamenode.HasNode(NODE_HEADER))
-                topnode = gamenode.GetNode(NODE_HEADER);
-            else
-                topnode = new ConfigNode(NODE_HEADER);
 
             foreach (string name in evals_info.Keys)
             {
@@ -259,19 +229,17 @@ namespace SimpleSurvival
                 Log("  amount    = " + info.current);
                 Log("  maxAmount = " + info.max);
 
-                ConfigNode node = topnode.AddNode(NODE_INNER_TITLE);
+                ConfigNode node = scenario_node.AddNode(C.NODE_EVA_TRACK);
                 node.AddValue("name", name);
                 node.AddValue("amount", info.current);
                 node.AddValue("maxAmount", info.max);
             }
-
-            gamenode.AddNode(topnode);
         }
 
         // This module needs its own logger
         private static void Log(string message)
         {
-            KSPLog.print("SimpleSurvival EVALifeSupportTracker: " + message);
+            KSPLog.print("SimpleSurvival: EVALifeSupportTracker -> " + message);
         }
     }
 }
