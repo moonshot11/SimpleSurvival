@@ -11,10 +11,6 @@ namespace SimpleSurvival
     {
         private float grace_timer = C.GRACE_PERIOD;
 
-        public override void OnAwake()
-        {
-        }
-
         public override void OnStart(StartState state)
         {
             if (HighLogic.LoadedSceneIsFlight)
@@ -44,7 +40,7 @@ namespace SimpleSurvival
                     bool enough = Util.StartupRequest(this, C.NAME_LIFESUPPORT, C.LS_DRAIN_PER_SEC);
 
                     if (!enough)
-                        grace_timer = 0f;
+                        grace_timer = C.KILL_BUFFER;
                 }
             }
 
@@ -104,7 +100,7 @@ namespace SimpleSurvival
                         ScreenMessages.PostScreenMessage(C.HTML_COLOR_WARNING + "Crew in " + name + "\nhas " + C.GRACE_PERIOD + " seconds to live!</color>", 8f, ScreenMessageStyle.UPPER_CENTER);
                     }
 
-                    grace_timer -= 1.0f * TimeWarp.fixedDeltaTime;
+                    grace_timer -= TimeWarp.fixedDeltaTime;
                     return;
                 }
 

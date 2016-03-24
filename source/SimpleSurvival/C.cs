@@ -82,6 +82,12 @@ namespace SimpleSurvival
         /// Seconds of grace period before empty LS module kills Kerbals
         /// </summary>
         public const float GRACE_PERIOD = 30.0f;
+        /// <summary>
+        /// Give the game a buffer to finish loading everything before killing Kerbals,
+        /// otherwise Rescue contracts won't register as failures.
+        /// This number can be increased if large vessels trigger this erroneous behavior.
+        /// </summary>
+        public const float KILL_BUFFER = 1f;
 
         // -- Converter rates --
 

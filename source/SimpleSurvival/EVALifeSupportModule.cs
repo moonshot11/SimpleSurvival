@@ -8,10 +8,19 @@ namespace SimpleSurvival
 {
     public class EVALifeSupportModule : PartModule
     {
+        /// <summary>
+        /// Give the game a buffer to load everything, otherwise failed
+        /// rescue contracts will not be registered
+        /// </summary>
+        private float kill_timer = C.KILL_BUFFER;
+
         public override void OnStart(StartState state)
         {
             // -- Check if resource is already added to part --
             bool found_resource = false;
+
+            // -- Always reset grace_timer to two frames
+            kill_timer = C.KILL_BUFFER;
 
             foreach (PartResource pr in part.Resources)
             {
@@ -78,9 +87,14 @@ namespace SimpleSurvival
             // Necessary to check if crew count > 0?
             if (retd == 0.0)
             {
-                Util.KillKerbals(this);
-                part.explode();
-                vessel.Die(); // Is this necessary?
+                kill_timer -= TimeWarp.fixedDeltaTime;
+
+                if (kill_timer <= 0)
+                {
+                    Util.KillKerbals(this);
+                    part.explode();
+                    vessel.Die(); // Is this necessary?
+                }
 
                 #region FlightResultsDialog
                 // string kerbal_name = part.protoModuleCrew[0].name; // Move to top of code block
