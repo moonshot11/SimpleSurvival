@@ -93,7 +93,6 @@ namespace SimpleSurvival
                 {
                     Util.KillKerbals(this);
                     part.explode();
-                    vessel.Die(); // Is this necessary?
                 }
 
                 #region FlightResultsDialog
