@@ -148,5 +148,27 @@ namespace SimpleSurvival
             return vessel.vesselType != VesselType.SpaceObject &&
                 vessel.DiscoveryInfo.Level == DiscoveryLevels.Unowned;
         }
+
+        /// <summary>
+        /// Log a VERY verbose printout of a contract.
+        /// </summary>
+        /// <param name="contract">Reference to the Contract object</param>
+        public static void PrintContractDetails(Contracts.Contract contract)
+        {
+            Util.Log("---------------------Contract Info---------------------------");
+            Util.Log("ContractGuid = " + contract.ContractGuid);
+            Util.Log("ContractID = " + contract.ContractID);
+            Util.Log("ContractState = " + contract.ContractState);
+            Util.Log("DateAccepted = " + contract.DateAccepted);
+            Util.Log("DateDeadline = " + contract.DateDeadline);
+            Util.Log("DateExpire = " + contract.DateExpire);
+            Util.Log("DateFinished = " + contract.DateFinished);
+            Util.Log("Description = " + contract.Description);
+            Util.Log("Notes = " + contract.Notes);
+            Util.Log("Prestige = " + contract.Prestige);
+            Util.Log("Synopsys = " + contract.Synopsys);
+            Util.Log("Title = " + contract.Title);
+            Util.Log("-------------------------------------------------------------");
+        }
     }
 }

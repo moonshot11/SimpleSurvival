@@ -24,7 +24,8 @@ namespace SimpleSurvival
                     string contract_guid = ContractChecker.Guids[i];
                     if (part.flightID.ToString() == ContractChecker.GetPartID(contract_guid))
                     {
-                        Util.Log("Found PartID " + part.flightID + ", skipping startup request");
+                        Util.Log("For Contract GUID: " + contract_guid);
+                        Util.Log("Found PartID " + part.flightID + ", skipping startup request for " + vessel.name);
 
                         // Remove guid from tracking, vessel will only transition to Owned once
                         ContractChecker.Guids.Remove(contract_guid);
