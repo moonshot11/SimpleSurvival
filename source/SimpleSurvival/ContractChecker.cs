@@ -90,6 +90,9 @@ namespace SimpleSurvival
 
         public static void Save(ConfigNode scenario_node)
         {
+            if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
+                return;
+
             Log("OnSave(..)");
             PruneOldGuids();
 
@@ -102,6 +105,9 @@ namespace SimpleSurvival
 
         public static void Load(ConfigNode scenario_node)
         {
+            if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
+                return;
+
             Log("OnLoad(..)");
 
             Guids.Clear();
