@@ -39,6 +39,7 @@ while (my $line = <$FILE>)
         # Amount of LifeSupport
         my $ls_amt = $5;
 
+        next unless ($name);
         next unless ($converter || $ls_amt);
 
         print "\@PART[$name]$NL";
