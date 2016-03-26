@@ -108,6 +108,10 @@ namespace SimpleSurvival
             Util.Log("Time elapsed: " + delta + " (" + KSPUtil.PrintDateDelta((int)delta, true, true) + ")");
             Util.Log("Initial resource request (" + resource_name + "): " + request);
 
+            // If user has disabled flow of LifeSupport to crewed part, assume this was in error
+            // Re-enable so Kerbals don't immediately die upon vessel load
+            module.part.Resources[resource_name].flowState = true;
+
             double obtained = module.part.RequestResource(resource_name, request, C.FLOWMODE_LIFESUPPORT);
 
             return obtained > (request - C.STARTUP_KILL_MARGIN);
