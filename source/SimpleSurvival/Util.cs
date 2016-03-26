@@ -108,7 +108,7 @@ namespace SimpleSurvival
             Util.Log("Time elapsed: " + delta + " (" + KSPUtil.PrintDateDelta((int)delta, true, true) + ")");
             Util.Log("Initial resource request (" + resource_name + "): " + request);
 
-            double obtained = module.part.RequestResource(resource_name, request);
+            double obtained = module.part.RequestResource(resource_name, request, C.FLOWMODE_LIFESUPPORT);
 
             return obtained > (request - C.STARTUP_KILL_MARGIN);
         }

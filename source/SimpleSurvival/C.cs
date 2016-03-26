@@ -141,5 +141,9 @@ namespace SimpleSurvival
         /// Guid of a contract unaddressed by LifeSupportModule OnStart
         /// </summary>
         public static string NODE_RESCUE_CONTRACT_GUID = "CONTRACT_RECOVERASSET_UNHANDLED_GUID";
+        /// <summary>
+        /// The flow mode when requesting LifeSupport in-game
+        /// </summary>
+        public const ResourceFlowMode FLOWMODE_LIFESUPPORT = ResourceFlowMode.NO_FLOW;
     }
 }

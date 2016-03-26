@@ -80,7 +80,7 @@ namespace SimpleSurvival
             double ls_request = crew_count * C.LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime;
 
             // Request resource based on rates defined by constants
-            double ret_rs = part.RequestResource(C.NAME_LIFESUPPORT, ls_request);
+            double ret_rs = part.RequestResource(C.NAME_LIFESUPPORT, ls_request, C.FLOWMODE_LIFESUPPORT);
 
             if (ret_rs > 0.0)
             {
