@@ -81,9 +81,9 @@ namespace SimpleSurvival
         /// <returns>Returns false if insufficient resources. Otherwise, returns true.</returns>
         public static bool StartupRequest(PartModule module, string resource_name, double resource_rate)
         {
-            if (IsContractVessel(module.vessel))
+            if (module.part.protoModuleCrew.Count == 0)
             {
-                Util.Log("Vessel " + module.vessel.name + " is contract vessel. Skipping startup request.");
+                Util.Log("Part " + module.part.name + " has no crew - skipping LSM startup");
                 return true;
             }
 
