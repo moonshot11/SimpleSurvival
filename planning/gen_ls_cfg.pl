@@ -30,7 +30,7 @@ while (my $line = <$FILE>)
     # Skip if this is the header
     next if ($line =~ /Notes/);
 
-    if ($line =~ /^([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),/)
+    if ($line =~ /^([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),/)
     {
         # Cfg part name
         my $name = $2;
@@ -38,12 +38,19 @@ while (my $line = <$FILE>)
         my $converter = $3;
         # Amount of LifeSupport
         my $ls_amt = $5;
+        # Technode to change, if any
+        my $technode = $7;
 
         next unless ($name);
-        next unless ($converter || $ls_amt);
+        next unless ($converter || $ls_amt || $technode);
 
         print "\@PART[$name]$NL";
         print "{$NL";
+
+        if ($technode)
+        {
+            print "    \@TechRequired = $technode$NL";
+        }
 
         if ($ls_amt)
         {
