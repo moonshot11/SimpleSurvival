@@ -96,15 +96,15 @@ namespace SimpleSurvival
         /// <summary>
         /// Consumables drained per second to generate LifeSupport
         /// </summary>
-        public const double CONV_CONS_PER_SEC = 0.1;
+        public const double CONV_CONS_PER_SEC = 4;
         /// <summary>
         /// ElectricCharge drained per second to generate LifeSupport
         /// </summary>
-        public const double CONV_ELEC_PER_SEC = 0.1;
+        public const double CONV_ELEC_PER_SEC = 2;
         /// <summary>
         /// LifeSupport generated per second from Consumables
         /// </summary>
-        public const double CONV_LS_PER_SEC = -0.1;
+        public const double CONV_LS_PER_SEC = -CONV_CONS_PER_SEC;
 
         /// <summary>
         /// Conversation rate of Consumables to EVA
