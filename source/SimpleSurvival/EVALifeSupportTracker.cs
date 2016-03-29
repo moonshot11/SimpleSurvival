@@ -146,7 +146,8 @@ namespace SimpleSurvival
         /// </summary>
         /// <param name="name"></param>
         /// <param name="amount"></param>
-        public static void AddEVAAmount(string name, double amount)
+        /// <returns>Returns the amount of EVA LS after adding</returns>
+        public static double AddEVAAmount(string name, double amount)
         {
             try
             {
@@ -157,6 +158,8 @@ namespace SimpleSurvival
                 Log("AddEVAAmount Exception thrown: Kerbal " + name + " not found to update tracking!");
                 Log(e.ToString());
             }
+
+            return evals_info[name].current;
         }
 
         private void OnVesselRecovered(ProtoVessel proto)

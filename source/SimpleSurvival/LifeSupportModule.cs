@@ -9,16 +9,18 @@ namespace SimpleSurvival
     [KSPModule("Life Support")]
     public class LifeSupportModule : PartModule
     {
-        private float grace_timer = C.GRACE_PERIOD;
+        private bool showed_eva_warning = false;
 
         public override void OnStart(StartState state)
         {
+            showed_eva_warning = false;
+
             if (HighLogic.LoadedSceneIsFlight)
             {
-                grace_timer = C.GRACE_PERIOD;
-
                 bool skip_startup_request = false;
 
+                // Check if this ship belongs to a Rescue contract
+                // and has not been set up with LifeSupport
                 for (int i = 0; i < ContractChecker.Guids.Count; i++)
                 {
                     string contract_guid = ContractChecker.Guids[i];
@@ -38,10 +40,21 @@ namespace SimpleSurvival
 
                 if (!skip_startup_request)
                 {
-                    bool enough = Util.StartupRequest(this, C.NAME_LIFESUPPORT, C.LS_DRAIN_PER_SEC);
+                    // Use the seconds remaining to calculate how much EVA LifeSupport needs to be deducted
+                    double seconds_remaining = Util.StartupRequest(this, C.NAME_LIFESUPPORT, C.LS_DRAIN_PER_SEC);
+                    double eva_diff = seconds_remaining * C.EVA_LS_DRAIN_PER_SEC;
 
-                    if (!enough)
-                        grace_timer = C.KILL_BUFFER;
+                    Util.Log(seconds_remaining + " seconds remaining for " + vessel.vesselName);
+                    Util.Log("Deducting " + eva_diff + " " + C.NAME_EVA_LIFESUPPORT);
+
+                    foreach (ProtoCrewMember kerbal in part.protoModuleCrew)
+                    {
+                        double current = EVALifeSupportTracker.AddEVAAmount(kerbal.name, -eva_diff);
+                        if (current < C.KILL_BUFFER)
+                        {
+                            EVALifeSupportTracker.SetCurrentEVAAmount(kerbal.name, C.KILL_BUFFER);
+                        }
+                    }
                 }
             }
 
@@ -65,7 +78,7 @@ namespace SimpleSurvival
             // If part is unmanned, nothing to do
             if (part.protoModuleCrew.Count == 0)
             {
-                grace_timer = C.GRACE_PERIOD;
+                showed_eva_warning = false;
                 return;
             }
 
@@ -82,30 +95,41 @@ namespace SimpleSurvival
             // Request resource based on rates defined by constants
             double ret_rs = part.RequestResource(C.NAME_LIFESUPPORT, ls_request, C.FLOWMODE_LIFESUPPORT);
 
+            // If LifeSupport exists or is restored, reset EVA warning and return
             if (ret_rs > 0.0)
             {
-                // If LifeSupport exists or is restored, reset grace period
-                grace_timer = C.GRACE_PERIOD;
+                showed_eva_warning = false;
+                return;
             }
-            else
+
+            // Otherwise, begin deducting EVA LS
+            if (!showed_eva_warning)
             {
-                // If timer hasn't run out, tick then return
-                if (grace_timer > 0f)
+                TimeWarp.SetRate(0, true);
+                string vessel_name = vessel.isActiveVessel ? part.partInfo.title : vessel.vesselName;
+
+                showed_eva_warning = true;
+                ScreenMessages.PostScreenMessage(
+                    C.HTML_COLOR_WARNING +
+                    "Crew in " + vessel_name + "\nhas run out of " + C.NAME_LIFESUPPORT + ",\n is consuming " + C.NAME_EVA_LIFESUPPORT + "</color>",
+                    8f, ScreenMessageStyle.UPPER_CENTER);
+            }
+
+            // Modify crew list in place
+            int i = 0;
+            while (i < part.protoModuleCrew.Count)
+            {
+                ProtoCrewMember kerbal = part.protoModuleCrew[i];
+
+                double current_eva = EVALifeSupportTracker.AddEVAAmount(kerbal.name, -C.EVA_LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime);
+                
+                if (current_eva < 0.0)
                 {
-                    // If this is the first tick, print warning
-                    if (grace_timer == C.GRACE_PERIOD)
-                    {
-                        TimeWarp.SetRate(0, true);
-                        string name = vessel.isActiveVessel ? part.partInfo.title : vessel.vesselName;
-
-                        ScreenMessages.PostScreenMessage(C.HTML_COLOR_WARNING + "Crew in " + name + "\nhas " + C.GRACE_PERIOD + " seconds to live!</color>", 8f, ScreenMessageStyle.UPPER_CENTER);
-                    }
-
-                    grace_timer -= TimeWarp.fixedDeltaTime;
-                    return;
+                    Util.KillKerbal(this, kerbal);
+                    continue;
                 }
 
-                Util.KillKerbals(this);
+                i++;
             }
         }
     }

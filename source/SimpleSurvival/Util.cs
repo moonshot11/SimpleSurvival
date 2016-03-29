@@ -26,6 +26,31 @@ namespace SimpleSurvival
         }
 
         /// <summary>
+        /// This kills the Kerbal
+        /// </summary>
+        /// <param name="module"></param>
+        /// <param name="kerbal"></param>
+        public static void KillKerbal(PartModule module, ProtoCrewMember kerbal)
+        {
+            List<ProtoCrewMember> part_crew = module.part.protoModuleCrew;
+            
+            bool respawn_flag = HighLogic.CurrentGame.Parameters.Difficulty.MissingCrewsRespawn;
+
+            ScreenMessages.PostScreenMessage(C.HTML_COLOR_ALERT + kerbal.name + " ran out of LifeSupport and died!</color>",
+                6f, ScreenMessageStyle.UPPER_CENTER);
+
+            // Kerbal must be removed from part BEFORE calling Die()
+            module.part.RemoveCrewmember(kerbal);
+
+            // ...for some reason
+            kerbal.Die();
+
+            // Put Kerbal in Missing queue
+            if (respawn_flag)
+                kerbal.StartRespawnPeriod();
+        }
+
+        /// <summary>
         /// Kill all Kerbals attached to this specific PartModule
         /// </summary>
         /// <param name="module"></param>
@@ -78,20 +103,20 @@ namespace SimpleSurvival
         /// <param name="part">The Part with the life support PartModule</param>
         /// <param name="resource_name">The resource to drain</param>
         /// <param name="resource_rate">The resource drain rate (per second)</param>
-        /// <returns>Returns false if insufficient resources. Otherwise, returns true.</returns>
-        public static bool StartupRequest(PartModule module, string resource_name, double resource_rate)
+        /// <returns>Returns the number of seconds remaining after LifeSupport is deducted</returns>
+        public static double StartupRequest(PartModule module, string resource_name, double resource_rate)
         {
             if (module.part.protoModuleCrew.Count == 0)
             {
                 Util.Log("Part " + module.part.name + " has no crew - skipping LSM startup");
-                return true;
+                return 0.0;
             }
 
             if (module.vessel.mainBody.atmosphereContainsOxygen && module.vessel.altitude < C.OXYGEN_CUTOFF_ALTITUDE)
             {
                 Util.Log("Vessel " + module.vessel.name + " is O2 atmo at " + module.vessel.altitude);
                 Util.Log("Startup resource will not be drained");
-                return true;
+                return 0.0;
             }
 
             // Universal Time in seconds
@@ -114,7 +139,8 @@ namespace SimpleSurvival
 
             double obtained = module.part.RequestResource(resource_name, request, C.FLOWMODE_LIFESUPPORT);
 
-            return obtained > (request - C.STARTUP_KILL_MARGIN);
+            // Calculate remaining time that needs to be deducted from EVA LifeSupport (if applicable)
+            return (obtained / request) * delta;
         }
 
         /// <summary>
