@@ -98,6 +98,15 @@ namespace SimpleSurvival
                 return;
 
             ProtoCrewMember kerbal = action.host;
+
+            // It's possible Kerbal is coming from a part that does not have a LifeSupportModule
+            // Alternative solution is to add LifeSupportModule + default resource values
+            // to any parts with ModuleCommand not defined in the cfg.
+            // Undeterministic if other configs add their own definitions in the future.
+            //
+            // EVALifeSupportModule.OnStart() covers the case when action.to is EVA
+            AddKerbalToTracking(kerbal.name);
+
             double current_eva = evals_info[kerbal.name].current;
 
             if (current_eva < C.EVA_LS_30_SECONDS &&
