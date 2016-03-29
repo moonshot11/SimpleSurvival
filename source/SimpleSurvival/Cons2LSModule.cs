@@ -65,8 +65,9 @@ namespace SimpleSurvival
 
                 foreach (ProtoCrewMember kerbal in active.GetVesselCrew())
                 {
-                    if (!EVALifeSupportTracker.InTracking(kerbal.name))
-                        continue;
+                    // Previously had a check here if Kerbal was in EVA tracking.
+                    // This should now be covered by LifeSupportModule adding
+                    // all missing Kerbals to tracking in OnStart.
 
                     var info = EVALifeSupportTracker.GetEVALSInfo(kerbal.name);
                     double request = info.max - info.current;

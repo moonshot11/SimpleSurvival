@@ -58,10 +58,12 @@ namespace SimpleSurvival
         }
 
         /// <summary>
-        /// Add a Kerbal to EVA LS tracking
+        /// Add a Kerbal to EVA LS tracking. By default, do nothing if entry
+        /// already exists. This behavior can be overridden.
         /// </summary>
         /// <param name="name">Name of the Kerbal to add to tracking</param>
-        public static void AddKerbalToTracking(string name)
+        /// <param name="overwrite">Overwrite the Kerbal's info if it already exists</param>
+        public static void AddKerbalToTracking(string name, bool overwrite = false)
         {
             Log("Call -> AddKerbal(..) for " + name);
 
@@ -71,8 +73,16 @@ namespace SimpleSurvival
             // but warn in the log file just in case.
             if (evals_info.ContainsKey(name))
             {
-                Log("Uh oh! " + name + "is already being tracked. Resetting...");
-                evals_info.Remove(name);
+                if (overwrite)
+                {
+                    Log("Uh oh! " + name + " is already being tracked. Resetting...");
+                    evals_info.Remove(name);
+                }
+                else
+                {
+                    Log("Kerbal " + name + " is already being tracked. Skipping...");
+                    return;
+                }
             }
 
             Log("Adding current/max EVA LS of " + eva_max + " for " + name);
@@ -86,7 +96,7 @@ namespace SimpleSurvival
         /// </summary>
         /// <param name="name">Name of Kerbal as defined by game</param>
         /// <returns>True if tracked, false otherwise.</returns>
-        public static bool InTracking(string name)
+        public static bool InTrackiang(string name)
         {
             return evals_info.ContainsKey(name);
         }
@@ -118,7 +128,7 @@ namespace SimpleSurvival
             {
                 foreach (ProtoCrewMember kerbal in part.protoModuleCrew)
                 {
-                    AddKerbalToTracking(kerbal.name);
+                    AddKerbalToTracking(kerbal.name, true);
                 }
             }
         }

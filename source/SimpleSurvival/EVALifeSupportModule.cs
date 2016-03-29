@@ -46,15 +46,7 @@ namespace SimpleSurvival
                 // Kerbals assigned after this mod's installation should already be tracked,
                 // but for Kerbals already in flight, add EVA LS according to current state
                 // of astronaut complex
-                if (EVALifeSupportTracker.InTracking(name))
-                {
-                    Util.Log("Found Kerbal " + name + " in EVA LS tracking");
-                }
-                else
-                {
-                    Util.Log("EVALifeSupportModule.OnStart(..)  Adding Kerbal to EVA LS tracking: " + name);
-                    EVALifeSupportTracker.AddKerbalToTracking(name);
-                }
+                EVALifeSupportTracker.AddKerbalToTracking(name);
 
                 var info = EVALifeSupportTracker.GetEVALSInfo(name);
 

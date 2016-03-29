@@ -49,7 +49,10 @@ namespace SimpleSurvival
 
                     foreach (ProtoCrewMember kerbal in part.protoModuleCrew)
                     {
+                        EVALifeSupportTracker.AddKerbalToTracking(kerbal.name);
+
                         double current = EVALifeSupportTracker.AddEVAAmount(kerbal.name, -eva_diff);
+
                         if (current < C.KILL_BUFFER)
                         {
                             EVALifeSupportTracker.SetCurrentEVAAmount(kerbal.name, C.KILL_BUFFER);
