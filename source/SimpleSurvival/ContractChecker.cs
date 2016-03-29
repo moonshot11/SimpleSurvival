@@ -72,6 +72,9 @@ namespace SimpleSurvival
 
         public static string GetPartID(string guid)
         {
+            if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
+                return "";
+
             // Assuming node exists since Guids is populated
             ConfigNode contracts = HighLogic.CurrentGame.config.GetNode("SCENARIO").GetNode("CONTRACTS");
             
