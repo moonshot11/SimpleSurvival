@@ -128,6 +128,15 @@ namespace SimpleSurvival
             double delta = currUT - lastUT;
             double request = module.part.protoModuleCrew.Count * resource_rate * delta;
 
+            if (request < C.DOUBLE_MARGIN)
+            {
+                Util.Log("Startup request is zero. This is unexpected. Factors:");
+                Util.Log("    Crew count    = " + module.part.protoModuleCrew.Count);
+                Util.Log("    Resource rate = " + resource_rate);
+                Util.Log("    Time delta    = " + delta);
+                return 0.0;
+            }
+
             Util.Log("LastUT = " + lastUT + " (" + KSPUtil.PrintDate((int)lastUT, true, true) + ")");
             Util.Log("CurrUT = " + currUT + " (" + KSPUtil.PrintDate((int)currUT, true, true) + ")");
             Util.Log("Time elapsed: " + delta + " (" + KSPUtil.PrintDateDelta((int)delta, true, true) + ")");

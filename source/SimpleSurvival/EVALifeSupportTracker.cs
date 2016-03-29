@@ -46,6 +46,7 @@ namespace SimpleSurvival
 
             // Kerbals will be added to tracking
             GameEvents.OnVesselRollout.Add(OnVesselRollout);
+            GameEvents.onCrewTransferred.Add(OnCrewTransferred);
 
             // Cover all the situations when a Kerbal's EVA LS will be reset.
             // Unfortunately, roster status changes can't be used exclusively,
@@ -91,12 +92,33 @@ namespace SimpleSurvival
             evals_info.Add(name, info);
         }
 
+        private void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> action)
+        {
+            if (action.from.vessel.isEVA || action.to.vessel.isEVA)
+                return;
+
+            ProtoCrewMember kerbal = action.host;
+            double current_eva = evals_info[kerbal.name].current;
+
+            if (current_eva < C.EVA_LS_30_SECONDS &&
+                action.from.Resources[C.NAME_LIFESUPPORT].amount > C.DOUBLE_MARGIN &&
+                action.to.Resources[C.NAME_LIFESUPPORT].amount == 0.0)
+            {
+                TimeWarp.SetRate(0, true);
+                string message = C.HTML_COLOR_WARNING +
+                kerbal.name + " has " + (int)(current_eva / C.EVA_LS_DRAIN_PER_SEC) + " seconds to live!</color>";
+
+                ScreenMessage template = new ScreenMessage(message, 8f, ScreenMessageStyle.UPPER_CENTER);
+                ScreenMessages.PostScreenMessage(template, true);
+            }
+        }
+
         /// <summary>
         /// Returns true if the Kerbal's EVA LS is currently being tracked
         /// </summary>
         /// <param name="name">Name of Kerbal as defined by game</param>
         /// <returns>True if tracked, false otherwise.</returns>
-        public static bool InTrackiang(string name)
+        public static bool InTracking(string name)
         {
             return evals_info.ContainsKey(name);
         }

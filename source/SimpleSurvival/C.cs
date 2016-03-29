@@ -67,6 +67,10 @@ namespace SimpleSurvival
         /// EVA Life Support drain rate per second
         /// </summary>
         public const double EVA_LS_DRAIN_PER_SEC = EVA_LS_PER_MINUTE / 60.0;
+        /// <summary>
+        /// 30 seconds' worth of EVA LifeSupport, for warning messages
+        /// </summary>
+        public const double EVA_LS_30_SECONDS = EVA_LS_DRAIN_PER_SEC * 30;
 
         /// <summary>
         /// Max amount of EVA Life Support w/ Astronaut Complex Level 2

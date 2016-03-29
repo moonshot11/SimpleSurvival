@@ -65,8 +65,11 @@ namespace SimpleSurvival
 
         public void FixedUpdate()
         {
-            EVALifeSupportTracker.SetCurrentEVAAmount(
-                part.protoModuleCrew[0].name, part.Resources[C.NAME_EVA_LIFESUPPORT].amount);
+            PartResource resource = part.Resources[C.NAME_EVA_LIFESUPPORT];
+            double prev_amount = resource.amount;
+            string kerbal_name = part.protoModuleCrew[0].name;
+
+            EVALifeSupportTracker.SetCurrentEVAAmount(kerbal_name, prev_amount);
 
             // If Kerbal is below this altitude in an atmosphere with oxygen,
             // LifeSupport is irrelevant
@@ -75,6 +78,18 @@ namespace SimpleSurvival
 
             // -- Reduce resource --
             double retd = part.RequestResource(C.NAME_EVA_LIFESUPPORT, C.EVA_LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime);
+
+            if (prev_amount > C.EVA_LS_30_SECONDS &&
+                resource.amount <= C.EVA_LS_30_SECONDS)
+            {
+                TimeWarp.SetRate(0, true);
+                string message = C.HTML_COLOR_WARNING +
+                kerbal_name + " has 30 seconds to live!</color>";
+                resource.amount = C.EVA_LS_30_SECONDS;
+
+                ScreenMessage template = new ScreenMessage(message, 8f, ScreenMessageStyle.UPPER_CENTER);
+                ScreenMessages.PostScreenMessage(template, true);
+            }
 
             // Necessary to check if crew count > 0?
             if (retd == 0.0)
