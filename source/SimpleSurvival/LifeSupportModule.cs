@@ -112,11 +112,8 @@ namespace SimpleSurvival
                 string vessel_name = vessel.isActiveVessel ? part.partInfo.title : vessel.vesselName;
 
                 showed_eva_warning = true;
-                string message = C.HTML_COLOR_WARNING +
-                    "Crew in " + vessel_name + " has run out of " + C.NAME_LIFESUPPORT + ",\n is consuming " + C.NAME_EVA_LIFESUPPORT + "</color>";
-
-                ScreenMessage template = new ScreenMessage(message, 8f, ScreenMessageStyle.UPPER_CENTER);
-                ScreenMessages.PostScreenMessage(template, true);
+                Util.PostUpperMessage("Crew in " + vessel_name + " has run out of "
+                    + C.NAME_LIFESUPPORT + ",\n is consuming " + C.NAME_EVA_LIFESUPPORT, 1);
             }
 
             // Modify crew list in place
@@ -133,13 +130,8 @@ namespace SimpleSurvival
                     current_eva <= C.EVA_LS_30_SECONDS)
                 {
                     TimeWarp.SetRate(0, true);
-                    string message = C.HTML_COLOR_WARNING +
-                    kerbal.name + " has 30 seconds to live!</color>";
-                    
+                    Util.PostUpperMessage(kerbal.name + " has 30 seconds to live!", 1);
                     EVALifeSupportTracker.SetCurrentEVAAmount(kerbal.name, C.EVA_LS_30_SECONDS);
-
-                    ScreenMessage template = new ScreenMessage(message, 8f, ScreenMessageStyle.UPPER_CENTER);
-                    ScreenMessages.PostScreenMessage(template, true);
                 }
                 
                 if (EVALifeSupportTracker.GetEVALSInfo(kerbal.name).current < 0.0)

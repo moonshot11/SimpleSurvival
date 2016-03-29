@@ -83,12 +83,8 @@ namespace SimpleSurvival
                 resource.amount <= C.EVA_LS_30_SECONDS)
             {
                 TimeWarp.SetRate(0, true);
-                string message = C.HTML_COLOR_WARNING +
-                kerbal_name + " has 30 seconds to live!</color>";
+                Util.PostUpperMessage(kerbal_name + " has 30 seconds to live!", 1);
                 resource.amount = C.EVA_LS_30_SECONDS;
-
-                ScreenMessage template = new ScreenMessage(message, 8f, ScreenMessageStyle.UPPER_CENTER);
-                ScreenMessages.PostScreenMessage(template, true);
             }
 
             // Necessary to check if crew count > 0?

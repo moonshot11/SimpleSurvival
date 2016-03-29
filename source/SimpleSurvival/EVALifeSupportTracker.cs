@@ -114,11 +114,7 @@ namespace SimpleSurvival
                 action.to.Resources[C.NAME_LIFESUPPORT].amount == 0.0)
             {
                 TimeWarp.SetRate(0, true);
-                string message = C.HTML_COLOR_WARNING +
-                kerbal.name + " has " + (int)(current_eva / C.EVA_LS_DRAIN_PER_SEC) + " seconds to live!</color>";
-
-                ScreenMessage template = new ScreenMessage(message, 8f, ScreenMessageStyle.UPPER_CENTER);
-                ScreenMessages.PostScreenMessage(template, true);
+                Util.PostUpperMessage(kerbal.name + " has " + (int)(current_eva / C.EVA_LS_DRAIN_PER_SEC) + " seconds to live!", 1);
             }
         }
 

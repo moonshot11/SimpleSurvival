@@ -82,8 +82,7 @@ namespace SimpleSurvival
                 if (eva_request_total < C.DOUBLE_MARGIN)
                 {
                     Util.Log("All crewmembers full! Skipping EVA refill");
-                    ScreenMessages.PostScreenMessage("EVA resources already full!",
-                        5f, ScreenMessageStyle.UPPER_LEFT);
+                    Util.PostUpperMessage("EVA resources already full!");
                     return;
                 }
 
@@ -106,14 +105,11 @@ namespace SimpleSurvival
                 }
 
                 if (frac > C.DOUBLE_ALMOST_ONE)
-                    ScreenMessages.PostScreenMessage("EVA resources refilled!",
-                        5f, ScreenMessageStyle.UPPER_LEFT);
+                    Util.PostUpperMessage("EVA resources refilled!");
                 else if (frac < C.DOUBLE_MARGIN)
-                    ScreenMessages.PostScreenMessage(C.HTML_COLOR_ALERT + C.NAME_CONSUMABLES + " are empty - could not refill!</color>",
-                        5f, ScreenMessageStyle.UPPER_CENTER);
+                    Util.PostUpperMessage(C.NAME_CONSUMABLES + " are empty - could not refill!", 2);
                 else
-                    ScreenMessages.PostScreenMessage(C.HTML_COLOR_ALERT + "Partial refill - " + C.NAME_CONSUMABLES + " are empty!</color>",
-                        5f, ScreenMessageStyle.UPPER_CENTER);
+                    Util.PostUpperMessage("Partial refill - " + C.NAME_CONSUMABLES + " are empty!", 2);
             }
             // Player is controlling EVA
             else
@@ -142,12 +138,10 @@ namespace SimpleSurvival
                     ScreenMessages.PostScreenMessage("EVA resources refilled!", 5f, ScreenMessageStyle.UPPER_LEFT);
                 // If Consumables are empty
                 else if (add < C.DOUBLE_MARGIN)
-                    ScreenMessages.PostScreenMessage(C.HTML_COLOR_ALERT + C.NAME_CONSUMABLES + " are empty - could not refill!</color>",
-                        5f, ScreenMessageStyle.UPPER_CENTER);
+                    Util.PostUpperMessage(C.NAME_CONSUMABLES + " are empty - could not refill!", 2);
                 // If Consumables are almost empty, partial refill
                 else
-                    ScreenMessages.PostScreenMessage(C.HTML_COLOR_WARNING + "Partial refill: " + C.NAME_CONSUMABLES + " are empty!</color>",
-                        5f, ScreenMessageStyle.UPPER_CENTER);
+                    Util.PostUpperMessage("Partial refill: " + C.NAME_CONSUMABLES + " are empty!", 1);
             }
         }
 
@@ -157,8 +151,7 @@ namespace SimpleSurvival
             {
                 if (!ProperlyManned())
                 {
-                    ScreenMessages.PostScreenMessage("Converter requires an Engineer to operate!",
-                        5f, ScreenMessageStyle.UPPER_CENTER);
+                    Util.PostUpperMessage("Converter requires an Engineer to operate!");
                     status = ConverterStatus.READY;
                     return;
                 }
@@ -217,7 +210,7 @@ namespace SimpleSurvival
                 else
                     message = "Cannot proceed, " + resource + " is full!";
 
-                ScreenMessages.PostScreenMessage(message, 3.0f, ScreenMessageStyle.UPPER_CENTER);
+                Util.PostUpperMessage(message);
             }
 
             return frac;

@@ -36,8 +36,7 @@ namespace SimpleSurvival
             
             bool respawn_flag = HighLogic.CurrentGame.Parameters.Difficulty.MissingCrewsRespawn;
 
-            ScreenMessages.PostScreenMessage(C.HTML_COLOR_ALERT + kerbal.name + " ran out of LifeSupport and died!</color>",
-                6f, ScreenMessageStyle.UPPER_CENTER);
+            Util.PostUpperMessage(kerbal.name + " ran out of LifeSupport and died!", 2);
 
             // Kerbal must be removed from part BEFORE calling Die()
             module.part.RemoveCrewmember(kerbal);
@@ -63,8 +62,7 @@ namespace SimpleSurvival
                 ProtoCrewMember kerbal = part_crew[0];
                 bool respawn_flag = HighLogic.CurrentGame.Parameters.Difficulty.MissingCrewsRespawn;
 
-                ScreenMessages.PostScreenMessage(C.HTML_COLOR_ALERT + kerbal.name + " ran out of LifeSupport and died!</color>",
-                    6f, ScreenMessageStyle.UPPER_CENTER);
+                Util.PostUpperMessage(kerbal.name + " ran out of LifeSupport and died!", 2);
 
                 // Kerbal must be removed from part BEFORE calling Die()
                 module.part.RemoveCrewmember(kerbal);
@@ -208,6 +206,31 @@ namespace SimpleSurvival
             Util.Log("Synopsys = " + contract.Synopsys);
             Util.Log("Title = " + contract.Title);
             Util.Log("-------------------------------------------------------------");
+        }
+
+        public static void PostUpperMessage(string message, int level = 0)
+        {
+            string prefix;
+
+            switch(level)
+            {
+                case 1:
+                    prefix = C.HTML_COLOR_WARNING;
+                    break;
+
+                case 2:
+                    prefix = C.HTML_COLOR_ALERT;
+                    break;
+
+                default:
+                    prefix = "";
+                    break;
+            }
+
+            message = prefix + message + "</color>";
+
+            ScreenMessage sm = new ScreenMessage(message, 8f, ScreenMessageStyle.UPPER_CENTER);
+            ScreenMessages.PostScreenMessage(sm, true);
         }
     }
 }
