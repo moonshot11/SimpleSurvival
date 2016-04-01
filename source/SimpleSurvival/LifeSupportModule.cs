@@ -60,6 +60,13 @@ namespace SimpleSurvival
 
                     if (current < C.KILL_BUFFER)
                         EVALifeSupportTracker.SetCurrentEVAAmount(kerbal.name, C.KILL_BUFFER);
+                    else if (current < C.EVA_LS_30_SECONDS)
+                        Util.PostUpperMessage(kerbal.name + " has " + (int)(current / C.EVA_LS_DRAIN_PER_SEC) + " seconds to live!", 1);
+
+                    // If Kerbal is about to die, messages will already be printed.
+                    // Don't clutter the screen with the "now on EVA LS" message too.
+                    if (current < C.EVA_LS_30_SECONDS)
+                        showed_eva_warning = true;
                 }
             }
 

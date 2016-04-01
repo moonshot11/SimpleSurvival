@@ -42,6 +42,8 @@ namespace SimpleSurvival
 
                 if (resource.amount < C.KILL_BUFFER)
                     resource.amount = C.KILL_BUFFER;
+                else if (resource.amount < C.EVA_LS_30_SECONDS)
+                    Util.PostUpperMessage(kerbal_name + " has " + (int)(resource.amount / C.EVA_LS_DRAIN_PER_SEC) + " seconds to live!", 1);
             }
             else
             {
