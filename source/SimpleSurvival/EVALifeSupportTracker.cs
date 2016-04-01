@@ -237,7 +237,8 @@ namespace SimpleSurvival
         {
             Log("Call -> OnLoad(..)");
 
-            evals_info.Clear();
+            Log("Clearing EVA LS tracking");
+            evals_info = new Dictionary<string, EVALS_Info>();
 
             foreach (ConfigNode node in scenario_node.GetNodes(C.NODE_EVA_TRACK))
             {

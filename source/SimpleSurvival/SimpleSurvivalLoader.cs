@@ -15,6 +15,7 @@ namespace SimpleSurvival
         public void Awake()
         {
             Util.Log("Loader Awake(..)");
+
             GameEvents.onGameStateLoad.Add(OnLoad);
             GameEvents.onGameStateSave.Add(OnSave);
         }
@@ -22,6 +23,9 @@ namespace SimpleSurvival
         public void OnSave(ConfigNode topnode)
         {
             Util.Log("Loader OnSave(..)");
+
+            if (topnode.HasNode(TOPNAME))
+                Util.Log("CheckThis -> Node " + TOPNAME + " already exists!");
 
             ConfigNode scenario_node = topnode.AddNode(TOPNAME);
 
@@ -33,7 +37,12 @@ namespace SimpleSurvival
         {
             Util.Log("Loader OnLoad(..)");
 
-            ConfigNode scenario_node = topnode.GetNode(TOPNAME);
+            ConfigNode scenario_node;
+
+            if (topnode.HasNode(TOPNAME))
+                scenario_node = topnode.GetNode(TOPNAME);
+            else
+                scenario_node = new ConfigNode(TOPNAME);
 
             EVALifeSupportTracker.Load(scenario_node);
             ContractChecker.Load(scenario_node);
