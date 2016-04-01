@@ -7,55 +7,33 @@ using UnityEngine;
 
 namespace SimpleSurvival
 {
-    #region Delete
-    /*[KSPAddon(KSPAddon.Startup.EveryScene, false)]
-    public class SimpleSurvivalLoader_Initializer : MonoBehaviour
+    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
+    public class SimpleSurvivalLoader : MonoBehaviour
     {
-        private void Awake()
+        private const string TOPNAME = "SIMPLESURVIVAL_MOD";
+
+        public void Awake()
         {
-            Game game = HighLogic.CurrentGame;
-
-            if (game == null)
-                return;
-
-            bool installed = false;
-
-            foreach (ProtoScenarioModule module in game.scenarios)
-            {
-                if (module.moduleName == typeof(SimpleSurvivalLoader).Name)
-                {
-                    Util.Log("Found SimpleSurvivalLoader already installed");
-                    installed = true;
-                    break;
-                }
-            }
-
-            if (!installed)
-            {
-                Util.Log("Installing SimpleSurvivalLoader");
-                var p = game.AddProtoScenarioModule(typeof(SimpleSurvivalLoader),
-                    GameScenes.EDITOR, GameScenes.FLIGHT, GameScenes.SPACECENTER,
-                    GameScenes.TRACKSTATION);
-            }
+            Util.Log("Loader Awake(..)");
+            GameEvents.onGameStateLoad.Add(OnLoad);
+            GameEvents.onGameStateSave.Add(OnSave);
         }
-    }*/
-    #endregion
 
-    [KSPScenario(ScenarioCreationOptions.AddToAllGames,
-        GameScenes.EDITOR, GameScenes.FLIGHT, GameScenes.SPACECENTER, GameScenes.TRACKSTATION)]
-    public class SimpleSurvivalLoader : ScenarioModule
-    {
-        public override void OnSave(ConfigNode scenario_node)
+        public void OnSave(ConfigNode topnode)
         {
             Util.Log("Loader OnSave(..)");
+
+            ConfigNode scenario_node = topnode.AddNode(TOPNAME);
 
             EVALifeSupportTracker.Save(scenario_node);
             ContractChecker.Save(scenario_node);
         }
 
-        public override void OnLoad(ConfigNode scenario_node)
+        public void OnLoad(ConfigNode topnode)
         {
             Util.Log("Loader OnLoad(..)");
+
+            ConfigNode scenario_node = topnode.GetNode(TOPNAME);
 
             EVALifeSupportTracker.Load(scenario_node);
             ContractChecker.Load(scenario_node);

@@ -13,6 +13,7 @@ namespace SimpleSurvival
 
         public override void OnStart(StartState state)
         {
+            Util.Log("LifeSupportModule OnStart()");
             showed_eva_warning = false;
 
             if (HighLogic.LoadedSceneIsFlight)
@@ -38,25 +39,28 @@ namespace SimpleSurvival
                     }
                 }
 
+                double seconds_remaining = 0;
+
                 if (!skip_startup_request)
                 {
                     // Use the seconds remaining to calculate how much EVA LifeSupport needs to be deducted
-                    double seconds_remaining = Util.StartupRequest(this, C.NAME_LIFESUPPORT, C.LS_DRAIN_PER_SEC);
-                    double eva_diff = seconds_remaining * C.EVA_LS_DRAIN_PER_SEC;
+                    seconds_remaining = Util.StartupRequest(this, C.NAME_LIFESUPPORT, C.LS_DRAIN_PER_SEC);
+                }
 
-                    Util.Log(seconds_remaining + " seconds remaining for " + vessel.vesselName);
-                    Util.Log("Deducting " + eva_diff + " " + C.NAME_EVA_LIFESUPPORT);
+                double eva_diff = seconds_remaining * C.EVA_LS_DRAIN_PER_SEC;
 
-                    foreach (ProtoCrewMember kerbal in part.protoModuleCrew)
+                Util.Log(seconds_remaining + " seconds remaining for " + vessel.vesselName);
+                Util.Log("Deducting " + eva_diff + " " + C.NAME_EVA_LIFESUPPORT);
+
+                foreach (ProtoCrewMember kerbal in part.protoModuleCrew)
+                {
+                    EVALifeSupportTracker.AddKerbalToTracking(kerbal.name);
+
+                    double current = EVALifeSupportTracker.AddEVAAmount(kerbal.name, -eva_diff);
+
+                    if (current < C.KILL_BUFFER)
                     {
-                        EVALifeSupportTracker.AddKerbalToTracking(kerbal.name);
-
-                        double current = EVALifeSupportTracker.AddEVAAmount(kerbal.name, -eva_diff);
-
-                        if (current < C.KILL_BUFFER)
-                        {
-                            EVALifeSupportTracker.SetCurrentEVAAmount(kerbal.name, C.KILL_BUFFER);
-                        }
+                        EVALifeSupportTracker.SetCurrentEVAAmount(kerbal.name, C.KILL_BUFFER);
                     }
                 }
             }

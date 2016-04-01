@@ -16,8 +16,14 @@ namespace SimpleSurvival
 
         public override void OnStart(StartState state)
         {
+            Util.Log("EVALifeSupportModule OnStart()");
+
             // -- Check if resource is already added to part --
             bool found_resource = false;
+
+            // To avoid conflicts with Unity variable "name"
+            // Assume EVA Kerbals will always have exactly one ProtoCrewMember
+            string kerbal_name = part.protoModuleCrew[0].name;
 
             // -- Always reset grace_timer to two frames
             kill_timer = C.KILL_BUFFER;
@@ -31,6 +37,11 @@ namespace SimpleSurvival
                 }
             }
 
+            // Kerbals assigned after this mod's installation should already be tracked,
+            // but for Kerbals already in flight, add EVA LS according to current state
+            // of astronaut complex
+            EVALifeSupportTracker.AddKerbalToTracking(kerbal_name);
+
             if (found_resource)
             {
                 // If found, this EVA is already active - deduct LS.
@@ -40,15 +51,7 @@ namespace SimpleSurvival
             {
                 Util.Log("Adding " + C.NAME_EVA_LIFESUPPORT + " resource to " + part.name);
 
-                // Assumes EVA Kerbals will always have exactly one ProtoCrewMember
-                string name = part.protoModuleCrew[0].name;
-
-                // Kerbals assigned after this mod's installation should already be tracked,
-                // but for Kerbals already in flight, add EVA LS according to current state
-                // of astronaut complex
-                EVALifeSupportTracker.AddKerbalToTracking(name);
-
-                var info = EVALifeSupportTracker.GetEVALSInfo(name);
+                var info = EVALifeSupportTracker.GetEVALSInfo(kerbal_name);
 
                 ConfigNode resource_node = new ConfigNode("RESOURCE");
                 resource_node.AddValue("name", C.NAME_EVA_LIFESUPPORT);
