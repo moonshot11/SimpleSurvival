@@ -59,9 +59,7 @@ namespace SimpleSurvival
                     double current = EVALifeSupportTracker.AddEVAAmount(kerbal.name, -eva_diff);
 
                     if (current < C.KILL_BUFFER)
-                    {
                         EVALifeSupportTracker.SetCurrentEVAAmount(kerbal.name, C.KILL_BUFFER);
-                    }
                 }
             }
 

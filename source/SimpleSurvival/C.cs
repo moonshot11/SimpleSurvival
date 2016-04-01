@@ -55,7 +55,7 @@ namespace SimpleSurvival
         /// </summary>
         public const double LS_PER_DAY_PER_KERBAL = 1.0;
         /// <summary>
-        /// Life Support drain rate per second
+        /// Life Support drain rate per second. Multiply for seconds -> days.
         /// </summary>
         public const double LS_DRAIN_PER_SEC = LS_PER_DAY_PER_KERBAL / 21600.0;
 
@@ -64,7 +64,7 @@ namespace SimpleSurvival
         /// </summary>
         private const double EVA_LS_PER_MINUTE = 1.0;
         /// <summary>
-        /// EVA Life Support drain rate per second
+        /// EVA Life Support drain rate per second. Multiply for seconds -> minutes.
         /// </summary>
         public const double EVA_LS_DRAIN_PER_SEC = EVA_LS_PER_MINUTE / 60.0;
         /// <summary>
@@ -90,10 +90,14 @@ namespace SimpleSurvival
         /// Give the game a buffer to finish loading everything before killing Kerbals,
         /// otherwise Rescue contracts won't register as failures.
         /// This number can be increased if large vessels trigger this erroneous behavior.
+        /// Units == minutes
         /// </summary>
         // Tested at 0.05 seconds on a 270 part behemoth, with an i5-4690 @ 3.5 GHz.
         // This should be okay, but not sure how ultra low budget PCs would perform.
-        public const float KILL_BUFFER = 1f;
+        //
+        // Units of EVA LS are minutes, so this value should be calculated as
+        // (x seconds) * (EVA_LS_DRAIN_PER_SEC) ==> (x in minutes)
+        public const double KILL_BUFFER = EVA_LS_DRAIN_PER_SEC;
 
         // -- Converter rates --
 

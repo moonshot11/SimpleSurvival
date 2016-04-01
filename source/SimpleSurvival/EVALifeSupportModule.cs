@@ -8,12 +8,6 @@ namespace SimpleSurvival
 {
     public class EVALifeSupportModule : PartModule
     {
-        /// <summary>
-        /// Give the game a buffer to load everything, otherwise failed
-        /// rescue contracts will not be registered
-        /// </summary>
-        private float kill_timer = C.KILL_BUFFER;
-
         public override void OnStart(StartState state)
         {
             Util.Log("EVALifeSupportModule OnStart()");
@@ -25,8 +19,7 @@ namespace SimpleSurvival
             // Assume EVA Kerbals will always have exactly one ProtoCrewMember
             string kerbal_name = part.protoModuleCrew[0].name;
 
-            // -- Always reset grace_timer to two frames
-            kill_timer = C.KILL_BUFFER;
+            PartResource resource = null;
 
             foreach (PartResource pr in part.Resources)
             {
@@ -46,6 +39,9 @@ namespace SimpleSurvival
             {
                 // If found, this EVA is already active - deduct LS.
                 Util.StartupRequest(this, C.NAME_EVA_LIFESUPPORT, C.EVA_LS_DRAIN_PER_SEC);
+
+                if (resource.amount < C.KILL_BUFFER)
+                    resource.amount = C.KILL_BUFFER;
             }
             else
             {
@@ -58,9 +54,9 @@ namespace SimpleSurvival
                 resource_node.AddValue("amount", info.current.ToString());
                 resource_node.AddValue("maxAmount", info.max.ToString());
 
-                part.AddResource(resource_node);
+                resource = part.AddResource(resource_node);
 
-                Util.Log("Added EVA LS to " + part.name);
+                Util.Log("Added EVA LS resource to " + part.name);
             }
 
             base.OnStart(state);
@@ -93,13 +89,8 @@ namespace SimpleSurvival
             // Necessary to check if crew count > 0?
             if (retd == 0.0)
             {
-                kill_timer -= TimeWarp.fixedDeltaTime;
-
-                if (kill_timer <= 0)
-                {
-                    Util.KillKerbals(this);
-                    part.explode();
-                }
+                Util.KillKerbals(this);
+                part.explode();
 
                 #region FlightResultsDialog
                 // string kerbal_name = part.protoModuleCrew[0].name; // Move to top of code block
