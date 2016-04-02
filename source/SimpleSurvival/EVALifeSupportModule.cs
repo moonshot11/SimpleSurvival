@@ -12,9 +12,6 @@ namespace SimpleSurvival
         {
             Util.Log("EVALifeSupportModule OnStart()");
 
-            // -- Check if resource is already added to part --
-            bool found_resource = false;
-
             // To avoid conflicts with Unity variable "name"
             // Assume EVA Kerbals will always have exactly one ProtoCrewMember
             string kerbal_name = part.protoModuleCrew[0].name;
@@ -25,7 +22,7 @@ namespace SimpleSurvival
             {
                 if (pr.resourceName == C.NAME_EVA_LIFESUPPORT)
                 {
-                    found_resource = true;
+                    resource = pr;
                     break;
                 }
             }
@@ -35,18 +32,9 @@ namespace SimpleSurvival
             // of astronaut complex
             EVALifeSupportTracker.AddKerbalToTracking(kerbal_name);
 
-            if (found_resource)
+            if (resource == null)
             {
-                // If found, this EVA is already active - deduct LS.
-                Util.StartupRequest(this, C.NAME_EVA_LIFESUPPORT, C.EVA_LS_DRAIN_PER_SEC);
-
-                if (resource.amount < C.KILL_BUFFER)
-                    resource.amount = C.KILL_BUFFER;
-                else if (resource.amount < C.EVA_LS_30_SECONDS)
-                    Util.PostUpperMessage(kerbal_name + " has " + (int)(resource.amount / C.EVA_LS_DRAIN_PER_SEC) + " seconds to live!", 1);
-            }
-            else
-            {
+                // If not found, add EVA LS resource to this PartModule.
                 Util.Log("Adding " + C.NAME_EVA_LIFESUPPORT + " resource to " + part.name);
 
                 var info = EVALifeSupportTracker.GetEVALSInfo(kerbal_name);
@@ -59,6 +47,16 @@ namespace SimpleSurvival
                 resource = part.AddResource(resource_node);
 
                 Util.Log("Added EVA LS resource to " + part.name);
+            }
+            else
+            {
+                // If found, this EVA is already active - deduct LS.
+                Util.StartupRequest(this, C.NAME_EVA_LIFESUPPORT, C.EVA_LS_DRAIN_PER_SEC);
+
+                if (resource.amount < C.KILL_BUFFER)
+                    resource.amount = C.KILL_BUFFER;
+                else if (resource.amount < C.EVA_LS_30_SECONDS)
+                    Util.PostUpperMessage(kerbal_name + " has " + (int)(resource.amount / C.EVA_LS_DRAIN_PER_SEC) + " seconds to live!", 1);
             }
 
             base.OnStart(state);
