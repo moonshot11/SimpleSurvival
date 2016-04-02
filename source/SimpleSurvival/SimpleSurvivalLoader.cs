@@ -16,8 +16,9 @@ namespace SimpleSurvival
         {
             Util.Log("Loader Awake(..)");
 
-            GameEvents.onGameStateLoad.Add(OnLoad);
+            GameEvents.onGameStateCreated.Add(OnLoad);
             GameEvents.onGameStateSave.Add(OnSave);
+
         }
 
         public void OnSave(ConfigNode topnode)
@@ -33,14 +34,17 @@ namespace SimpleSurvival
             ContractChecker.Save(scenario_node);
         }
 
-        public void OnLoad(ConfigNode topnode)
+        public void OnLoad(Game game)
         {
             Util.Log("Loader OnLoad(..)");
 
+            if (!HighLogic.LoadedSceneIsGame)
+                return;
+            
             ConfigNode scenario_node;
 
-            if (topnode.HasNode(TOPNAME))
-                scenario_node = topnode.GetNode(TOPNAME);
+            if (game.config.HasNode(TOPNAME))
+                scenario_node = game.config.GetNode(TOPNAME);
             else
                 scenario_node = new ConfigNode(TOPNAME);
 
