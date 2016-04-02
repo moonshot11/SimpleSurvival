@@ -30,6 +30,7 @@ namespace SimpleSurvival
         private void OnAccepted(Contracts.Contract c)
         {
             Log("OnAccepted(..)");
+            PruneOldGuids();
 
             if (c is Contracts.Templates.RecoverAsset)
             {
@@ -97,7 +98,6 @@ namespace SimpleSurvival
                 return;
 
             Log("OnSave(..)");
-            PruneOldGuids();
 
             foreach (string guid in Guids)
             {
@@ -138,7 +138,8 @@ namespace SimpleSurvival
             // Move Guids that are found to new list...
             foreach (string guid in Guids)
             {
-                Log("Searching for guid in contracts: " + guid);
+                Log("Searching for guid in contracts (" + current_contracts.Count +
+                    " found): " + guid);
 
                 foreach (Contracts.Contract contract in current_contracts)
                 {
