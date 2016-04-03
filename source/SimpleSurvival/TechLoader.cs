@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace SimpleSurvival
 {
+    /// <summary>
+    /// Add the tech icon to the R&D tech tree.
+    /// </summary>
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class TechLoader : MonoBehaviour
     {

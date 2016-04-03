@@ -6,9 +6,17 @@ using System.Threading.Tasks;
 
 namespace SimpleSurvival
 {
+    /// <summary>
+    /// LifeSupport PartModule.
+    /// </summary>
     [KSPModule("Life Support")]
     public class LifeSupportModule : PartModule
     {
+        /// <summary>
+        /// If true, part has already displayed warning that
+        /// LifeSupport is empty, and EVA resource is being drained
+        /// from global tracking.
+        /// </summary>
         private bool showed_eva_warning = false;
 
         public override void OnStart(StartState state)
@@ -73,6 +81,10 @@ namespace SimpleSurvival
             base.OnStart(state);
         }
 
+        /// <summary>
+        /// VAB info
+        /// </summary>
+        /// <returns></returns>
         public override string GetInfo()
         {
             // NOTE: This method is called ONCE during initial part loading,
@@ -114,7 +126,7 @@ namespace SimpleSurvival
                 return;
             }
 
-            // Otherwise, begin deducting EVA LS
+            // Otherwise, begin deducting EVA LifeSupport
             if (!showed_eva_warning)
             {
                 TimeWarp.SetRate(0, true);
@@ -140,10 +152,11 @@ namespace SimpleSurvival
                 {
                     TimeWarp.SetRate(0, true);
                     Util.PostUpperMessage(kerbal.name + " has 30 seconds to live!", 1);
+                    // Set to 30 seconds in case of large timewarp.
                     EVALifeSupportTracker.SetCurrentEVAAmount(kerbal.name, C.EVA_LS_30_SECONDS);
                 }
                 
-                if (EVALifeSupportTracker.GetEVALSInfo(kerbal.name).current < 0.0)
+                if (EVALifeSupportTracker.GetEVALSInfo(kerbal.name).current < C.DOUBLE_MARGIN)
                 {
                     Util.KillKerbal(this, kerbal);
                     continue;

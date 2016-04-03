@@ -7,15 +7,30 @@ using UnityEngine;
 
 namespace SimpleSurvival
 {
+    /// <summary>
+    /// Global tracking of EVA LifeSupport when Kerbals are not in EVA.
+    /// </summary>
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class EVALifeSupportTracker : MonoBehaviour
     {
+        /// <summary>
+        /// Title of each individual node holding one Kerbal's info
+        /// </summary>
+        private const string NODE_EVA_TRACK = "KERBAL_EVA_LS";
+
         /// <summary>
         /// Stores the EVA info for a Kerbal
         /// </summary>
         public class EVALS_Info
         {
+            /// <summary>
+            /// The current amount of EVA LifeSupport for this Kerbal.
+            /// </summary>
             public double current;
+            /// <summary>
+            /// The maximum amount of LifeSupport this Kerbal has.
+            /// Persists until s/he is recovered.
+            /// </summary>
             public double max;
 
             public EVALS_Info(double current, double max)
@@ -24,6 +39,10 @@ namespace SimpleSurvival
                 this.max = max;
             }
 
+            /// <summary>
+            /// Returns a deep copy of this data structure.
+            /// </summary>
+            /// <returns></returns>
             public EVALS_Info Copy()
             {
                 return new EVALS_Info(current, max);
@@ -104,7 +123,7 @@ namespace SimpleSurvival
             // to any parts with ModuleCommand not defined in the cfg.
             // Undeterministic if other configs add their own definitions in the future.
             //
-            // EVALifeSupportModule.OnStart() covers the case when action.to is EVA
+            // EVALifeSupportModule.OnStart() covers the case when destination part is EVA.
             AddKerbalToTracking(kerbal.name);
 
             double current_eva = evals_info[kerbal.name].current;
@@ -199,6 +218,10 @@ namespace SimpleSurvival
             return evals_info[name].current;
         }
 
+        /// <summary>
+        /// Remove Kerbal from tracking.
+        /// </summary>
+        /// <param name="proto"></param>
         private void OnVesselRecovered(ProtoVessel proto)
         {
             Log("Call -> OnVesselRecovered(..) for vessel: " + proto.vesselName);
@@ -233,6 +256,10 @@ namespace SimpleSurvival
             evals_info.Remove(kerbal.name);
         }
 
+        /// <summary>
+        /// Load EVA tracking info to ConfigNode.
+        /// </summary>
+        /// <param name="scenario_node"></param>
         public static void Load(ConfigNode scenario_node)
         {
             Log("Call -> OnLoad(..)");
@@ -240,7 +267,7 @@ namespace SimpleSurvival
             Log("Clearing EVA LS tracking");
             evals_info = new Dictionary<string, EVALS_Info>();
 
-            foreach (ConfigNode node in scenario_node.GetNodes(C.NODE_EVA_TRACK))
+            foreach (ConfigNode node in scenario_node.GetNodes(NODE_EVA_TRACK))
             {
                 string name = node.GetValue("name");
                 double current = Convert.ToDouble(node.GetValue("amount"));
@@ -251,13 +278,18 @@ namespace SimpleSurvival
             }
         }
 
+        /// <summary>
+        /// Save EVA LifeSupport info to ConfigNode.
+        /// </summary>
+        /// <param name="scenario_node"></param>
         public static void Save(ConfigNode scenario_node)
         {
             Log("Call -> OnSave(..)");
 
+            // This shouldn't ever happen.
             if (evals_info == null)
             {
-                Log("evals_info is null, aborting OnSave");
+                Log("CheckThis --> evals_info is null, aborting OnSave");
                 return;
             }
 
@@ -270,7 +302,7 @@ namespace SimpleSurvival
                 Log("  amount    = " + info.current);
                 Log("  maxAmount = " + info.max);
 
-                ConfigNode node = scenario_node.AddNode(C.NODE_EVA_TRACK);
+                ConfigNode node = scenario_node.AddNode(NODE_EVA_TRACK);
                 node.AddValue("name", name);
                 node.AddValue("amount", info.current);
                 node.AddValue("maxAmount", info.max);

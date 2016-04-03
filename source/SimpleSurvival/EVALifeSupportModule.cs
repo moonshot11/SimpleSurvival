@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace SimpleSurvival
 {
+    /// <summary>
+    /// EVA LifeSupport PartModule, lives in EVA Kerbals.
+    /// </summary>
     public class EVALifeSupportModule : PartModule
     {
         public override void OnStart(StartState state)
@@ -65,10 +68,14 @@ namespace SimpleSurvival
         public void FixedUpdate()
         {
             PartResource resource = part.Resources[C.NAME_EVA_LIFESUPPORT];
-            double prev_amount = resource.amount;
+            double initial_value = resource.amount;
             string kerbal_name = part.protoModuleCrew[0].name;
 
-            EVALifeSupportTracker.SetCurrentEVAAmount(kerbal_name, prev_amount);
+            // Update tracking info.
+            // While Kerbal is in EVA, PartResource contains the "primary" value,
+            // and tracking is only updated as a consequence.
+            // It will be a frame behind, but that should be okay.
+            EVALifeSupportTracker.SetCurrentEVAAmount(kerbal_name, initial_value);
 
             // If Kerbal is below this altitude in an atmosphere with oxygen,
             // LifeSupport is irrelevant
@@ -78,7 +85,7 @@ namespace SimpleSurvival
             // -- Reduce resource --
             double retd = part.RequestResource(C.NAME_EVA_LIFESUPPORT, C.EVA_LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime);
 
-            if (prev_amount > C.EVA_LS_30_SECONDS &&
+            if (initial_value > C.EVA_LS_30_SECONDS &&
                 resource.amount <= C.EVA_LS_30_SECONDS)
             {
                 TimeWarp.SetRate(0, true);
@@ -91,22 +98,6 @@ namespace SimpleSurvival
             {
                 Util.KillKerbals(this);
                 part.explode();
-
-                #region FlightResultsDialog
-                // string kerbal_name = part.protoModuleCrew[0].name; // Move to top of code block
-
-                // These values persist if user switches to another craft
-                //
-                // FlightResultsDialog.showExitControls = true;
-                // FlightResultsDialog.allowClosingDialog = true;
-
-                // Prints log with this message at the top,
-                // where flight status is typically displayed
-                //
-                // If user leaves focus immediately, Kerbal is not registered as dead
-                //
-                // FlightResultsDialog.Display(kerbal_name + " ran out of EVA LifeSupport!");
-                #endregion
             }
         }
     }

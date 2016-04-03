@@ -7,15 +7,31 @@ using UnityEngine;
 
 namespace SimpleSurvival
 {
+    /// <summary>
+    /// Manages rescue contracts so that Kerbals in orbit don't die
+    /// as soon as they come into focus.
+    /// </summary>
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class ContractChecker : MonoBehaviour
     {
+        /// <summary>
+        /// Guid of a contract yet unaddressed by LifeSupportModule OnStart
+        /// </summary>
+        private const string NODE_RESCUE_CONTRACT_GUID = "CONTRACT_RECOVERASSET_UNHANDLED_GUID";
+
+        /// <summary>
+        /// List of GUIDs of yet-unaddressed rescue contracts
+        /// </summary>
         public static List<string> Guids
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// The key in the ConfigNode pointing to the rescue contract's part
+        /// housing the stranded Kerbal
+        /// </summary>
         private const string PARTID_VALNAME = "partID";
 
         private void Awake()
@@ -45,30 +61,6 @@ namespace SimpleSurvival
                 Log("Adding contract guid " + guid);
                 Guids.Add(guid);
             }
-
-            #region resource mod in-place
-            /* This would work if a link to vessel or part ID existed here
-            foreach (Vessel vessel in FlightGlobals.Vessels)
-            {
-                if (!Util.IsContractVessel(vessel))
-                    continue;
-
-                Log("Contract vessel = " + vessel.name);
-                ProtoVessel pv = vessel.protoVessel;
-
-                foreach(ProtoPartSnapshot partsnap in pv.protoPartSnapshots)
-                {
-                    Log("PartSnapshot = " + partsnap.partName);
-
-                    foreach (ProtoPartResourceSnapshot resnap in partsnap.resources)
-                    {
-                        Log("ResourceSnapshot = " + resnap.resourceName);
-                        double max = Convert.ToDouble(resnap.resourceValues.GetValue("maxAmount"));
-                        resnap.resourceValues.SetValue("amount", (max/2.0).ToString());
-                    }
-                }
-            } */
-            #endregion
         }
 
         public static string GetPartID(string guid)
@@ -92,6 +84,10 @@ namespace SimpleSurvival
             return "";
         }
 
+        /// <summary>
+        /// Save the current GUIDs to a ConfigNode.
+        /// </summary>
+        /// <param name="scenario_node"></param>
         public static void Save(ConfigNode scenario_node)
         {
             if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
@@ -102,10 +98,14 @@ namespace SimpleSurvival
             foreach (string guid in Guids)
             {
                 Log("Adding guid to ConfigNode (" + guid + ")");
-                scenario_node.AddNode(C.NODE_RESCUE_CONTRACT_GUID).AddValue("guid", guid);
+                scenario_node.AddNode(NODE_RESCUE_CONTRACT_GUID).AddValue("guid", guid);
             }
         }
 
+        /// <summary>
+        /// Load the current GUIDs from a ConfigNode.
+        /// </summary>
+        /// <param name="scenario_node"></param>
         public static void Load(ConfigNode scenario_node)
         {
             if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
@@ -115,7 +115,7 @@ namespace SimpleSurvival
 
             Guids.Clear();
 
-            foreach (ConfigNode node in scenario_node.GetNodes(C.NODE_RESCUE_CONTRACT_GUID))
+            foreach (ConfigNode node in scenario_node.GetNodes(NODE_RESCUE_CONTRACT_GUID))
             {
                 string guid = node.GetValue("guid");
 
@@ -147,6 +147,7 @@ namespace SimpleSurvival
                     {
                         Log("Found in contract: " + contract.Title);
                         newlist.Add(guid);
+                        break;
                     }
                 }
 
@@ -158,6 +159,10 @@ namespace SimpleSurvival
             Guids = newlist;
         }
 
+        /// <summary>
+        /// Print a log message unique to ContractChecker.
+        /// </summary>
+        /// <param name="message"></param>
         private static void Log(string message)
         {
             Util.Log("ContractChecker -> " + message);

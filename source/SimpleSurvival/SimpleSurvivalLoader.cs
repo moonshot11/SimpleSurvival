@@ -7,9 +7,15 @@ using UnityEngine;
 
 namespace SimpleSurvival
 {
+    /// <summary>
+    /// Manages loading/saving of global tracking data.
+    /// </summary>
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class SimpleSurvivalLoader : MonoBehaviour
     {
+        /// <summary>
+        /// Top-level node that will appear in persistence file.
+        /// </summary>
         private const string TOPNAME = "SIMPLESURVIVAL_MOD";
 
         public void Awake()
@@ -18,7 +24,6 @@ namespace SimpleSurvival
 
             GameEvents.onGameStateCreated.Add(OnLoad);
             GameEvents.onGameStateSave.Add(OnSave);
-
         }
 
         public void OnSave(ConfigNode topnode)

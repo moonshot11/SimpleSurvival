@@ -59,6 +59,8 @@ namespace SimpleSurvival
         /// </summary>
         public const double LS_DRAIN_PER_SEC = LS_PER_DAY_PER_KERBAL / 21600.0;
 
+        // -- EVA Life Support rates --
+
         /// <summary>
         /// EVA Life Support drain rate per day (game time)
         /// </summary>
@@ -72,6 +74,8 @@ namespace SimpleSurvival
         /// </summary>
         public const double EVA_LS_30_SECONDS = EVA_LS_DRAIN_PER_SEC * 30;
 
+        // -- EVA LS career values --
+
         /// <summary>
         /// Max amount of EVA Life Support w/ Astronaut Complex Level 2
         /// </summary>
@@ -81,6 +85,8 @@ namespace SimpleSurvival
         /// Max amount of EVA Life Support w/ Astronaut Complex Level 3
         /// </summary>
         public const double EVA_LS_LVL_3 = 300;
+
+        // -- Almost-out tweaking values --
 
         /// <summary>
         /// Seconds of grace period before empty LS module kills Kerbals
@@ -137,18 +143,6 @@ namespace SimpleSurvival
         /// </summary>
         public const string HTML_VAB_GREEN = "<color=#99ff00>";
 
-        /// <summary>
-        /// Header for the ConfigNode section that will contain EVA LS tracking
-        /// </summary>
-        public static string NODE_SIMPLESURVIVAL = "SIMPLESURVIVAL_MOD";
-        /// <summary>
-        /// Title of each individual node holding one Kerbal's info
-        /// </summary>
-        public static string NODE_EVA_TRACK = "KERBAL_EVA_LS";
-        /// <summary>
-        /// Guid of a contract unaddressed by LifeSupportModule OnStart
-        /// </summary>
-        public static string NODE_RESCUE_CONTRACT_GUID = "CONTRACT_RECOVERASSET_UNHANDLED_GUID";
         /// <summary>
         /// The flow mode when requesting LifeSupport in-game
         /// </summary>

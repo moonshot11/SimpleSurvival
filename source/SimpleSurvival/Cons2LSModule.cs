@@ -12,6 +12,9 @@ namespace SimpleSurvival
         CONVERTING
     }
 
+    /// <summary>
+    /// The Consumables -> LifeSupport converter PartModule.
+    /// </summary>
     [KSPModule("Converter")]
     public class Cons2LSModule : PartModule
     {
@@ -27,6 +30,9 @@ namespace SimpleSurvival
 
         ConverterStatus status = ConverterStatus.READY;
 
+        /// <summary>
+        /// Button in KSP interface to toggle converter
+        /// </summary>
         [KSPEvent(guiActive = true, guiActiveEditor = false,
             guiName = "Convert " + C.NAME_CONSUMABLES, guiActiveUncommand = true)]
         public void ToggleStatus()
@@ -46,6 +52,9 @@ namespace SimpleSurvival
             Util.Log(" to " + status);
         }
 
+        /// <summary>
+        /// Button in right-click interface to fill EVA
+        /// </summary>
         [KSPEvent(guiActive = true, guiActiveEditor = false,
             guiName = "Refill " + C.NAME_EVA_LIFESUPPORT, guiActiveUncommand = true,
             guiActiveUnfocused = true, unfocusedRange = 3f, externalToEVAOnly = true)]
@@ -147,39 +156,40 @@ namespace SimpleSurvival
 
         public void FixedUpdate()
         {
-            if (status == ConverterStatus.CONVERTING)
-            {
-                if (!ProperlyManned())
-                {
-                    Util.PostUpperMessage("Converter requires an Engineer to operate!");
-                    status = ConverterStatus.READY;
-                    return;
-                }
+            if (status != ConverterStatus.CONVERTING)
+                return;
 
-                double frac_elec = PullResource(C.NAME_ELECTRICITY, C.CONV_ELEC_PER_SEC);
-                double frac_cons = PullResource(C.NAME_CONSUMABLES, C.CONV_CONS_PER_SEC);
-                double frac_ls = PullResource(C.NAME_LIFESUPPORT, C.CONV_LS_PER_SEC,
+            if (!ProperlyManned())
+            {
+                Util.PostUpperMessage("Converter requires an Engineer to operate!");
+                status = ConverterStatus.READY;
+                return;
+            }
+
+            double frac_elec = PullResource(C.NAME_ELECTRICITY, C.CONV_ELEC_PER_SEC);
+            double frac_cons = PullResource(C.NAME_CONSUMABLES, C.CONV_CONS_PER_SEC);
+            double frac_ls = PullResource(C.NAME_LIFESUPPORT, C.CONV_LS_PER_SEC,
+                ResourceFlowMode.ALL_VESSEL);
+
+            double min_frac = Math.Min(Math.Min(frac_elec, frac_cons), frac_ls);
+
+            // If not all resources could be obtained,
+            // proportionally return the excess resources
+            if (min_frac < C.DOUBLE_ALMOST_ONE)
+            {
+                // Factor (min_frac - frac_*) will be <= 0,
+                // negating the sign of the original request in PullResource
+                part.RequestResource(C.NAME_ELECTRICITY,
+                    (min_frac - frac_elec) * C.CONV_ELEC_PER_SEC * TimeWarp.fixedDeltaTime);
+                part.RequestResource(C.NAME_CONSUMABLES,
+                    (min_frac - frac_cons) * C.CONV_CONS_PER_SEC * TimeWarp.fixedDeltaTime);
+                part.RequestResource(C.NAME_LIFESUPPORT,
+                    (min_frac - frac_ls) * C.CONV_LS_PER_SEC * TimeWarp.fixedDeltaTime,
                     ResourceFlowMode.ALL_VESSEL);
 
-                double min_frac = Math.Min(Math.Min(frac_elec, frac_cons), frac_ls);
-
-                // If not all resources could be obtained,
-                // proportionally return the excess resources
-                if (min_frac < C.DOUBLE_ALMOST_ONE)
-                {
-                    // Factor (min_frac - frac_*) will be <= 0,
-                    // negating the sign of the original request in PullResource
-                    part.RequestResource(C.NAME_ELECTRICITY,
-                        (min_frac - frac_elec) * C.CONV_ELEC_PER_SEC * TimeWarp.fixedDeltaTime);
-                    part.RequestResource(C.NAME_CONSUMABLES,
-                        (min_frac - frac_cons) * C.CONV_CONS_PER_SEC * TimeWarp.fixedDeltaTime);
-                    part.RequestResource(C.NAME_LIFESUPPORT,
-                        (min_frac - frac_ls) * C.CONV_LS_PER_SEC * TimeWarp.fixedDeltaTime,
-                        ResourceFlowMode.ALL_VESSEL);
-
-                    status = ConverterStatus.READY;
-                }
+                status = ConverterStatus.READY;
             }
+
         }
 
         /// <summary>
@@ -199,6 +209,7 @@ namespace SimpleSurvival
             else
                 obtained = part.RequestResource(resource, amount, flowmode);
 
+            // Percentage of resource request that was obtained
             double frac = Math.Abs(obtained / req);
 
             if (frac < C.DOUBLE_ALMOST_ONE)
@@ -225,6 +236,11 @@ namespace SimpleSurvival
             base.OnUpdate();
         }
 
+        /// <summary>
+        /// Convert converter status to its string representation
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
         public string StatusToString(ConverterStatus status)
         {
             switch(status)
@@ -255,6 +271,10 @@ namespace SimpleSurvival
             return false;
         }
 
+        /// <summary>
+        /// Return VAB info text
+        /// </summary>
+        /// <returns></returns>
         public override string GetInfo()
         {
             string info = "Converts " + C.NAME_CONSUMABLES + " to " + C.NAME_LIFESUPPORT +

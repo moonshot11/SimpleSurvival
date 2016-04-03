@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace SimpleSurvival
 {
+    /// <summary>
+    /// Loads the EVALifeSupportModule into the EVA parts on startup.
+    /// </summary>
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class EVALifeSupportLoader : MonoBehaviour
     {
@@ -29,10 +32,11 @@ namespace SimpleSurvival
             ConfigNode mod_node = new ConfigNode("MODULE");
             mod_node.AddValue("name", "EVALifeSupportModule");
 
+            // Search each loaded part. If EVA part is found,
+            // add EVALifeSupportModule.
             foreach (AvailablePart part in part_list)
             {
                 string name = part.name;
-                // Util.Log("Part name = " + name);
 
                 if (name.StartsWith("kerbalEVA"))
                 {

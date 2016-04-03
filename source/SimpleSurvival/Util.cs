@@ -26,7 +26,7 @@ namespace SimpleSurvival
         }
 
         /// <summary>
-        /// This kills the Kerbal
+        /// This kills the Kerbal.
         /// </summary>
         /// <param name="module"></param>
         /// <param name="kerbal"></param>
@@ -126,9 +126,11 @@ namespace SimpleSurvival
             double delta = currUT - lastUT;
             double request = module.part.protoModuleCrew.Count * resource_rate * delta;
 
+            // Startup should not be zero unless user is REALLY quick with the mouse
+            // (i.e. never).
             if (request < C.DOUBLE_MARGIN)
             {
-                Util.Log("Startup request is zero. This is unexpected. Factors:");
+                Util.Log("CheckThis -> Startup request is zero. This is unexpected. Factors:");
                 Util.Log("    Crew count    = " + module.part.protoModuleCrew.Count);
                 Util.Log("    Resource rate = " + resource_rate);
                 Util.Log("    Time delta    = " + delta);
@@ -151,7 +153,8 @@ namespace SimpleSurvival
         }
 
         /// <summary>
-        /// Formats a double for the VAB
+        /// Formats a double for the VAB. Returns double truncated to one digit
+        /// after the decimal.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -208,8 +211,15 @@ namespace SimpleSurvival
             Util.Log("-------------------------------------------------------------");
         }
 
+        /// <summary>
+        /// Post a message to UPPER_CENTER.
+        /// </summary>
+        /// <param name="message">The text to print.</param>
+        /// <param name="level">0=info, 1=warning, 2=alert. Decides message color.</param>
         public static void PostUpperMessage(string message, int level = 0)
         {
+            const float message_duration = 8f;
+
             string prefix;
 
             switch(level)
@@ -229,7 +239,7 @@ namespace SimpleSurvival
 
             message = prefix + message + "</color>";
 
-            ScreenMessage sm = new ScreenMessage(message, 8f, ScreenMessageStyle.UPPER_CENTER);
+            ScreenMessage sm = new ScreenMessage(message, message_duration, ScreenMessageStyle.UPPER_CENTER);
             ScreenMessages.PostScreenMessage(sm, true);
         }
     }
