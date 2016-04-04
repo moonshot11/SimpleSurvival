@@ -62,12 +62,18 @@ namespace SimpleSurvival
 
                 foreach (ProtoCrewMember kerbal in part.protoModuleCrew)
                 {
-                    EVALifeSupportTracker.AddKerbalToTracking(kerbal.name);
+                    // If Kerbal isn't yet in tracking (i.e. mod was just installed),
+                    // add EVA LifeSupport but don't deduct anything. That seems unfair.
+                    if (!EVALifeSupportTracker.InTracking(kerbal.name))
+                    {
+                        EVALifeSupportTracker.AddKerbalToTracking(kerbal.name);
+                        continue;
+                    }
 
-                    double current = EVALifeSupportTracker.AddEVAAmount(kerbal.name, -eva_diff);
+                    double current = EVALifeSupportTracker.AddEVAAmount(kerbal.name, -eva_diff, EVA_Resource.LifeSupport);
 
                     if (current < C.KILL_BUFFER)
-                        EVALifeSupportTracker.SetLifeSupportAmount(kerbal.name, C.KILL_BUFFER);
+                        EVALifeSupportTracker.SetCurrentAmount(kerbal.name, C.KILL_BUFFER, EVA_Resource.LifeSupport);
                     else if (current < C.EVA_LS_30_SECONDS)
                         Util.PostUpperMessage(kerbal.name + " has " + (int)(current / C.EVA_LS_DRAIN_PER_SEC) + " seconds to live!", 1);
 
@@ -145,7 +151,7 @@ namespace SimpleSurvival
 
                 double request = C.EVA_LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime;
 
-                double current_eva = EVALifeSupportTracker.AddEVAAmount(kerbal.name, -request);
+                double current_eva = EVALifeSupportTracker.AddEVAAmount(kerbal.name, -request, EVA_Resource.LifeSupport);
 
                 if (current_eva + request > C.EVA_LS_30_SECONDS &&
                     current_eva <= C.EVA_LS_30_SECONDS)
@@ -153,7 +159,7 @@ namespace SimpleSurvival
                     TimeWarp.SetRate(0, true);
                     Util.PostUpperMessage(kerbal.name + " has 30 seconds to live!", 1);
                     // Set to 30 seconds in case of large timewarp.
-                    EVALifeSupportTracker.SetLifeSupportAmount(kerbal.name, C.EVA_LS_30_SECONDS);
+                    EVALifeSupportTracker.SetCurrentAmount(kerbal.name, C.EVA_LS_30_SECONDS, EVA_Resource.LifeSupport);
                 }
                 
                 if (EVALifeSupportTracker.GetEVALSInfo(kerbal.name).ls_current < C.DOUBLE_MARGIN)

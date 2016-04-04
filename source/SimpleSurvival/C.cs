@@ -137,9 +137,13 @@ namespace SimpleSurvival
         public const double CONV_LS_PER_SEC = -CONV_CONS_PER_SEC;
 
         /// <summary>
-        /// Conversation rate of Consumables to EVA
+        /// Conversation rate of Consumables to EVA LifeSupport
         /// </summary>
-        public const double CONS_TO_EVA = 1.0;
+        public const double CONS_TO_EVA_LS = 1.0;
+        /// <summary>
+        /// Conversion rate of Consumables to EVA Propellant
+        /// </summary>
+        public const double CONS_TO_EVA_PROP = 1.0;
 
         /// <summary>
         /// Altitude under which LifeSupport is not needed in atmosphere with oxygen

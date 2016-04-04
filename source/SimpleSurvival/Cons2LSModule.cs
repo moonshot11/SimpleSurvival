@@ -51,16 +51,29 @@ namespace SimpleSurvival
 
             Util.Log(" to " + status);
         }
-
-        /// <summary>
-        /// Button in right-click interface to fill EVA
-        /// </summary>
-        [KSPEvent(guiActive = true, guiActiveEditor = false,
-            guiName = "Refill " + C.NAME_EVA_LIFESUPPORT, guiActiveUncommand = true,
-            guiActiveUnfocused = true, unfocusedRange = 3f, externalToEVAOnly = true)]
-        public void FillEVA()
+        
+        private int FillEVAResource(EVA_Resource choice)
         {
             Vessel active = FlightGlobals.ActiveVessel;
+
+            double conversion_rate;
+            string resource_name;
+
+            switch (choice)
+            {
+                case EVA_Resource.LifeSupport:
+                    conversion_rate = C.CONS_TO_EVA_LS;
+                    resource_name = C.NAME_EVA_LIFESUPPORT;
+                    break;
+                case EVA_Resource.Propellant:
+                    conversion_rate = C.CONS_TO_EVA_PROP;
+                    resource_name = C.NAME_EVA_PROPELLANT;
+                    break;
+                default:
+                    throw new ArgumentException("Cons2LSModule.FillEVAResource, request enum not properly set");
+            }
+
+            Util.Log("Processing FillEVA resource request for " + resource_name);
 
             // Player is controlling ship
             if (vessel == active)
@@ -79,7 +92,17 @@ namespace SimpleSurvival
                     // all missing Kerbals to tracking in OnStart.
 
                     var info = EVALifeSupportTracker.GetEVALSInfo(kerbal.name);
-                    double request = info.ls_max - info.ls_current;
+                    double request = 0;
+
+                    switch(choice)
+                    {
+                        case EVA_Resource.Propellant:
+                            request = info.prop_max - info.prop_current;
+                            break;
+                        case EVA_Resource.LifeSupport:
+                            request = info.ls_max - info.ls_current;
+                            break;
+                    }                       
 
                     eva_request_total += request;
                     kerbal_requests.Add(kerbal.name, request);
@@ -92,15 +115,15 @@ namespace SimpleSurvival
                 {
                     Util.Log("All crewmembers full! Skipping EVA refill");
                     Util.PostUpperMessage("EVA resources already full!");
-                    return;
+                    return -1;
                 }
 
                 // Deduct Consumables
-                double obtained = part.RequestResource(C.NAME_CONSUMABLES, C.CONS_TO_EVA * eva_request_total);
+                double obtained = part.RequestResource(C.NAME_CONSUMABLES, conversion_rate * eva_request_total);
                 double frac = obtained / eva_request_total;
 
                 Util.Log("    EVA request total  = " + eva_request_total);
-                Util.Log("    Request * factor   = " + C.CONS_TO_EVA * eva_request_total);
+                Util.Log("    Request * factor   = " + conversion_rate * eva_request_total);
                 Util.Log("    Obtained           = " + obtained);
                 Util.Log("    Fraction available = " + frac);
 
@@ -108,17 +131,17 @@ namespace SimpleSurvival
                 foreach (string name in kerbal_requests.Keys)
                 {
                     double add = kerbal_requests[name] * frac;
-                    EVALifeSupportTracker.AddEVAAmount(name, add);
+                    EVALifeSupportTracker.AddEVAAmount(name, add, choice);
 
                     Util.Log("    Adding " + add + " to " + name);
                 }
 
                 if (frac > C.DOUBLE_ALMOST_ONE)
-                    Util.PostUpperMessage("EVA resources refilled!");
+                    return 0;
                 else if (frac < C.DOUBLE_MARGIN)
-                    Util.PostUpperMessage(C.NAME_CONSUMABLES + " are empty - could not refill!", 2);
+                    return 2;
                 else
-                    Util.PostUpperMessage("Partial refill - " + C.NAME_CONSUMABLES + " are empty!", 2);
+                    return 1;
             }
             // Player is controlling EVA
             else
@@ -130,27 +153,61 @@ namespace SimpleSurvival
                 // This works right now because the tracker updates live.
                 // May break in the future.
                 var info = EVALifeSupportTracker.GetEVALSInfo(name);
-                double eva_request = info.ls_max - info.ls_current;
+                double eva_request = 0;
 
-                double obtained = part.RequestResource(C.NAME_CONSUMABLES, C.CONS_TO_EVA * eva_request);
-                double add = obtained / C.CONS_TO_EVA;
-                active.rootPart.RequestResource(C.NAME_EVA_LIFESUPPORT, -add);
+                switch (choice)
+                {
+                    case EVA_Resource.Propellant:
+                        eva_request = info.prop_max - info.prop_current;
+                        break;
+                    case EVA_Resource.LifeSupport:
+                        eva_request = info.ls_max - info.ls_current;
+                        break;
+                }
+
+                double obtained = part.RequestResource(C.NAME_CONSUMABLES, conversion_rate * eva_request);
+                double add = obtained / conversion_rate;
+                active.rootPart.RequestResource(resource_name, -add);
 
                 Util.Log("    EVA Request  = " + eva_request);
                 Util.Log("    Amt Obtained = " + obtained);
 
-                // Fill EVA Propellant while we're at it
-                active.rootPart.RequestResource(C.NAME_EVA_PROPELLANT, -double.MaxValue);
-
                 // If enough resources were added
                 if (add > eva_request - C.DOUBLE_MARGIN)
-                    ScreenMessages.PostScreenMessage("EVA resources refilled!", 5f, ScreenMessageStyle.UPPER_LEFT);
+                    return 0;
                 // If Consumables are empty
                 else if (add < C.DOUBLE_MARGIN)
-                    Util.PostUpperMessage(C.NAME_CONSUMABLES + " are empty - could not refill!", 2);
+                    return 2;
                 // If Consumables are almost empty, partial refill
                 else
-                    Util.PostUpperMessage("Partial refill: " + C.NAME_CONSUMABLES + " are empty!", 1);
+                    return 1;
+            }
+        }
+
+        /// <summary>
+        /// Button in right-click interface to fill EVA
+        /// </summary>
+        [KSPEvent(guiActive = true, guiActiveEditor = false,
+            guiName = "Refill EVA", guiActiveUncommand = true,
+            guiActiveUnfocused = true, unfocusedRange = 3f, externalToEVAOnly = true)]
+        public void FillEVA()
+        {
+            int warning_level = FillEVAResource(EVA_Resource.LifeSupport);
+            warning_level = Math.Max(warning_level, FillEVAResource(EVA_Resource.Propellant));
+
+            switch(warning_level)
+            {
+                case 0:
+                    Util.PostUpperMessage("EVA resources refilled!");
+                    break;
+
+                case 1:
+                    Util.PostUpperMessage("Partial refill - " + C.NAME_CONSUMABLES + " are empty!", 2);
+                    break;
+
+                case 2:
+                    Util.PostUpperMessage(C.NAME_CONSUMABLES + " are empty - could not refill!", 2);
+                    break;
             }
         }
 
@@ -288,7 +345,7 @@ namespace SimpleSurvival
 
             "EVA refill has no crew requirement and is instantaneous. " + C.NAME_EVA_PROPELLANT + " is refilled for free.\n\n" +
             "<b>" + C.HTML_VAB_GREEN + "Conversion rate:</color></b>\n" +
-            "  " + Util.FormatForGetInfo(C.CONS_TO_EVA) + " " + C.NAME_CONSUMABLES +
+            "  " + Util.FormatForGetInfo(C.CONS_TO_EVA_LS) + " " + C.NAME_CONSUMABLES +
             "\n  = 1.0 " + C.NAME_EVA_LIFESUPPORT;
 
             return info;

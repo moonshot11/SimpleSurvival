@@ -83,8 +83,8 @@ namespace SimpleSurvival
             // While Kerbal is in EVA, PartResource contains the "primary" value,
             // and tracking is only updated as a consequence.
             // It will be a frame behind, but that should be okay.
-            EVALifeSupportTracker.SetLifeSupportAmount(kerbal_name, initial_value);
-            EVALifeSupportTracker.SetPropAmount(kerbal_name, part.Resources[C.NAME_EVA_PROPELLANT].amount);
+            EVALifeSupportTracker.SetCurrentAmount(kerbal_name, initial_value, EVA_Resource.LifeSupport);
+            EVALifeSupportTracker.SetCurrentAmount(kerbal_name, part.Resources[C.NAME_EVA_PROPELLANT].amount, EVA_Resource.Propellant);
 
             // If Kerbal is below this altitude in an atmosphere with oxygen,
             // LifeSupport is irrelevant

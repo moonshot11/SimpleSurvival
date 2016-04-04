@@ -7,6 +7,12 @@ using UnityEngine;
 
 namespace SimpleSurvival
 {
+    public enum EVA_Resource
+    {
+        Propellant,
+        LifeSupport
+    }
+
     /// <summary>
     /// Global tracking of EVA LifeSupport when Kerbals are not in EVA.
     /// </summary>
@@ -94,8 +100,8 @@ namespace SimpleSurvival
         {
             Log("Call -> AddKerbal(..) for " + name);
 
-            double prop_max = Util.CurrentEVAMax(0);
-            double eva_max = Util.CurrentEVAMax(1);
+            double prop_max = Util.CurrentEVAMax(EVA_Resource.Propellant);
+            double eva_max = Util.CurrentEVAMax(EVA_Resource.LifeSupport);
 
             // Assume that this Kerbal's info should be reset,
             // but warn in the log file just in case.
@@ -192,29 +198,19 @@ namespace SimpleSurvival
         /// </summary>
         /// <param name="name">The Kerbal's name</param>
         /// <param name="amount">The current amount</param>
-        public static void SetLifeSupportAmount(string name, double amount)
+        public static void SetCurrentAmount(string name, double amount, EVA_Resource choice)
         {
             try
             {
-                evals_info[name].ls_current = amount;
-            }
-            catch (KeyNotFoundException e)
-            {
-                Log("SetCurrentEVAAmount Exception thrown: Kerbal " + name + " not found to update tracking!");
-                Log(e.ToString());
-            }
-        }
-
-        /// <summary>
-        /// Set the amount of EVA Propellant a Kerbal currently has
-        /// </summary>
-        /// <param name="name">The Kerbal's name</param>
-        /// <param name="amount">The current amount</param>
-        public static void SetPropAmount(string name, double amount)
-        {
-            try
-            {
-                evals_info[name].prop_current = amount;
+                switch(choice)
+                {
+                    case EVA_Resource.LifeSupport:
+                        evals_info[name].ls_current = amount;
+                        break;
+                    case EVA_Resource.Propellant:
+                        evals_info[name].prop_current = amount;
+                        break;
+                }
             }
             catch (KeyNotFoundException e)
             {
@@ -229,11 +225,19 @@ namespace SimpleSurvival
         /// <param name="name"></param>
         /// <param name="amount"></param>
         /// <returns>Returns the amount of EVA LS after adding</returns>
-        public static double AddEVAAmount(string name, double amount)
+        public static double AddEVAAmount(string name, double amount, EVA_Resource choice)
         {
             try
             {
-                evals_info[name].ls_current += amount;
+                switch (choice)
+                {
+                    case EVA_Resource.LifeSupport:
+                        evals_info[name].ls_current += amount;
+                        break;
+                    case EVA_Resource.Propellant:
+                        evals_info[name].prop_current += amount;
+                        break;
+                }
             }
             catch (KeyNotFoundException e)
             {
@@ -296,12 +300,16 @@ namespace SimpleSurvival
             // This isn't initialized when an old save is loaded.
             // This is purely for safety. All ConfigNode values
             // should be added naturally over the normal course of play.
-            string astro_lvl = HighLogic.CurrentGame.config
+
+            string astro_lvl = "1";
+
+            if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
+                astro_lvl = HighLogic.CurrentGame.config
                 .GetNode("SCENARIO", "name", "ScenarioUpgradeableFacilities")
                 .GetNode("SpaceCenter/AstronautComplex").GetValue("lvl");
 
-            string game_prop_max = Util.CurrentEVAMax(0, astro_lvl).ToString();
-            string game_ls_max = Util.CurrentEVAMax(1, astro_lvl).ToString();
+            string game_prop_max = Util.CurrentEVAMax(EVA_Resource.Propellant, astro_lvl).ToString();
+            string game_ls_max = Util.CurrentEVAMax(EVA_Resource.LifeSupport, astro_lvl).ToString();
 
             foreach (ConfigNode node in scenario_node.GetNodes(NODE_EVA_TRACK))
             {

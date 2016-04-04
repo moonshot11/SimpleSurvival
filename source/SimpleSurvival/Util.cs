@@ -80,9 +80,9 @@ namespace SimpleSurvival
         /// Returns the current maximum EVA LifeSupport given the state
         /// of the astronaut complex
         /// </summary>
-        /// <param name="index">0 = Propellant, 1 = LifeSupport</param>
+        /// <param name="choice">Which resource to return</param>
         /// <returns></returns>
-        public static double CurrentEVAMax(int index, string astro_level = "")
+        public static double CurrentEVAMax(EVA_Resource choice, string astro_level = "")
         {
             // Default astro_level value is "" instead of null
             // to capture the case where the input to this method
@@ -99,14 +99,14 @@ namespace SimpleSurvival
 
             // If Astronaut Complex is fully upgraded, EVA LS gets higher value
 
-            if (index == 0)
+            if (choice == EVA_Resource.Propellant)
             {
                 if (lvl == 1.0f)
                     return C.EVA_PROP_LVL_3;
                 else
                     return C.EVA_PROP_LVL_2;
             }
-            else if (index == 1)
+            else if (choice == EVA_Resource.LifeSupport)
             {
                 if (lvl == 1.0f)
                     return C.EVA_LS_LVL_3;
@@ -261,7 +261,10 @@ namespace SimpleSurvival
                     break;
             }
 
-            message = prefix + message + "</color>";
+            message = prefix + message;
+
+            if (level > 0)
+                message += "</color>";
 
             ScreenMessage sm = new ScreenMessage(message, message_duration, ScreenMessageStyle.UPPER_CENTER);
             ScreenMessages.PostScreenMessage(sm, true);
