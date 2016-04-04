@@ -21,38 +21,45 @@ namespace SimpleSurvival
         /// <summary>
         /// Stores the EVA info for a Kerbal
         /// </summary>
-        public class EVALS_Info
+        public class EvaInfo
         {
             /// <summary>
             /// The current amount of EVA LifeSupport for this Kerbal.
             /// </summary>
-            public double current;
+            public double ls_current;
             /// <summary>
             /// The maximum amount of LifeSupport this Kerbal has.
             /// Persists until s/he is recovered.
             /// </summary>
-            public double max;
+            public double ls_max;
 
-            public EVALS_Info(double current, double max)
+            public double prop_current;
+            public double prop_max;
+
+            public EvaInfo(double prop_current, double prop_max,
+                double ls_current, double ls_max)
             {
-                this.current = current;
-                this.max = max;
+                this.ls_current = ls_current;
+                this.ls_max = ls_max;
+
+                this.prop_current = prop_current;
+                this.prop_max = prop_max;
             }
 
             /// <summary>
             /// Returns a deep copy of this data structure.
             /// </summary>
             /// <returns></returns>
-            public EVALS_Info Copy()
+            public EvaInfo Copy()
             {
-                return new EVALS_Info(current, max);
+                return new EvaInfo(prop_current, prop_max, ls_current, ls_max);
             }
         }
 
         /// <summary>
         /// Stores the live EVA LS tracking info
         /// </summary>
-        private static Dictionary<string, EVALS_Info> evals_info = null;
+        private static Dictionary<string, EvaInfo> evals_info = null;
 
         /// <summary>
         /// Run once on startup, set up hooks to rest of game
@@ -61,7 +68,7 @@ namespace SimpleSurvival
         {
             Log("Call -> Awake(..) " + HighLogic.LoadedScene.ToString());
 
-            evals_info = new Dictionary<string, EVALS_Info>();
+            evals_info = new Dictionary<string, EvaInfo>();
 
             // Kerbals will be added to tracking
             GameEvents.OnVesselRollout.Add(OnVesselRollout);
@@ -87,7 +94,8 @@ namespace SimpleSurvival
         {
             Log("Call -> AddKerbal(..) for " + name);
 
-            double eva_max = Util.CurrentEVAMax();
+            double prop_max = Util.CurrentEVAMax(0);
+            double eva_max = Util.CurrentEVAMax(1);
 
             // Assume that this Kerbal's info should be reset,
             // but warn in the log file just in case.
@@ -107,7 +115,7 @@ namespace SimpleSurvival
 
             Log("Adding current/max EVA LS of " + eva_max + " for " + name);
 
-            EVALS_Info info = new EVALS_Info(eva_max, eva_max);
+            EvaInfo info = new EvaInfo(prop_max, prop_max , eva_max, eva_max);
             evals_info.Add(name, info);
         }
 
@@ -126,7 +134,7 @@ namespace SimpleSurvival
             // EVALifeSupportModule.OnStart() covers the case when destination part is EVA.
             AddKerbalToTracking(kerbal.name);
 
-            double current_eva = evals_info[kerbal.name].current;
+            double current_eva = evals_info[kerbal.name].ls_current;
 
             if (current_eva < C.EVA_LS_30_SECONDS &&
                 action.from.Resources[C.NAME_LIFESUPPORT].amount > C.DOUBLE_MARGIN &&
@@ -153,7 +161,7 @@ namespace SimpleSurvival
         /// </summary>
         /// <param name="name">Name of Kerbal</param>
         /// <returns></returns>
-        public static EVALS_Info GetEVALSInfo(string name)
+        public static EvaInfo GetEVALSInfo(string name)
         {
             if (!evals_info.ContainsKey(name))
                 return null;
@@ -180,15 +188,33 @@ namespace SimpleSurvival
         }
 
         /// <summary>
-        /// Update the amount of EVA LS a Kerbal currently has
+        /// Set the amount of EVA LifeSupport a Kerbal currently has
         /// </summary>
         /// <param name="name">The Kerbal's name</param>
         /// <param name="amount">The current amount</param>
-        public static void SetCurrentEVAAmount(string name, double amount)
+        public static void SetLifeSupportAmount(string name, double amount)
         {
             try
             {
-                evals_info[name].current = amount;
+                evals_info[name].ls_current = amount;
+            }
+            catch (KeyNotFoundException e)
+            {
+                Log("SetCurrentEVAAmount Exception thrown: Kerbal " + name + " not found to update tracking!");
+                Log(e.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Set the amount of EVA Propellant a Kerbal currently has
+        /// </summary>
+        /// <param name="name">The Kerbal's name</param>
+        /// <param name="amount">The current amount</param>
+        public static void SetPropAmount(string name, double amount)
+        {
+            try
+            {
+                evals_info[name].prop_current = amount;
             }
             catch (KeyNotFoundException e)
             {
@@ -207,7 +233,7 @@ namespace SimpleSurvival
         {
             try
             {
-                evals_info[name].current += amount;
+                evals_info[name].ls_current += amount;
             }
             catch (KeyNotFoundException e)
             {
@@ -215,7 +241,7 @@ namespace SimpleSurvival
                 Log(e.ToString());
             }
 
-            return evals_info[name].current;
+            return evals_info[name].ls_current;
         }
 
         /// <summary>
@@ -265,16 +291,19 @@ namespace SimpleSurvival
             Log("Call -> OnLoad(..)");
 
             Log("Clearing EVA LS tracking");
-            evals_info = new Dictionary<string, EVALS_Info>();
+            evals_info = new Dictionary<string, EvaInfo>();
 
             foreach (ConfigNode node in scenario_node.GetNodes(NODE_EVA_TRACK))
             {
                 string name = node.GetValue("name");
-                double current = Convert.ToDouble(node.GetValue("amount"));
-                double max = Convert.ToDouble(node.GetValue("maxAmount"));
 
-                evals_info.Add(name, new EVALS_Info(current, max));
-                Log("Adding " + name + ": [" + current + ", " + max + "]");
+                double prop_current = Convert.ToDouble(node.GetValue("propellant_amount"));
+                double prop_max = Convert.ToDouble(node.GetValue("propellant_maxAmount"));
+                double ls_current = Convert.ToDouble(node.GetValue("lifesupport_amount"));
+                double ls_max = Convert.ToDouble(node.GetValue("lifesupport_maxAmount"));
+
+                evals_info.Add(name, new EvaInfo(prop_current, prop_max, ls_current, ls_max));
+                Log("Adding " + name + ": [" + prop_current + ", " + prop_max + ", " + ls_current + ", " + ls_max + "]");
             }
         }
 
@@ -299,13 +328,13 @@ namespace SimpleSurvival
 
                 Log("Adding " + name + " to ConfigNode");
                 Log("  name      = " + name);
-                Log("  amount    = " + info.current);
-                Log("  maxAmount = " + info.max);
+                Log("  amount    = " + info.ls_current);
+                Log("  maxAmount = " + info.ls_max);
 
                 ConfigNode node = scenario_node.AddNode(NODE_EVA_TRACK);
                 node.AddValue("name", name);
-                node.AddValue("amount", info.current);
-                node.AddValue("maxAmount", info.max);
+                node.AddValue("amount", info.ls_current);
+                node.AddValue("maxAmount", info.ls_max);
             }
         }
 

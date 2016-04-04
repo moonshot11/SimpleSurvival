@@ -79,7 +79,7 @@ namespace SimpleSurvival
                     // all missing Kerbals to tracking in OnStart.
 
                     var info = EVALifeSupportTracker.GetEVALSInfo(kerbal.name);
-                    double request = info.max - info.current;
+                    double request = info.ls_max - info.ls_current;
 
                     eva_request_total += request;
                     kerbal_requests.Add(kerbal.name, request);
@@ -130,7 +130,7 @@ namespace SimpleSurvival
                 // This works right now because the tracker updates live.
                 // May break in the future.
                 var info = EVALifeSupportTracker.GetEVALSInfo(name);
-                double eva_request = info.max - info.current;
+                double eva_request = info.ls_max - info.ls_current;
 
                 double obtained = part.RequestResource(C.NAME_CONSUMABLES, C.CONS_TO_EVA * eva_request);
                 double add = obtained / C.CONS_TO_EVA;

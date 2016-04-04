@@ -67,7 +67,7 @@ namespace SimpleSurvival
                     double current = EVALifeSupportTracker.AddEVAAmount(kerbal.name, -eva_diff);
 
                     if (current < C.KILL_BUFFER)
-                        EVALifeSupportTracker.SetCurrentEVAAmount(kerbal.name, C.KILL_BUFFER);
+                        EVALifeSupportTracker.SetLifeSupportAmount(kerbal.name, C.KILL_BUFFER);
                     else if (current < C.EVA_LS_30_SECONDS)
                         Util.PostUpperMessage(kerbal.name + " has " + (int)(current / C.EVA_LS_DRAIN_PER_SEC) + " seconds to live!", 1);
 
@@ -153,10 +153,10 @@ namespace SimpleSurvival
                     TimeWarp.SetRate(0, true);
                     Util.PostUpperMessage(kerbal.name + " has 30 seconds to live!", 1);
                     // Set to 30 seconds in case of large timewarp.
-                    EVALifeSupportTracker.SetCurrentEVAAmount(kerbal.name, C.EVA_LS_30_SECONDS);
+                    EVALifeSupportTracker.SetLifeSupportAmount(kerbal.name, C.EVA_LS_30_SECONDS);
                 }
                 
-                if (EVALifeSupportTracker.GetEVALSInfo(kerbal.name).current < C.DOUBLE_MARGIN)
+                if (EVALifeSupportTracker.GetEVALSInfo(kerbal.name).ls_current < C.DOUBLE_MARGIN)
                 {
                     Util.KillKerbal(this, kerbal);
                     continue;

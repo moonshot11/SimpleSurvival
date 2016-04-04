@@ -19,13 +19,13 @@ namespace SimpleSurvival
             // Assume EVA Kerbals will always have exactly one ProtoCrewMember
             string kerbal_name = part.protoModuleCrew[0].name;
 
-            PartResource resource = null;
+            PartResource ls_resource = null;
 
             foreach (PartResource pr in part.Resources)
             {
                 if (pr.resourceName == C.NAME_EVA_LIFESUPPORT)
                 {
-                    resource = pr;
+                    ls_resource = pr;
                     break;
                 }
             }
@@ -35,7 +35,7 @@ namespace SimpleSurvival
             // of astronaut complex
             EVALifeSupportTracker.AddKerbalToTracking(kerbal_name);
 
-            if (resource == null)
+            if (ls_resource == null)
             {
                 // If not found, add EVA LS resource to this PartModule.
                 Util.Log("Adding " + C.NAME_EVA_LIFESUPPORT + " resource to " + part.name);
@@ -44,10 +44,10 @@ namespace SimpleSurvival
 
                 ConfigNode resource_node = new ConfigNode("RESOURCE");
                 resource_node.AddValue("name", C.NAME_EVA_LIFESUPPORT);
-                resource_node.AddValue("amount", info.current.ToString());
-                resource_node.AddValue("maxAmount", info.max.ToString());
+                resource_node.AddValue("amount", info.ls_current.ToString());
+                resource_node.AddValue("maxAmount", info.ls_max.ToString());
 
-                resource = part.AddResource(resource_node);
+                ls_resource = part.AddResource(resource_node);
 
                 Util.Log("Added EVA LS resource to " + part.name);
             }
@@ -56,11 +56,19 @@ namespace SimpleSurvival
                 // If found, this EVA is already active - deduct LS.
                 Util.StartupRequest(this, C.NAME_EVA_LIFESUPPORT, C.EVA_LS_DRAIN_PER_SEC);
 
-                if (resource.amount < C.KILL_BUFFER)
-                    resource.amount = C.KILL_BUFFER;
-                else if (resource.amount < C.EVA_LS_30_SECONDS)
-                    Util.PostUpperMessage(kerbal_name + " has " + (int)(resource.amount / C.EVA_LS_DRAIN_PER_SEC) + " seconds to live!", 1);
+                if (ls_resource.amount < C.KILL_BUFFER)
+                    ls_resource.amount = C.KILL_BUFFER;
+                else if (ls_resource.amount < C.EVA_LS_30_SECONDS)
+                    Util.PostUpperMessage(kerbal_name + " has " + (int)(ls_resource.amount / C.EVA_LS_DRAIN_PER_SEC) + " seconds to live!", 1);
             }
+
+            PartResource prop_resource = part.Resources[C.NAME_EVA_PROPELLANT];
+
+            prop_resource.maxAmount = EVALifeSupportTracker.GetEVALSInfo(kerbal_name).prop_max;
+            prop_resource.amount = EVALifeSupportTracker.GetEVALSInfo(kerbal_name).prop_current;
+
+            if (prop_resource.amount < C.EVA_PROP_SAFE_MIN)
+                prop_resource.amount = C.EVA_PROP_SAFE_MIN;
 
             base.OnStart(state);
         }
@@ -75,7 +83,8 @@ namespace SimpleSurvival
             // While Kerbal is in EVA, PartResource contains the "primary" value,
             // and tracking is only updated as a consequence.
             // It will be a frame behind, but that should be okay.
-            EVALifeSupportTracker.SetCurrentEVAAmount(kerbal_name, initial_value);
+            EVALifeSupportTracker.SetLifeSupportAmount(kerbal_name, initial_value);
+            EVALifeSupportTracker.SetPropAmount(kerbal_name, part.Resources[C.NAME_EVA_PROPELLANT].amount);
 
             // If Kerbal is below this altitude in an atmosphere with oxygen,
             // LifeSupport is irrelevant

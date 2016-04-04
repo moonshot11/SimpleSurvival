@@ -74,7 +74,7 @@ namespace SimpleSurvival
         /// </summary>
         public const double EVA_LS_30_SECONDS = EVA_LS_DRAIN_PER_SEC * 30;
 
-        // -- EVA LS career values --
+        // -- EVA LifeSupport career values --
 
         /// <summary>
         /// Max amount of EVA Life Support w/ Astronaut Complex Level 2
@@ -85,6 +85,22 @@ namespace SimpleSurvival
         /// Max amount of EVA Life Support w/ Astronaut Complex Level 3
         /// </summary>
         public const double EVA_LS_LVL_3 = 300;
+
+        // -- EVA Propellant values --
+
+        /// <summary>
+        /// Max amount of EVA Propellant w/ Astronaut Complex Level 2
+        /// </summary>
+        public const double EVA_PROP_LVL_2 = 5;
+        /// <summary>
+        /// Max amount of EVA Propellant w/ Astronaut Complex Level 3
+        /// </summary>
+        public const double EVA_PROP_LVL_3 = 20;
+        /// <summary>
+        /// If EVA Propellant is less than this, set to this to avoid cases
+        /// where player EVAs and consequently "bricks" a Kerbal
+        /// </summary>
+        public const double EVA_PROP_SAFE_MIN = 0.1;
 
         // -- Almost-out tweaking values --
 
