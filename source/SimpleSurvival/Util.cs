@@ -173,7 +173,7 @@ namespace SimpleSurvival
             double obtained = module.part.RequestResource(resource_name, request, C.FLOWMODE_LIFESUPPORT);
 
             // Calculate remaining time that needs to be deducted from EVA LifeSupport (if applicable)
-            return (obtained / request) * delta;
+            return ((request - obtained) / request) * delta;
         }
 
         /// <summary>
