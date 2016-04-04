@@ -293,14 +293,28 @@ namespace SimpleSurvival
             Log("Clearing EVA LS tracking");
             evals_info = new Dictionary<string, EvaInfo>();
 
+            // This isn't initialized when an old save is loaded.
+            // This is purely for safety. All ConfigNode values
+            // should be added naturally over the normal course of play.
+            string astro_lvl = HighLogic.CurrentGame.config
+                .GetNode("SCENARIO", "name", "ScenarioUpgradeableFacilities")
+                .GetNode("SpaceCenter/AstronautComplex").GetValue("lvl");
+
+            string game_prop_max = Util.CurrentEVAMax(0, astro_lvl).ToString();
+            string game_ls_max = Util.CurrentEVAMax(1, astro_lvl).ToString();
+
             foreach (ConfigNode node in scenario_node.GetNodes(NODE_EVA_TRACK))
             {
                 string name = node.GetValue("name");
 
-                double prop_current = Convert.ToDouble(node.GetValue("propellant_amount"));
-                double prop_max = Convert.ToDouble(node.GetValue("propellant_maxAmount"));
-                double ls_current = Convert.ToDouble(node.GetValue("lifesupport_amount"));
-                double ls_max = Convert.ToDouble(node.GetValue("lifesupport_maxAmount"));
+                double prop_current = Convert.ToDouble(
+                    Util.GetConfigNodeValue(node, "propellant_amount", game_prop_max));
+                double prop_max = Convert.ToDouble(
+                    Util.GetConfigNodeValue(node, "propellant_maxAmount", game_prop_max));
+                double ls_current = Convert.ToDouble(
+                    Util.GetConfigNodeValue(node, "lifesupport_amount", game_ls_max));
+                double ls_max = Convert.ToDouble(
+                    Util.GetConfigNodeValue(node, "lifesupport_maxAmount", game_ls_max));
 
                 evals_info.Add(name, new EvaInfo(prop_current, prop_max, ls_current, ls_max));
                 Log("Adding " + name + ": [" + prop_current + ", " + prop_max + ", " + ls_current + ", " + ls_max + "]");
@@ -328,13 +342,17 @@ namespace SimpleSurvival
 
                 Log("Adding " + name + " to ConfigNode");
                 Log("  name      = " + name);
-                Log("  amount    = " + info.ls_current);
-                Log("  maxAmount = " + info.ls_max);
+                Log("  propellant_amount     = " + info.prop_current);
+                Log("  propellant_maxAmount  = " + info.prop_max);
+                Log("  lifesupport_amount    = " + info.ls_current);
+                Log("  lifesupport_maxAmount = " + info.ls_max);
 
                 ConfigNode node = scenario_node.AddNode(NODE_EVA_TRACK);
                 node.AddValue("name", name);
-                node.AddValue("amount", info.ls_current);
-                node.AddValue("maxAmount", info.ls_max);
+                node.AddValue("propellant_amount", info.prop_current);
+                node.AddValue("propellant_maxAmount", info.prop_max);
+                node.AddValue("lifesupport_amount", info.ls_current);
+                node.AddValue("lifesupport_maxAmount", info.ls_max);
             }
         }
 

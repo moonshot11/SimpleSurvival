@@ -82,24 +82,33 @@ namespace SimpleSurvival
         /// </summary>
         /// <param name="index">0 = Propellant, 1 = LifeSupport</param>
         /// <returns></returns>
-        public static double CurrentEVAMax(int index)
+        public static double CurrentEVAMax(int index, string astro_level = "")
         {
-            float astro_lvl = ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.AstronautComplex);
+            // Default astro_level value is "" instead of null
+            // to capture the case where the input to this method
+            // is a missing ConfigNode value.
 
-            Util.Log("Astronaut Complex Level " + astro_lvl);
+            float lvl;
+
+            if (astro_level == "")
+                lvl = ScenarioUpgradeableFacilities.GetFacilityLevel(SpaceCenterFacility.AstronautComplex);
+            else
+                lvl = Convert.ToSingle(astro_level);
+
+            Util.Log("Astronaut Complex Level " + lvl);
 
             // If Astronaut Complex is fully upgraded, EVA LS gets higher value
 
             if (index == 0)
             {
-                if (astro_lvl == 1.0f)
+                if (lvl == 1.0f)
                     return C.EVA_PROP_LVL_3;
                 else
                     return C.EVA_PROP_LVL_2;
             }
             else if (index == 1)
             {
-                if (astro_lvl == 1.0f)
+                if (lvl == 1.0f)
                     return C.EVA_LS_LVL_3;
                 else
                     return C.EVA_LS_LVL_2;
@@ -256,6 +265,21 @@ namespace SimpleSurvival
 
             ScreenMessage sm = new ScreenMessage(message, message_duration, ScreenMessageStyle.UPPER_CENTER);
             ScreenMessages.PostScreenMessage(sm, true);
+        }
+
+        /// <summary>
+        /// Safely get a ConfigNode value if it exists
+        /// </summary>
+        /// <param name="node">Ref to the ConfigNode</param>
+        /// <param name="key">Key.</param>
+        /// <param name="default_value">Value to return if node does not exist.</param>
+        /// <returns></returns>
+        public static string GetConfigNodeValue(ConfigNode node, string key, string default_value)
+        {
+            if (node.HasValue(key))
+                return node.GetValue(key);
+
+            return default_value;
         }
     }
 }
