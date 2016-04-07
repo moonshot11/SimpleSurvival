@@ -16,7 +16,7 @@ namespace SimpleSurvival
     /// The Consumables -> LifeSupport converter PartModule.
     /// </summary>
     [KSPModule("Converter")]
-    public class Cons2LSModule : PartModule
+    public class Cons2LSModule : PartModule, IResourceConsumer
     {
         const double test_value = C.DOUBLE_MARGIN;
 
@@ -349,6 +349,20 @@ namespace SimpleSurvival
             "\n  = 1.0 " + C.NAME_EVA_LIFESUPPORT;
 
             return info;
+        }
+
+        /// <summary>
+        /// Return resource definition for use in Engineer's Report
+        /// </summary>
+        /// <returns></returns>
+        public List<PartResourceDefinition> GetConsumedResources()
+        {
+            PartResourceDefinition def = PartResourceLibrary.Instance.resourceDefinitions[C.NAME_CONSUMABLES];
+
+            List<PartResourceDefinition> list = new List<PartResourceDefinition>();
+            list.Add(def);
+
+            return list;
         }
     }
 }

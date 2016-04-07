@@ -10,7 +10,7 @@ namespace SimpleSurvival
     /// LifeSupport PartModule.
     /// </summary>
     [KSPModule("Life Support")]
-    public class LifeSupportModule : PartModule
+    public class LifeSupportModule : PartModule, IResourceConsumer
     {
         /// <summary>
         /// If true, part has already displayed warning that
@@ -170,6 +170,20 @@ namespace SimpleSurvival
 
                 i++;
             }
+        }
+
+        /// <summary>
+        /// Return resource definition for use in Engineer's Report
+        /// </summary>
+        /// <returns></returns>
+        public List<PartResourceDefinition> GetConsumedResources()
+        {
+            PartResourceDefinition def = PartResourceLibrary.Instance.resourceDefinitions[C.NAME_LIFESUPPORT];
+
+            List<PartResourceDefinition> list = new List<PartResourceDefinition>();
+            list.Add(def);
+
+            return list;
         }
     }
 }
