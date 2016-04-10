@@ -120,6 +120,11 @@ namespace SimpleSurvival
         // Units of EVA LS are minutes, so this value should be calculated as
         // (x seconds) * (EVA_LS_DRAIN_PER_SEC) ==> (x in minutes)
         public const double KILL_BUFFER = EVA_LS_DRAIN_PER_SEC;
+        /// <summary>
+        /// How much to "top off" a LifeSupport module during vessel load
+        /// after Consumables have been drained to keep Kerbals alive
+        /// </summary>
+        public const double AUTO_LS_REFILL_EXTRA = 0.25;
 
         // -- Converter rates --
 

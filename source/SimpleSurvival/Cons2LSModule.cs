@@ -315,7 +315,7 @@ namespace SimpleSurvival
         /// Check if the converter has the proper crew to operate
         /// </summary>
         /// <returns></returns>
-        private bool ProperlyManned()
+        internal bool ProperlyManned()
         {
             // If game isn't in Career Mode, Kerbal specializations
             // aren't supposed to matter. Just check if converter is manned.
