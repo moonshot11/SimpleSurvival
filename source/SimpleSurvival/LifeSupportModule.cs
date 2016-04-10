@@ -66,43 +66,14 @@ namespace SimpleSurvival
                 seconds_remaining = Util.StartupRequest(this, C.NAME_LIFESUPPORT, C.LS_DRAIN_PER_SEC);
             }
 
-            // Return early to avoid scanning all the parts
-            // Just make sure all Kerbals are in tracking before exit,
-            // otherwise this is taken care of in section 3
-            if (seconds_remaining < C.DOUBLE_MARGIN)
-            {
-                foreach (ProtoCrewMember kerbal in part.protoModuleCrew)
-                    EVALifeSupportTracker.AddKerbalToTracking(kerbal.name);
-
-                return;
-            }
-
             // -- 2. Deduct from Consumables if vessel has Converter --
-            bool has_manned_converter = false;
+            Cons2LSModule converter_module = part.FindModuleImplementing<Cons2LSModule>();
 
-            // Check if vessel has a Converter
-            foreach (Part part in vessel.Parts)
-            {
-                List<Cons2LSModule> converters = part.FindModulesImplementing<Cons2LSModule>();
-
-                foreach (Cons2LSModule converter in converters)
-                {
-                    if (converter.ProperlyManned())
-                    {
-                        has_manned_converter = true;
-                        break;
-                    }
-                }
-
-                if (has_manned_converter)
-                    break;
-            }
-
-            // Found Converter, convert Consumables.
+            // Part is Converter, convert Consumables.
             // Ignore ElectricChanrge here. Too many escapes re. capacity,
             // charge rate, LOS to sun, etc. Assume Kerbals have been
             // converting slowly while player is away.
-            if (has_manned_converter)
+            if (converter_module != null && converter_module.ProperlyManned())
             {
                 double cons_over_lifesupport = C.CONV_CONS_PER_SEC / C.CONV_LS_PER_SEC;
                 double cons_per_sec = C.LS_DRAIN_PER_SEC * cons_over_lifesupport;
@@ -111,6 +82,7 @@ namespace SimpleSurvival
                 double request = seconds_remaining * cons_per_sec * part.protoModuleCrew.Count;
                 double frac_obtained = part.RequestResource(C.NAME_CONSUMABLES, request) / request;
 
+                // Deduct Consumables contribution from seconds remaining
                 seconds_remaining *= (1 - frac_obtained);
 
                 // Now add a bit more LifeSupport
