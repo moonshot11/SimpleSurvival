@@ -83,9 +83,9 @@ namespace SimpleSurvival
             // Check if vessel has a Converter
             foreach (Part part in vessel.Parts)
             {
-                List<Cons2LSModule> converters = part.FindModulesImplementing<Cons2LSModule>();
+                List<Cons2LSModule> conv_list = part.FindModulesImplementing<Cons2LSModule>();
 
-                foreach (Cons2LSModule converter in converters)
+                foreach (Cons2LSModule converter in conv_list)
                 {
                     if (converter.ProperlyManned())
                     {
@@ -126,6 +126,10 @@ namespace SimpleSurvival
             double eva_diff = seconds_remaining * C.EVA_LS_DRAIN_PER_SEC;
 
             Util.Log(seconds_remaining + " seconds remaining for " + vessel.vesselName);
+
+            if (seconds_remaining < C.DOUBLE_MARGIN)
+                eva_diff = 0;
+
             Util.Log("Deducting " + eva_diff + " " + C.NAME_EVA_LIFESUPPORT);
 
             foreach (ProtoCrewMember kerbal in part.protoModuleCrew)
@@ -138,6 +142,7 @@ namespace SimpleSurvival
                     continue;
                 }
 
+                // Current EVA LifeSupport after draining from tracking
                 double current = EVALifeSupportTracker.AddEVAAmount(kerbal.name, -eva_diff, EVA_Resource.LifeSupport);
 
                 if (current < C.KILL_BUFFER)

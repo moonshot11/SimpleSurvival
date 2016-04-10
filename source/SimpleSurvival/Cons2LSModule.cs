@@ -225,7 +225,7 @@ namespace SimpleSurvival
 
             double frac_elec = PullResource(C.NAME_ELECTRICITY, C.CONV_ELEC_PER_SEC);
             double frac_cons = PullResource(C.NAME_CONSUMABLES, C.CONV_CONS_PER_SEC);
-            double frac_ls = PullResource(C.NAME_LIFESUPPORT, C.CONV_LS_PER_SEC,
+            double frac_ls = PullResource(C.NAME_LIFESUPPORT, -C.CONV_LS_PER_SEC,
                 ResourceFlowMode.ALL_VESSEL);
 
             double min_frac = Math.Min(Math.Min(frac_elec, frac_cons), frac_ls);
@@ -241,7 +241,7 @@ namespace SimpleSurvival
                 part.RequestResource(C.NAME_CONSUMABLES,
                     (min_frac - frac_cons) * C.CONV_CONS_PER_SEC * TimeWarp.fixedDeltaTime);
                 part.RequestResource(C.NAME_LIFESUPPORT,
-                    (min_frac - frac_ls) * C.CONV_LS_PER_SEC * TimeWarp.fixedDeltaTime,
+                    (min_frac - frac_ls) * -C.CONV_LS_PER_SEC * TimeWarp.fixedDeltaTime,
                     ResourceFlowMode.ALL_VESSEL);
 
                 status = ConverterStatus.READY;
@@ -347,7 +347,7 @@ namespace SimpleSurvival
             "- " + C.NAME_CONSUMABLES + ": " + Util.FormatForGetInfo(C.CONV_CONS_PER_SEC) + "/sec.\n" +
             "- " + C.NAME_ELECTRICITY + ": " + Util.FormatForGetInfo(C.CONV_ELEC_PER_SEC) + "/sec.\n" +
             "<b>" + C.HTML_VAB_GREEN + "Outputs:</color></b>\n" +
-            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(-C.CONV_LS_PER_SEC) + "/sec.\n\n" +
+            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(C.CONV_LS_PER_SEC) + "/sec.\n\n" +
 
             "EVA refill has no crew requirement and is instantaneous. " + C.NAME_EVA_PROPELLANT + " is refilled for free.\n\n" +
             "<b>" + C.HTML_VAB_GREEN + "Conversion rate:</color></b>\n" +
