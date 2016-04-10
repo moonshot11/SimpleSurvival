@@ -317,6 +317,12 @@ namespace SimpleSurvival
         /// <returns></returns>
         private bool ProperlyManned()
         {
+            // If game isn't in Career Mode, Kerbal specializations
+            // aren't supposed to matter. Just check if converter is manned.
+            if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER &&
+                part.protoModuleCrew.Count > 0)
+                return true;
+
             foreach (ProtoCrewMember kerbal in part.protoModuleCrew)
             {
                 // kerbal.experienceTrait.Title also returns "Engineer"

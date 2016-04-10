@@ -67,6 +67,12 @@ namespace SimpleSurvival
             prop_resource.maxAmount = EVALifeSupportTracker.GetEVALSInfo(kerbal_name).prop_max;
             prop_resource.amount = EVALifeSupportTracker.GetEVALSInfo(kerbal_name).prop_current;
 
+            // Will this add safety Propellant on every load?
+            // Should only be added when Kerbal first leaves ship
+            //
+            // Confirmed. At the time of this comment, the Propellant
+            // threshhold is brutally low (0.1), so it's okay, but
+            // this should be changed in the future.
             if (prop_resource.amount < C.EVA_PROP_SAFE_MIN)
                 prop_resource.amount = C.EVA_PROP_SAFE_MIN;
 
