@@ -252,9 +252,10 @@ namespace SimpleSurvival
         /// Remove Kerbal from tracking.
         /// </summary>
         /// <param name="proto"></param>
-        private void OnVesselRecovered(ProtoVessel proto)
+        private void OnVesselRecovered(ProtoVessel proto, bool mystery_var)
         {
             Log("Call -> OnVesselRecovered(..) for vessel: " + proto.vesselName);
+            Log("Mystery bool = " + mystery_var);
 
             foreach (ProtoCrewMember kerbal in proto.GetVesselCrew())
             {

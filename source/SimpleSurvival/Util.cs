@@ -267,7 +267,7 @@ namespace SimpleSurvival
                 message += "</color>";
 
             ScreenMessage sm = new ScreenMessage(message, message_duration, ScreenMessageStyle.UPPER_CENTER);
-            ScreenMessages.PostScreenMessage(sm, true);
+            ScreenMessages.PostScreenMessage(sm);
         }
 
         /// <summary>

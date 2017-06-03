@@ -15,10 +15,10 @@ namespace SimpleSurvival
     {
         public void Awake()
         {
-            RDController.OnRDTreeSpawn.Add(OnRDTreeSpawn);
+            KSP.UI.Screens.RDController.OnRDTreeSpawn.Add(OnRDTreeSpawn);
         }
 
-        private void OnRDTreeSpawn(RDController rd)
+        private void OnRDTreeSpawn(KSP.UI.Screens.RDController rd)
         {
             string refname = "RD_node_icon_simplesurvivalbasic";
             Texture2D texture = GameDatabase.Instance.GetTexture("SimpleSurvival/Tech/RD_node_icon_simplesurvivalbasic", false);
@@ -30,7 +30,7 @@ namespace SimpleSurvival
             // Speed up load time by beginning iteration backwards.
             for (int i = rd.nodes.Count-1; i >= 0; i--)
             {
-                RDNode node = rd.nodes[i];
+                KSP.UI.Screens.RDNode node = rd.nodes[i];
 
                 // This is the "id" field in the tech tree config
                 if (node.tech.techID == "simplesurvivalBasic")
