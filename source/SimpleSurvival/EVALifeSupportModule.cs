@@ -15,8 +15,19 @@ namespace SimpleSurvival
         {
             Util.Log("EVALifeSupportModule OnStart()");
 
+            // Check if EVA Kerbal has exactly one ProtoCrewMember
+            if (part.protoModuleCrew.Count == 0)
+            {
+                string msg = "0 PMCs found in EVA Kerbal: " + part.name;
+                Util.Log(msg);
+                throw new IndexOutOfRangeException(msg);
+            }
+            else if (part.protoModuleCrew.Count > 1)
+            {
+                Util.Log("Weird...multiple PMCs found in EVA Kerbal: " + part.name);
+            }
+
             // To avoid conflicts with Unity variable "name"
-            // Assume EVA Kerbals will always have exactly one ProtoCrewMember
             string kerbal_name = part.protoModuleCrew[0].name;
 
             PartResource ls_resource = null;
