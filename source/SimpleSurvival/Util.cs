@@ -34,18 +34,23 @@ namespace SimpleSurvival
         {
             List<ProtoCrewMember> part_crew = module.part.protoModuleCrew;
             
-            bool respawn_flag = HighLogic.CurrentGame.Parameters.Difficulty.MissingCrewsRespawn;
-
             Util.PostUpperMessage(kerbal.name + " ran out of LifeSupport and died!", 2);
 
             // Kerbal must be removed from part BEFORE calling Die()
             module.part.RemoveCrewmember(kerbal);
-
-            // ...for some reason
+            // Necessary for "Valentina Kermal was killed" message in log.
+            // Doesn't seem to have any other effect.
             kerbal.Die();
+            // Remove dead Kerbal's portrait - if not done, player will still be able
+            // to control a ship with zero live Kerbals.
+            // First two lines don't seem necessary, but may be more complete
+            // if they update information used by other mods.
+            module.vessel.CrewListSetDirty();
+            Vessel.CrewWasModified(module.vessel);
+            KSP.UI.Screens.Flight.KerbalPortraitGallery.Instance.StartRefresh(module.vessel);
 
             // Put Kerbal in Missing queue
-            if (respawn_flag)
+            if (HighLogic.CurrentGame.Parameters.Difficulty.MissingCrewsRespawn)
                 kerbal.StartRespawnPeriod();
         }
 
