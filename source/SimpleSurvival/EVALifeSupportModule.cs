@@ -75,17 +75,29 @@ namespace SimpleSurvival
 
             PartResource prop_resource = part.Resources[C.NAME_EVA_PROPELLANT];
 
-            prop_resource.maxAmount = EVALifeSupportTracker.GetEVALSInfo(kerbal_name).prop_max;
-            prop_resource.amount = EVALifeSupportTracker.GetEVALSInfo(kerbal_name).prop_current;
+            // Necessary to override game's default behavior, which refills
+            // EVA Propellant automatically every time EVA Kerbal is reset
+            var eva_info = EVALifeSupportTracker.GetEVALSInfo(kerbal_name);
+            prop_resource.maxAmount = eva_info.prop_max;
+            prop_resource.amount = eva_info.prop_current;
 
             // Will this add safety Propellant on every load?
             // Should only be added when Kerbal first leaves ship
             //
-            // Confirmed. At the time of this comment, the Propellant
-            // threshhold is brutally low (0.1), so it's okay, but
-            // this should be changed in the future.
+            // Confirmed (1.0.5). At the time of this comment, the Propellant
+            // threshold is brutally low (0.1), so it's okay,
+            // but this should be changed in the future.
             if (prop_resource.amount < C.EVA_PROP_SAFE_MIN)
                 prop_resource.amount = C.EVA_PROP_SAFE_MIN;
+
+            // If difficulty option "Immediate Level Up" is selected,
+            // immediately set this Kerbal's EVA to new max
+            if (HighLogic.CurrentGame.Parameters.CustomParams<GameParameters.AdvancedParams>().EnableKerbalExperience &&
+                HighLogic.CurrentGame.Parameters.CustomParams<GameParameters.AdvancedParams>().ImmediateLevelUp)
+            {
+                ls_resource.maxAmount = Util.CurrentEVAMax(EVA_Resource.LifeSupport);
+                prop_resource.maxAmount = Util.CurrentEVAMax(EVA_Resource.Propellant);
+            }
 
             base.OnStart(state);
         }
