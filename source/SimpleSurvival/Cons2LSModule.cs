@@ -6,52 +6,22 @@ using System.Threading.Tasks;
 
 namespace SimpleSurvival
 {
-    public enum ConverterStatus
-    {
-        READY,
-        CONVERTING
-    }
-
     /// <summary>
     /// The Consumables -> LifeSupport converter PartModule.
     /// </summary>
     [KSPModule("Converter")]
-    public class Cons2LSModule : PartModule, IResourceConsumer
+    public class Cons2LSModule : ModuleResourceConverter, IResourceConsumer
     {
-        const double test_value = C.DOUBLE_MARGIN;
+        private const string CONV_SPECIALIST = "Engineer";
+        private string MSG_ENG = "";
 
-        // -- Minimum values for Consumable->LifeSupport conversion
-        const double minElectric = test_value;
-        const double minConsum = test_value;
-        const double minLS = test_value;
-
-        [KSPField(guiActive = true, guiName = "Converter")]
-        string str_status = "";
-
-        ConverterStatus status = ConverterStatus.READY;
-
-        /// <summary>
-        /// Button in KSP interface to toggle converter
-        /// </summary>
-        [KSPEvent(guiActive = true, guiActiveEditor = false,
-            guiName = "Convert " + C.NAME_CONSUMABLES, guiActiveUncommand = true)]
-        public void ToggleStatus()
+        public override void OnStart(StartState state)
         {
-            Util.Log("Toggling Converter status from " + status);
-            switch (status)
-            {
-                case ConverterStatus.CONVERTING:
-                    status = ConverterStatus.READY;
-                    break;
-
-                case ConverterStatus.READY:
-                    status = ConverterStatus.CONVERTING;
-                    break;
-            }
-
-            Util.Log(" to " + status);
+            MSG_ENG = "Missing " +
+                (Util.AdvParams.EnableKerbalExperience ? CONV_SPECIALIST : "Kerbal");
+            base.OnStart(state);
         }
-        
+
         private int FillEVAResource(EVA_Resource choice)
         {
             Vessel active = FlightGlobals.ActiveVessel;
@@ -211,106 +181,6 @@ namespace SimpleSurvival
             }
         }
 
-        public void FixedUpdate()
-        {
-            if (status != ConverterStatus.CONVERTING)
-                return;
-
-            if (!ProperlyManned())
-            {
-                Util.PostUpperMessage("Converter requires an Engineer to operate!");
-                status = ConverterStatus.READY;
-                return;
-            }
-
-            double frac_elec = PullResource(C.NAME_ELECTRICITY, C.CONV_ELEC_PER_SEC);
-            double frac_cons = PullResource(C.NAME_CONSUMABLES, C.CONV_CONS_PER_SEC);
-            double frac_ls = PullResource(C.NAME_LIFESUPPORT, -C.CONV_LS_PER_SEC,
-                ResourceFlowMode.ALL_VESSEL);
-
-            double min_frac = Math.Min(Math.Min(frac_elec, frac_cons), frac_ls);
-
-            // If not all resources could be obtained,
-            // proportionally return the excess resources
-            if (min_frac < C.DOUBLE_ALMOST_ONE)
-            {
-                // Factor (min_frac - frac_*) will be <= 0,
-                // negating the sign of the original request in PullResource
-                part.RequestResource(C.NAME_ELECTRICITY,
-                    (min_frac - frac_elec) * C.CONV_ELEC_PER_SEC * TimeWarp.fixedDeltaTime);
-                part.RequestResource(C.NAME_CONSUMABLES,
-                    (min_frac - frac_cons) * C.CONV_CONS_PER_SEC * TimeWarp.fixedDeltaTime);
-                part.RequestResource(C.NAME_LIFESUPPORT,
-                    (min_frac - frac_ls) * -C.CONV_LS_PER_SEC * TimeWarp.fixedDeltaTime,
-                    ResourceFlowMode.ALL_VESSEL);
-
-                status = ConverterStatus.READY;
-            }
-
-        }
-
-        /// <summary>
-        /// Request resource for Converter, print message
-        /// </summary>
-        /// <param name="resource">Name of the resource to request</param>
-        /// <param name="amount">Amount of the resource to request</param>
-        /// <param name="flowmode">Flowmode. Defaults to resource default</param>
-        /// <returns>Returns the fraction of resource obtained to resource requested</returns>
-        public double PullResource(string resource, double amount, ResourceFlowMode flowmode = ResourceFlowMode.NULL)
-        {
-            double req = amount * TimeWarp.fixedDeltaTime;
-            double obtained;
-
-            if (flowmode == ResourceFlowMode.NULL)
-                obtained = part.RequestResource(resource, amount);
-            else
-                obtained = part.RequestResource(resource, amount, flowmode);
-
-            // Percentage of resource request that was obtained
-            double frac = Math.Abs(obtained / req);
-
-            if (frac < C.DOUBLE_ALMOST_ONE)
-            {
-                string message;
-
-                if (req >= 0)
-                    message = "Not enough " + resource + " to use Converter!";
-                else
-                    message = "Cannot proceed, " + resource + " is full!";
-
-                Util.PostUpperMessage(message);
-            }
-
-            return frac;
-        }
-
-        /// <summary>
-        /// Generic part update. Handle part status.
-        /// </summary>
-        public override void OnUpdate()
-        {
-            str_status = StatusToString(status);
-            base.OnUpdate();
-        }
-
-        /// <summary>
-        /// Convert converter status to its string representation
-        /// </summary>
-        /// <param name="status"></param>
-        /// <returns></returns>
-        public string StatusToString(ConverterStatus status)
-        {
-            switch(status)
-            {
-                case ConverterStatus.CONVERTING:
-                    return "Converting";
-                case ConverterStatus.READY:
-                    return "Ready";
-                default:
-                    return "ERROR ConverterStatus";
-            }
-        }
-
         /// <summary>
         /// Check if the converter has the proper crew to operate
         /// </summary>
@@ -319,19 +189,32 @@ namespace SimpleSurvival
         {
             // If game isn't in Career Mode, Kerbal specializations
             // aren't supposed to matter. Just check if converter is manned.
-            if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER &&
-                part.protoModuleCrew.Count > 0)
+            if (!Util.AdvParams.EnableKerbalExperience && part.protoModuleCrew.Count > 0)
                 return true;
 
             foreach (ProtoCrewMember kerbal in part.protoModuleCrew)
             {
                 // kerbal.experienceTrait.Title also returns "Engineer"
                 // kerbal.experienceLevel [0..5] to add experience check
-                if (kerbal.experienceTrait.TypeName == "Engineer")
+                if (kerbal.experienceTrait.TypeName == CONV_SPECIALIST)
                     return true;
             }
 
             return false;
+        }
+
+        public override void FixedUpdate()
+        {
+            if (!ProperlyManned())
+            {
+                StopResourceConverter();
+                status = MSG_ENG;
+            }
+            else if (status == MSG_ENG)
+            {
+                status = "Inactive"; // Stock default status
+            }
+            base.FixedUpdate();
         }
 
         /// <summary>

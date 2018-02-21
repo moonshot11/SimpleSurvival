@@ -33,7 +33,7 @@ namespace SimpleSurvival
         public static void KillKerbal(PartModule module, ProtoCrewMember kerbal)
         {
             List<ProtoCrewMember> part_crew = module.part.protoModuleCrew;
-            
+
             Util.PostUpperMessage(kerbal.name + " ran out of LifeSupport and died!", 2);
 
             // Kerbal must be removed from part BEFORE calling Die()
@@ -289,5 +289,12 @@ namespace SimpleSurvival
 
             return default_value;
         }
+
+        /// <summary>
+        /// Return CurrentGame's AdvancedParams
+        /// </summary>
+        public static GameParameters.AdvancedParams AdvParams =>
+            HighLogic.CurrentGame.Parameters.
+            CustomParams<GameParameters.AdvancedParams>();
     }
 }

@@ -66,7 +66,7 @@ while (my $line = <$FILE>)
             print "    }$NL";
         }
 
-        if ($converter)
+        if (0 && $converter)
         {
             print "    MODULE$NL";
             print "    {$NL";

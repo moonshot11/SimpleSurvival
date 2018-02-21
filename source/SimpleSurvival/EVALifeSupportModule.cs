@@ -92,8 +92,7 @@ namespace SimpleSurvival
 
             // If difficulty option "Immediate Level Up" is selected,
             // immediately set this Kerbal's EVA to new max
-            if (HighLogic.CurrentGame.Parameters.CustomParams<GameParameters.AdvancedParams>().EnableKerbalExperience &&
-                HighLogic.CurrentGame.Parameters.CustomParams<GameParameters.AdvancedParams>().ImmediateLevelUp)
+            if (Util.AdvParams.EnableKerbalExperience && Util.AdvParams.ImmediateLevelUp)
             {
                 ls_resource.maxAmount = Util.CurrentEVAMax(EVA_Resource.LifeSupport);
                 prop_resource.maxAmount = Util.CurrentEVAMax(EVA_Resource.Propellant);
