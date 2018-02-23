@@ -223,19 +223,14 @@ namespace SimpleSurvival
         /// <returns></returns>
         public override string GetInfo()
         {
-            string info = "Converts " + C.NAME_CONSUMABLES + " to " + C.NAME_LIFESUPPORT +
-                ". Part must be manned by an Engineer.\n\n" +
+            string info = base.GetInfo();
 
-            "<b>" + C.HTML_VAB_GREEN + "Requires:</color></b>\n" +
-            "- " + C.NAME_CONSUMABLES + ": " + Util.FormatForGetInfo(C.CONV_CONS_PER_SEC) + "/sec.\n" +
-            "- " + C.NAME_ELECTRICITY + ": " + Util.FormatForGetInfo(C.CONV_ELEC_PER_SEC) + "/sec.\n" +
-            "<b>" + C.HTML_VAB_GREEN + "Outputs:</color></b>\n" +
-            "- " + C.NAME_LIFESUPPORT + ": " + Util.FormatForGetInfo(C.CONV_LS_PER_SEC) + "/sec.\n\n" +
-
-            "EVA refill has no crew requirement and is instantaneous. " + C.NAME_EVA_PROPELLANT + " is refilled for free.\n\n" +
-            "<b>" + C.HTML_VAB_GREEN + "Conversion rate:</color></b>\n" +
+            info += "\n\nPart must be manned by an Engineer.\n\n" +
+            C.HTML_VAB_GREEN + "EVA conversion rate:</color>\n" +
             "  " + Util.FormatForGetInfo(C.CONS_TO_EVA_LS) + " " + C.NAME_CONSUMABLES +
-            "\n  = 1.0 " + C.NAME_EVA_LIFESUPPORT;
+            "\n  = 1.0 " + C.NAME_EVA_LIFESUPPORT +
+            "\n\nEVA refill has no crew requirement and is instantaneous. " +
+            C.NAME_EVA_PROPELLANT + " is refilled for free.\n\n";
 
             return info;
         }
