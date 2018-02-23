@@ -22,6 +22,18 @@ namespace SimpleSurvival
         {
             Util.Log("Loader Awake(..)");
 
+            string url = "SimpleSurvival / settings / SIMPLESURVIVAL_SETTINGS";
+            ConfigNode node = GameDatabase.Instance.GetConfigNode(url);
+
+            C.EVA_LS_LVL_2 = Convert.ToDouble(
+                Util.GetConfigNodeValue(node, "eva_ls_2", C.EVA_LS_LVL_2));
+            C.EVA_LS_LVL_3 = Convert.ToDouble(
+                Util.GetConfigNodeValue(node, "eva_ls_3", C.EVA_LS_LVL_3));
+            C.EVA_PROP_LVL_2 = Convert.ToDouble(
+                Util.GetConfigNodeValue(node, "eva_prop_2", C.EVA_PROP_LVL_2));
+            C.EVA_PROP_LVL_3 = Convert.ToDouble(
+                Util.GetConfigNodeValue(node, "eva_prop_3", C.EVA_PROP_LVL_3));
+
             GameEvents.onGameStateCreated.Add(OnLoad);
             GameEvents.onGameStateSave.Add(OnSave);
         }

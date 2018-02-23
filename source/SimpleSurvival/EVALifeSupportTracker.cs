@@ -309,8 +309,8 @@ namespace SimpleSurvival
                 .GetNode("SCENARIO", "name", "ScenarioUpgradeableFacilities")
                 .GetNode("SpaceCenter/AstronautComplex").GetValue("lvl");
 
-            string game_prop_max = Util.CurrentEVAMax(EVA_Resource.Propellant, astro_lvl).ToString();
-            string game_ls_max = Util.CurrentEVAMax(EVA_Resource.LifeSupport, astro_lvl).ToString();
+            double game_prop_max = Util.CurrentEVAMax(EVA_Resource.Propellant, astro_lvl);
+            double game_ls_max = Util.CurrentEVAMax(EVA_Resource.LifeSupport, astro_lvl);
 
             foreach (ConfigNode node in scenario_node.GetNodes(NODE_EVA_TRACK))
             {

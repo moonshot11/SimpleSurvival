@@ -282,12 +282,12 @@ namespace SimpleSurvival
         /// <param name="key">Key.</param>
         /// <param name="default_value">Value to return if node does not exist.</param>
         /// <returns></returns>
-        public static string GetConfigNodeValue(ConfigNode node, string key, string default_value)
+        public static string GetConfigNodeValue(ConfigNode node, string key, object default_value)
         {
             if (node.HasValue(key))
                 return node.GetValue(key);
 
-            return default_value;
+            return default_value.ToString();
         }
 
         /// <summary>
