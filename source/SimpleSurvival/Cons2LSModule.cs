@@ -248,5 +248,30 @@ namespace SimpleSurvival
 
             return list;
         }
+
+        // These two functions are needed to redefine guiActiveUncommand,
+        // since these particular buttons should be available when the only
+        // Kerbal in the vessel is in the crewCabin. The vessel is unmanned,
+        // rendering stock ModuleResourceConverters inoperable.
+
+        /// <summary>
+        /// KSP in-flight GUI button: start converter
+        /// </summary>
+        [KSPEvent(guiName = "#autoLOC_6001471", guiActive = true, active = false,
+            guiActiveUncommand = true)]
+        public override void StartResourceConverter()
+        {
+            base.StartResourceConverter();
+        }
+
+        /// <summary>
+        /// KSP in-flight GUI button: stop converter
+        /// </summary>
+        [KSPEvent(guiName = "#autoLOC_6001472", guiActive = true, active = false,
+            guiActiveUncommand = true)]
+        public override void StopResourceConverter()
+        {
+            base.StopResourceConverter();
+        }
     }
 }
