@@ -13,12 +13,12 @@ namespace SimpleSurvival
     public class Cons2LSModule : ModuleResourceConverter, IResourceConsumer
     {
         private const string CONV_SPECIALIST = "Engineer";
-        private string MSG_ENG = "";
+        private string msgMissing = "";
 
         public override void OnStart(StartState state)
         {
-            MSG_ENG = "Missing " +
-                (Util.AdvParams.EnableKerbalExperience ? CONV_SPECIALIST : "Kerbal");
+            string specialist = (Util.AdvParams.EnableKerbalExperience ? CONV_SPECIALIST : "Kerbal");
+            msgMissing = "Missing " + specialist;
             base.OnStart(state);
         }
 
@@ -208,9 +208,9 @@ namespace SimpleSurvival
             if (!ProperlyManned())
             {
                 StopResourceConverter();
-                status = MSG_ENG;
+                status = msgMissing;
             }
-            else if (status == MSG_ENG)
+            else if (status == msgMissing)
             {
                 status = "Inactive"; // Stock default status
             }
@@ -225,12 +225,13 @@ namespace SimpleSurvival
         {
             string info = base.GetInfo();
 
-            info += "\n\nPart must be manned by an Engineer.\n\n" +
-            C.HTML_VAB_GREEN + "EVA conversion rate:</color>\n" +
-            "  " + Util.FormatForGetInfo(C.CONS_TO_EVA_LS) + " " + C.NAME_CONSUMABLES +
-            "\n  = 1.0 " + C.NAME_EVA_LIFESUPPORT +
-            "\n\nEVA refill has no crew requirement and is instantaneous. " +
-            C.NAME_EVA_PROPELLANT + " is refilled for free.\n\n";
+            info += "\n\nPart must be manned by an Engineer.\n" +
+                "(Can be manned by any Kerbal if \"Enable Kerbal Experience\" is unchecked.)\n\n" +
+                C.HTML_VAB_GREEN + "EVA conversion rate:</color>\n" +
+                "  " + Util.FormatForGetInfo(C.CONS_TO_EVA_LS) + " " + C.NAME_CONSUMABLES +
+                "\n  = 1.0 " + C.NAME_EVA_LIFESUPPORT +
+                "\n\nEVA refill has no crew requirement and is instantaneous. " +
+                C.NAME_EVA_PROPELLANT + " is refilled for free.\n\n";
 
             return info;
         }
