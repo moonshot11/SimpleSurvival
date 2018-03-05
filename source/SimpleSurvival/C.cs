@@ -150,11 +150,6 @@ namespace SimpleSurvival
         public const double CONS_TO_EVA_PROP = 1.0;
 
         /// <summary>
-        /// Altitude under which LifeSupport is not needed in atmosphere with oxygen
-        /// </summary>
-        public const double OXYGEN_CUTOFF_ALTITUDE = 10000.0;
-
-        /// <summary>
         /// Medium priority - Orange
         /// </summary>
         public const string HTML_COLOR_WARNING = "<color=#ff8800>";

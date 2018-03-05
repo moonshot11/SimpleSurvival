@@ -116,7 +116,7 @@ namespace SimpleSurvival
 
             // If Kerbal is below this altitude in an atmosphere with oxygen,
             // LifeSupport is irrelevant
-            if (vessel.mainBody.atmosphereContainsOxygen && vessel.altitude < C.OXYGEN_CUTOFF_ALTITUDE)
+            if (Util.BreathableAir(vessel))
                 return;
 
             // -- Reduce resource --

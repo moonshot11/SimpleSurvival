@@ -139,7 +139,7 @@ namespace SimpleSurvival
                 return 0.0;
             }
 
-            if (module.vessel.mainBody.atmosphereContainsOxygen && module.vessel.altitude < C.OXYGEN_CUTOFF_ALTITUDE)
+            if (Util.BreathableAir(module.vessel))
             {
                 Util.Log("Vessel " + module.vessel.name + " is O2 atmo at " + module.vessel.altitude);
                 Util.Log("Startup resource will not be drained");
@@ -296,5 +296,19 @@ namespace SimpleSurvival
         public static GameParameters.AdvancedParams AdvParams =>
             HighLogic.CurrentGame.Parameters.
             CustomParams<GameParameters.AdvancedParams>();
+
+        /// <summary>
+        /// Return true if Kerbals can breathe on their own.
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static bool BreathableAir(Vessel v)
+        {
+            // 1. Atmosphere contains oxygen
+            // 2. Kerbal is lower than 1/2 height of low atmosphere
+            CelestialBody body = v.mainBody;
+            return body.atmosphereContainsOxygen &&
+                v.altitude < (body.scienceValues.flyingAltitudeThreshold / 2);
+        }
     }
 }
