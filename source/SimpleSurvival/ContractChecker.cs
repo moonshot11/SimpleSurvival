@@ -90,9 +90,6 @@ namespace SimpleSurvival
         /// <param name="scenario_node"></param>
         public static void Save(ConfigNode scenario_node)
         {
-            if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
-                return;
-
             Log("OnSave(..)");
 
             foreach (string guid in Guids)
@@ -108,9 +105,6 @@ namespace SimpleSurvival
         /// <param name="scenario_node"></param>
         public static void Load(ConfigNode scenario_node)
         {
-            if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
-                return;
-
             Log("OnLoad(..)");
 
             Guids.Clear();

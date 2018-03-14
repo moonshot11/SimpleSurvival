@@ -40,7 +40,7 @@ namespace SimpleSurvival
 
         public void OnSave(ConfigNode topnode)
         {
-            Util.Log("Loader OnSave(..)");
+            Util.Log("Loader OnSave(..) in " + HighLogic.LoadedScene.ToString());
 
             if (topnode.HasNode(TOPNAME))
                 Util.Log("CheckThis -> Node " + TOPNAME + " already exists!");
@@ -53,10 +53,7 @@ namespace SimpleSurvival
 
         public void OnLoad(Game game)
         {
-            Util.Log("Loader OnLoad(..)");
-
-            if (!HighLogic.LoadedSceneIsGame)
-                return;
+            Util.Log("Loader OnLoad(..) in " + HighLogic.LoadedScene.ToString());
             
             ConfigNode scenario_node;
 

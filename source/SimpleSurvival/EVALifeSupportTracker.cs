@@ -302,9 +302,9 @@ namespace SimpleSurvival
             // This is purely for safety. All ConfigNode values
             // should be added naturally over the normal course of play.
 
-            string astro_lvl = "1";
+            string astro_lvl = "3";
 
-            if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
+            if (HighLogic.CurrentGame?.Mode == Game.Modes.CAREER)
                 astro_lvl = HighLogic.CurrentGame.config
                 .GetNode("SCENARIO", "name", "ScenarioUpgradeableFacilities")
                 .GetNode("SpaceCenter/AstronautComplex").GetValue("lvl");
