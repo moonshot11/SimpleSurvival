@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -60,46 +61,54 @@ namespace SimpleSurvival
                 }
             }
 
-            // New?
-            Texture2D result = null;
+            // New ?
             var textures = GameDatabase.Instance.databaseTexture;
-            foreach (GameDatabase.TextureInfo info in textures)
+            Texture2D overlay_orig = textures.Find(a => a.name.EndsWith("/Test_OVERLAY")).texture;
+
+            List<DecalMap> decals = TextureUtil.ReadDecalCfg(
+                Util.Combine("GameData", "SimpleSurvival", "Parts", "decals.txt"));
+
+            foreach (DecalMap decal in decals)
             {
-                if (info.name.EndsWith("/125Tanks_BW"))
+                Util.Log("Modifying part " + decal.Part);
+                AvailablePart part = PartLoader.getPartInfoByName(decal.Part);
+
+                // Get original texture
+                if (part.Variants == null)
                 {
-                    Util.Log("Changing texture!");
-                    Texture2D tex = info.texture;
-                    Texture2D overlay = textures.Find(a => a.name.EndsWith("/125Tanks_OVERLAY")).texture;
-
-                    tex = TextureUtil.MakeWritable(tex);
-                    // Change to data parameters
-                    int WIDTH = 420;
-                    int HEIGHT = 420;
-                    int originX = 550;
-                    int originY = 800;
-                    overlay = TextureUtil.MakeWritable(overlay, WIDTH, HEIGHT);
-                    Util.Log($"Starting transform at {DateTime.Now}");
-                    TextureUtil.FlipVertical(overlay);
-                    TextureUtil.FlipHorizontal(overlay);
-                    for (int x = 0; x < Math.Min(tex.width - originX, overlay.width); x++)
-                    {
-                        for (int y = 0; y < Math.Min(tex.height - originY, overlay.height); y++)
-                        {
-                            Color overcol = overlay.GetPixel(x, y);
-                            if (overcol.a < 0.1f)
-                                continue;
-                            tex.SetPixel(originX + x, originY + y, overcol);
-                        }
-                    }
-                    tex.Apply(true);
-                    info.texture = tex;
-                    result = tex;
-                    Util.Log($"Completed transform at {DateTime.Now}");
+                    Util.Warn("  Variants is null. Skipping " + decal.Part);
+                    continue;
                 }
-            }
+                string texname = part.Variants[0].Materials[0].mainTexture.name;
+                Util.Log("  Found texture: " + texname);
+                Texture2D tex = textures.Find(a => a.name == texname).texture;
+                Texture2D result = TextureUtil.MakeWritable(tex);
 
-            AvailablePart ap = PartLoader.getPartInfoByName("fuelTank");
-            ap.Variants[0].Materials[0].mainTexture = result;
+                // Get resized decal
+                Texture2D overlay = TextureUtil.MakeWritable(overlay_orig, decal.Width, decal.Height);
+
+                // Transform decal
+                TextureUtil.Rotate(overlay, cycles: decal.Rotate);
+                if (decal.FlipHorizontal)
+                    TextureUtil.FlipHorizontal(overlay);
+                if (decal.FlipVertical)
+                    TextureUtil.FlipVertical(overlay);
+
+                // Place decal on original texture
+                for (int x = 0; x < Math.Min(result.width - decal.OriginX, overlay.width); x++)
+                {
+                    for (int y = 0; y < Math.Min(result.height - decal.OriginY, overlay.height); y++)
+                    {
+                        Color overcol = overlay.GetPixel(x, y);
+                        if (overcol.a < 0.1f)
+                            continue;
+                        result.SetPixel(decal.OriginX + x, decal.OriginY + y, overcol);
+                    }
+                }
+
+                result.Apply(true);
+                part.Variants[0].Materials[0].mainTexture = result;
+            }
 
             Util.Log("Completed setup of EVA LifeSupport");
         }

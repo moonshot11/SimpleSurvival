@@ -1,1 +1,2 @@
 # <part name>: (originX, originY) (width, height) rotation[0-3] flip[0-3]
+simplesurvivalConsumableInlineLarge: (0, 0) (512, 512) 0 2

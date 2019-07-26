@@ -319,5 +319,22 @@ namespace SimpleSurvival
             return body.atmosphereContainsOxygen &&
                 v.altitude < (body.scienceValues.flyingAltitudeThreshold / 2);
         }
+
+        /// <summary>
+        /// Combine strings using System.IO.Combine.Path()
+        /// </summary>
+        /// <param name="paths"></param>
+        /// <returns></returns>
+        public static string Combine (params string[] paths)
+        {
+            if (paths.Length == 0)
+                return "";
+
+            string result = paths[0];
+
+            for (int i = 1; i < paths.Length; i++)
+                result = System.IO.Path.Combine(result, paths[i]);
+            return result;
+        }
     }
 }
