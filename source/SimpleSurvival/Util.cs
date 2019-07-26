@@ -26,6 +26,15 @@ namespace SimpleSurvival
         }
 
         /// <summary>
+        /// Print a log warning.
+        /// </summary>
+        /// <param name="message"></param>
+        public static void Warn(string message)
+        {
+            KSPLog.print("SimpleSurvival: WARN " + message);
+        }
+
+        /// <summary>
         /// This kills the Kerbal.
         /// </summary>
         /// <param name="module"></param>
