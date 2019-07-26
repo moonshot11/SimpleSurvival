@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +9,32 @@ using UnityEngine;
 
 namespace SimpleSurvival
 {
+    public struct DecalMap
+    {
+        public readonly string Part;
+        public readonly int OriginX;
+        public readonly int OriginY;
+        public readonly int Width;
+        public readonly int Height;
+        public readonly int Rotate;
+        public readonly bool FlipHorizontal;
+        public readonly bool FlipVertical;
+
+        public DecalMap(string partname, int originX, int originY,
+            int width, int height, int rotate, bool flipHorizontal,
+            bool flipVertical)
+        {
+            this.Part = partname;
+            this.OriginX = originX;
+            this.OriginY = originY;
+            this.Width = width;
+            this.Height = height;
+            this.Rotate = rotate;
+            this.FlipHorizontal = flipHorizontal;
+            this.FlipVertical = flipVertical;
+        }
+    }
+
     public static class TextureUtil
     {
         /// <summary>
@@ -20,7 +48,7 @@ namespace SimpleSurvival
         {
             // Attribution:
             // https://support.unity3d.com/hc/en-us/articles/206486626-How-can-I-get-pixels-from-unreadable-textures-
-
+            
             // Throw exception
             if (width * height < 0)
                 width = height = -1;
@@ -94,6 +122,48 @@ namespace SimpleSurvival
             for (int y = texture.height - 1; y >= 0; y--)
                 for (int x = 0; x < texture.width; x++)
                     texture.SetPixel(x, y, pixels[index++]);
+        }
+
+        /// <summary>
+        /// Translate decal config to a list of DecalMaps.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public static List<DecalMap> ReadDecalCfg(string filename)
+        {
+            List<DecalMap> result = new List<DecalMap>();
+
+            using(StreamReader sr = new StreamReader(filename)) while (!sr.EndOfStream)
+            {
+                string line = sr.ReadLine();
+
+                line = Regex.Replace(line, @"#.*", "");
+                if (Regex.IsMatch(line, @"^\s*$"))
+                    continue;
+
+                line = Regex.Replace(line, @"\s", "");
+                var match = Regex.Match(line, @"^(.+):\((\d+),(\d+)\)\((\d+),(\d+)\)(\d)(\d)");
+                if (!match.Success)
+                {
+                    Util.Log($"WARN line in decal config not understood: {line}");
+                    continue;
+                }
+
+                int flip = int.Parse(match.Groups[7].Value);
+
+                result.Add(new DecalMap(
+                    partname: match.Groups[1].Value,
+                    originX: int.Parse(match.Groups[2].Value),
+                    originY: int.Parse(match.Groups[3].Value),
+                    width: int.Parse(match.Groups[4].Value),
+                    height: int.Parse(match.Groups[5].Value),
+                    rotate: int.Parse(match.Groups[6].Value),
+                    flipHorizontal: flip % 2 == 1,
+                    flipVertical: flip >= 2
+                ));
+            }
+
+            return result;
         }
     }
 }

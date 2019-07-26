@@ -1,0 +1,1 @@
+# <part name>: (originX, originY) (width, height) rotation[0-3] flip[0-3]
