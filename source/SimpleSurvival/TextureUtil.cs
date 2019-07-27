@@ -129,27 +129,43 @@ namespace SimpleSurvival
             List<string[]> progs = ReadDecalCfg(
                 Util.Combine("GameData", "SimpleSurvival", "Decals", "decals.txt"));
 
-            string prevpartname = null;
+            string prevPartname = null;
+            int prevVariant = -1;
             AvailablePart part = null;
             Texture2D result = null;
 
             foreach (string[] prog in progs)
             {
-                Util.Log("Length = " + prog.Length);
+                if (prog.Length < 3)
+                {
+                    Util.Warn($"Prog error: length {prog.Length}");
+                    continue;
+                }
+
                 string partname = prog[0];
-                string progname = prog[1];
+                int variant = int.Parse(prog[1]);
+                string progname = prog[2];
+                int tokenIndex = 3;
 
                 Util.Log("Modifying part " + partname);
                 Util.Log("  Prog: " + progname);
 
-                if (partname != prevpartname)
+                if (partname != prevPartname || variant != prevVariant)
                 {
                     part = PartLoader.getPartInfoByName(partname);
-                    string texname = part.Variants[0].Materials[0].mainTexture.name;
+                    if (variant >= part.Variants.Count)
+                    {
+                        Util.Warn($"Variant #{variant} out of range; part has {part.Variants.Count} variants");
+                        prevPartname = null;
+                        prevVariant = -1;
+                        continue;
+                    }
+                    string texname = part.Variants[variant].Materials[0].mainTexture.name;
                     Util.Log("  Found texture: " + texname);
                     Texture2D tex = textures.Find(a => a.name == texname).texture;
                     result = MakeWritable(tex);
-                    prevpartname = partname;
+                    prevPartname = partname;
+                    prevVariant = variant;
                 }
 
                 if (progname == C.PROG_APPLY_DECAL)
@@ -160,14 +176,13 @@ namespace SimpleSurvival
                         continue;
                     }
 
-                    int i = 2;
-                    string decal = prog[i++];
-                    int originX = int.Parse(prog[i++]);
-                    int originY = int.Parse(prog[i++]);
-                    int width = int.Parse(prog[i++]);
-                    int height = int.Parse(prog[i++]);
-                    int rotate = int.Parse(prog[i++]);
-                    int flip = int.Parse(prog[i++]);
+                    string decal = prog[tokenIndex++];
+                    int originX = int.Parse(prog[tokenIndex++]);
+                    int originY = int.Parse(prog[tokenIndex++]);
+                    int width = int.Parse(prog[tokenIndex++]);
+                    int height = int.Parse(prog[tokenIndex++]);
+                    int rotate = int.Parse(prog[tokenIndex++]);
+                    int flip = int.Parse(prog[tokenIndex++]);
 
                     Texture2D overlay_orig = textures.Find(a => a.name.EndsWith('/' + decal)).texture;
 
@@ -210,14 +225,13 @@ namespace SimpleSurvival
                 }
                 else if (progname == C.PROG_COLORMULT)
                 {
-                    int i = 2;
-                    float rfact = float.Parse(prog[i++]);
-                    float gfact = float.Parse(prog[i++]);
-                    float bfact = float.Parse(prog[i++]);
-                    int originX = int.Parse(prog[i++]);
-                    int originY = int.Parse(prog[i++]);
-                    int width = int.Parse(prog[i++]);
-                    int height = int.Parse(prog[i++]);
+                    float rfact = float.Parse(prog[tokenIndex++]);
+                    float gfact = float.Parse(prog[tokenIndex++]);
+                    float bfact = float.Parse(prog[tokenIndex++]);
+                    int originX = int.Parse(prog[tokenIndex++]);
+                    int originY = int.Parse(prog[tokenIndex++]);
+                    int width = int.Parse(prog[tokenIndex++]);
+                    int height = int.Parse(prog[tokenIndex++]);
 
                     for (int x = originX; x < Math.Min(result.width, originX + width); x++)
                     {
@@ -250,7 +264,7 @@ namespace SimpleSurvival
                 }
 
                 result.Apply(true);
-                part.Variants[0].Materials[0].mainTexture = result;
+                part.Variants[variant].Materials[0].mainTexture = result;
             }
 
             Util.Log("Completed setup of EVA LifeSupport");

@@ -1,4 +1,4 @@
-# <part name>: <decal> (originX, originY) (width, height) rotation[0-3] flip[0-3]
-simplesurvivalConsRadialLong: apply ssDecalLine (151, 315) (202, 101) 0 2
-simplesurvivalConsRadialLong: grayscale
-simplesurvivalConsInline3: colormult 0.1 1.0 0.1 (0, 834) (480, 130)
+# <part name>[variant]: <decal> (originX, originY) (width, height) rotation[0-3] flip[0-3]
+simplesurvivalConsRadialLong[0]: apply ssDecalLine (151, 315) (202, 101) 0 2
+simplesurvivalConsRadialLong[0]: grayscale
+simplesurvivalConsInline3[1]: colormult 0.1 0.7 0.1 (0, 834) (480, 130)
