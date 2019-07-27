@@ -1,0 +1,2 @@
+# <part name>: <decal> (originX, originY) (width, height) rotation[0-3] flip[0-3]
+simplesurvivalConsInlineLarge: ssDecalLine (151, 315) (202, 101) 0 2

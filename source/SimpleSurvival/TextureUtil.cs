@@ -11,28 +11,15 @@ namespace SimpleSurvival
 {
     public struct DecalMap
     {
-        public readonly string Part;
-        public readonly int OriginX;
-        public readonly int OriginY;
-        public readonly int Width;
-        public readonly int Height;
-        public readonly int Rotate;
-        public readonly bool FlipHorizontal;
-        public readonly bool FlipVertical;
-
-        public DecalMap(string partname, int originX, int originY,
-            int width, int height, int rotate, bool flipHorizontal,
-            bool flipVertical)
-        {
-            this.Part = partname;
-            this.OriginX = originX;
-            this.OriginY = originY;
-            this.Width = width;
-            this.Height = height;
-            this.Rotate = rotate;
-            this.FlipHorizontal = flipHorizontal;
-            this.FlipVertical = flipVertical;
-        }
+        public string Part;
+        public string Decal;
+        public int OriginX;
+        public int OriginY;
+        public int Width;
+        public int Height;
+        public int Rotate;
+        public bool FlipHorizontal;
+        public bool FlipVertical;
     }
 
     public static class TextureUtil
@@ -142,25 +129,28 @@ namespace SimpleSurvival
                     continue;
 
                 line = Regex.Replace(line, @"\s", "");
-                var match = Regex.Match(line, @"^(.+):\((\d+),(\d+)\)\((\d+),(\d+)\)(\d)(\d)");
+                var match = Regex.Match(line, @"^(.+):(\w+)\((\d+),(\d+)\)\((\d+),(\d+)\)(\d)(\d)");
                 if (!match.Success)
                 {
                     Util.Log($"WARN line in decal config not understood: {line}");
                     continue;
                 }
 
-                int flip = int.Parse(match.Groups[7].Value);
+                DecalMap decalmap;
+                int i = 1;
 
-                result.Add(new DecalMap(
-                    partname: match.Groups[1].Value,
-                    originX: int.Parse(match.Groups[2].Value),
-                    originY: int.Parse(match.Groups[3].Value),
-                    width: int.Parse(match.Groups[4].Value),
-                    height: int.Parse(match.Groups[5].Value),
-                    rotate: int.Parse(match.Groups[6].Value),
-                    flipHorizontal: flip % 2 == 1,
-                    flipVertical: flip >= 2
-                ));
+                decalmap.Part = match.Groups[i++].Value;
+                decalmap.Decal = match.Groups[i++].Value;
+                decalmap.OriginX = int.Parse(match.Groups[i++].Value);
+                decalmap.OriginY = int.Parse(match.Groups[i++].Value);
+                decalmap.Width = int.Parse(match.Groups[i++].Value);
+                decalmap.Height = int.Parse(match.Groups[i++].Value);
+                decalmap.Rotate = int.Parse(match.Groups[i++].Value);
+                int flip = int.Parse(match.Groups[i++].Value);
+
+                decalmap.FlipHorizontal = flip % 2 == 1;
+                decalmap.FlipVertical = flip >= 2;
+                result.Add(decalmap);
             }
 
             return result;
