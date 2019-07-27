@@ -9,19 +9,6 @@ using UnityEngine;
 
 namespace SimpleSurvival
 {
-    public struct DecalMap
-    {
-        public string Part;
-        public string Decal;
-        public int OriginX;
-        public int OriginY;
-        public int Width;
-        public int Height;
-        public int Rotate;
-        public bool FlipHorizontal;
-        public bool FlipVertical;
-    }
-
     public static class TextureUtil
     {
         /// <summary>
@@ -116,44 +103,157 @@ namespace SimpleSurvival
         /// </summary>
         /// <param name="filename"></param>
         /// <returns></returns>
-        public static List<DecalMap> ReadDecalCfg(string filename)
+        public static List<string[]> ReadDecalCfg(string filename)
         {
-            List<DecalMap> result = new List<DecalMap>();
+            List<string[]> result = new List<string[]>();
 
             using(StreamReader sr = new StreamReader(filename)) while (!sr.EndOfStream)
             {
-                string line = sr.ReadLine();
+                string line = sr.ReadLine().Trim();
 
                 line = Regex.Replace(line, @"#.*", "");
                 if (Regex.IsMatch(line, @"^\s*$"))
                     continue;
 
-                line = Regex.Replace(line, @"\s", "");
-                var match = Regex.Match(line, @"^(.+):(\w+)\((\d+),(\d+)\)\((\d+),(\d+)\)(\d)(\d)");
-                if (!match.Success)
-                {
-                    Util.Log($"WARN line in decal config not understood: {line}");
-                    continue;
-                }
-
-                DecalMap decalmap;
-                int i = 1;
-
-                decalmap.Part = match.Groups[i++].Value;
-                decalmap.Decal = match.Groups[i++].Value;
-                decalmap.OriginX = int.Parse(match.Groups[i++].Value);
-                decalmap.OriginY = int.Parse(match.Groups[i++].Value);
-                decalmap.Width = int.Parse(match.Groups[i++].Value);
-                decalmap.Height = int.Parse(match.Groups[i++].Value);
-                decalmap.Rotate = int.Parse(match.Groups[i++].Value);
-                int flip = int.Parse(match.Groups[i++].Value);
-
-                decalmap.FlipHorizontal = flip % 2 == 1;
-                decalmap.FlipVertical = flip >= 2;
-                result.Add(decalmap);
+                string[] tokens = Regex.Split(line, @"[ \(\)\[\]:,]+");
+                result.Add(tokens);
             }
 
             return result;
+        }
+
+        public static void ApplyDecals()
+        {
+            var textures = GameDatabase.Instance.databaseTexture;
+
+            List<string[]> progs = ReadDecalCfg(
+                Util.Combine("GameData", "SimpleSurvival", "Decals", "decals.txt"));
+
+            string prevpartname = null;
+            AvailablePart part = null;
+            Texture2D result = null;
+
+            foreach (string[] prog in progs)
+            {
+                Util.Log("Length = " + prog.Length);
+                string partname = prog[0];
+                string progname = prog[1];
+
+                Util.Log("Modifying part " + partname);
+                Util.Log("  Prog: " + progname);
+
+                if (partname != prevpartname)
+                {
+                    part = PartLoader.getPartInfoByName(partname);
+                    string texname = part.Variants[0].Materials[0].mainTexture.name;
+                    Util.Log("  Found texture: " + texname);
+                    Texture2D tex = textures.Find(a => a.name == texname).texture;
+                    result = MakeWritable(tex);
+                    prevpartname = partname;
+                }
+
+                if (progname == C.PROG_APPLY_DECAL)
+                {
+                    if (prog.Length < 9)
+                    {
+                        Util.Warn("  Fewer than 9 req'd tokens found; skipping");
+                        continue;
+                    }
+
+                    int i = 2;
+                    string decal = prog[i++];
+                    int originX = int.Parse(prog[i++]);
+                    int originY = int.Parse(prog[i++]);
+                    int width = int.Parse(prog[i++]);
+                    int height = int.Parse(prog[i++]);
+                    int rotate = int.Parse(prog[i++]);
+                    int flip = int.Parse(prog[i++]);
+
+                    Texture2D overlay_orig = textures.Find(a => a.name.EndsWith('/' + decal)).texture;
+
+                    // Get original texture
+                    if (part.Variants == null)
+                    {
+                        Util.Warn("  Variants is null. Skipping " + partname);
+                        continue;
+                    }
+
+                    // Get resized decal
+                    Texture2D overlay = MakeWritable(overlay_orig, width, height);
+
+                    // Transform decal
+                    Util.Log($"  Rotating CW {rotate} times");
+                    Rotate(overlay, cycles: rotate);
+                    if (flip % 2 == 1)
+                    {
+                        Util.Log("  Flipping horizontally");
+                        FlipHorizontal(overlay);
+                    }
+                    if (flip >= 2)
+                    {
+                        Util.Log("  Flipping vertically");
+                        FlipVertical(overlay);
+                    }
+
+                    // Place decal on original texture
+                    for (int x = 0; x < Math.Min(result.width - originX, overlay.width); x++)
+                    {
+                        for (int y = 0; y < Math.Min(result.height - originY, overlay.height); y++)
+                        {
+                            Color overcol = overlay.GetPixel(x, y);
+                            if (overcol.a < 0.1f)
+                                continue;
+                            result.SetPixel(originX + x, originY + y, overcol);
+                        }
+                    }
+
+                }
+                else if (progname == C.PROG_COLORMULT)
+                {
+                    int i = 2;
+                    float rfact = float.Parse(prog[i++]);
+                    float gfact = float.Parse(prog[i++]);
+                    float bfact = float.Parse(prog[i++]);
+                    int originX = int.Parse(prog[i++]);
+                    int originY = int.Parse(prog[i++]);
+                    int width = int.Parse(prog[i++]);
+                    int height = int.Parse(prog[i++]);
+
+                    for (int x = originX; x < Math.Min(result.width, originX + width); x++)
+                    {
+                        for (int y = originY; y < Math.Min(result.height, originY + height); y++)
+                        {
+                            Color col = result.GetPixel(x, y);
+                            col.r *= rfact;
+                            col.g *= gfact;
+                            col.b *= bfact;
+                            result.SetPixel(x, y, col);
+                        }
+                    }
+                }
+                else if (progname == C.PROG_GRAYSCALE)
+                {
+                    Color[] pixels = result.GetPixels();
+                    for (int i = 0; i < pixels.Length; i++)
+                    {
+                        float gs = pixels[i].grayscale;
+                        pixels[i].r = gs;
+                        pixels[i].g = gs;
+                        pixels[i].b = gs;
+                    }
+                    result.SetPixels(pixels);
+                }
+                else
+                {
+                    Util.Warn($"  Program {progname} not recognized");
+                    continue;
+                }
+
+                result.Apply(true);
+                part.Variants[0].Materials[0].mainTexture = result;
+            }
+
+            Util.Log("Completed setup of EVA LifeSupport");
         }
     }
 }

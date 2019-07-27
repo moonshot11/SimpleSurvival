@@ -163,6 +163,14 @@ namespace SimpleSurvival
         public const string HTML_VAB_GREEN = "<color=#99ff00>";
 
         /// <summary>
+        /// Program name to apply decal
+        /// </summary>
+        public const string PROG_APPLY_DECAL = "apply";
+
+        public const string PROG_COLORMULT = "colormult";
+        public const string PROG_GRAYSCALE = "grayscale";
+
+        /// <summary>
         /// The flow mode when requesting LifeSupport in-game
         /// </summary>
         public const ResourceFlowMode FLOWMODE_LIFESUPPORT = ResourceFlowMode.NO_FLOW;

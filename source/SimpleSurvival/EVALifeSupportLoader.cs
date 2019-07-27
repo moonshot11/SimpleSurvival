@@ -61,63 +61,9 @@ namespace SimpleSurvival
                 }
             }
 
-            // New ?
-            var textures = GameDatabase.Instance.databaseTexture;
-
-            List<DecalMap> decals = TextureUtil.ReadDecalCfg(
-                Util.Combine("GameData", "SimpleSurvival", "Decals", "decals.txt"));
-
-            foreach (DecalMap decal in decals)
-            {
-                Util.Log("Modifying part " + decal.Part);
-                AvailablePart part = PartLoader.getPartInfoByName(decal.Part);
-                Texture2D overlay_orig = textures.Find(a => a.name.EndsWith('/' + decal.Decal)).texture;
-
-                // Get original texture
-                if (part.Variants == null)
-                {
-                    Util.Warn("  Variants is null. Skipping " + decal.Part);
-                    continue;
-                }
-                string texname = part.Variants[0].Materials[0].mainTexture.name;
-                Util.Log("  Found texture: " + texname);
-                Texture2D tex = textures.Find(a => a.name == texname).texture;
-                Texture2D result = TextureUtil.MakeWritable(tex);
-
-                // Get resized decal
-                Texture2D overlay = TextureUtil.MakeWritable(overlay_orig, decal.Width, decal.Height);
-
-                // Transform decal
-                Util.Log($"  Rotating CW {decal.Rotate} times");
-                TextureUtil.Rotate(overlay, cycles: decal.Rotate);
-                if (decal.FlipHorizontal)
-                {
-                    Util.Log("  Flipping horizontally");
-                    TextureUtil.FlipHorizontal(overlay);
-                }
-                if (decal.FlipVertical)
-                {
-                    Util.Log("  Flipping vertically");
-                    TextureUtil.FlipVertical(overlay);
-                }
-
-                // Place decal on original texture
-                for (int x = 0; x < Math.Min(result.width - decal.OriginX, overlay.width); x++)
-                {
-                    for (int y = 0; y < Math.Min(result.height - decal.OriginY, overlay.height); y++)
-                    {
-                        Color overcol = overlay.GetPixel(x, y);
-                        if (overcol.a < 0.1f)
-                            continue;
-                        result.SetPixel(decal.OriginX + x, decal.OriginY + y, overcol);
-                    }
-                }
-
-                result.Apply(true);
-                part.Variants[0].Materials[0].mainTexture = result;
-            }
-
-            Util.Log("Completed setup of EVA LifeSupport");
+            TextureUtil.ApplyDecals();
         }
+
+        
     }
 }
