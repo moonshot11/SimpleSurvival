@@ -28,7 +28,7 @@ while (my $line = <$FILE>)
     chomp $line;
 
     # Skip if this is the header
-    next if ($line =~ /Notes/);
+    next if ($line =~ /Notes/ || $line =~ /^[\s,]*$/);
 
     if ($line =~ /^([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),/)
     {
