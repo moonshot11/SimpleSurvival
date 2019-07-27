@@ -63,7 +63,7 @@ namespace SimpleSurvival
 
             // New ?
             var textures = GameDatabase.Instance.databaseTexture;
-            Texture2D overlay_orig = textures.Find(a => a.name.EndsWith("/Test_OVERLAY")).texture;
+            Texture2D overlay_orig = textures.Find(a => a.name.EndsWith("/simplesurvivalDecal")).texture;
 
             List<DecalMap> decals = TextureUtil.ReadDecalCfg(
                 Util.Combine("GameData", "SimpleSurvival", "Parts", "decals.txt"));
