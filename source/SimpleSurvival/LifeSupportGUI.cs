@@ -37,17 +37,17 @@ namespace SimpleSurvival
 
         public void AddToolbar()
         {
-            Texture2D icon = GameDatabase.Instance.databaseTexture.Find(
-                a => a.name.EndsWith("/RD_node_icon_simplesurvivalbasic")).texture;
             if (toolbarButton == null)
             {
+                Texture2D icon = GameDatabase.Instance.databaseTexture.Find(
+                    a => a.name.EndsWith("/RD_node_icon_simplesurvivalbasic")).texture;
                 toolbarButton = ApplicationLauncher.Instance.AddModApplication(
-                  ButtonOnTrue, ButtonOnFalse,
-                  null, null, null, null,
-                  ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW,
-                  icon);
-                toolbarButton.SetFalse();
+                    ButtonOnTrue, ButtonOnFalse,
+                    null, null, null, null,
+                    ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW,
+                    icon);
             }
+            toolbarButton.SetFalse();
             showgui = false;
         }
 
@@ -58,6 +58,7 @@ namespace SimpleSurvival
                 ApplicationLauncher.Instance.RemoveApplication(toolbarButton);
                 toolbarButton = null;
             }
+            showgui = false;
         }
 
         private void ButtonOnTrue()
@@ -130,21 +131,26 @@ namespace SimpleSurvival
 
         private void UpdateGUI()
         {
-            var vessel = FlightGlobals.ActiveVessel;
+            Vessel vessel = FlightGlobals.ActiveVessel;
             var parts = vessel.FindPartModulesImplementing<LifeSupportModule>();
+            List<string> deadKerbals = new List<string>();
+
             foreach (var module in parts)
             {
-                var part = module.part;
+                Part part = module.part;
                 List<ProtoCrewMember> crew = part.protoModuleCrew;
                 crew.Sort(CompareCrewNames);
+
                 double perhead = part.Resources[C.NAME_LIFESUPPORT].amount / crew.Count;
                 string timestr = DaysToString(perhead / C.LS_PER_DAY_PER_KERBAL);
+
                 foreach (string kerbal in labelMap.Keys)
                 {
                     if (!crew.Exists(a => a.name == kerbal))
                     {
                         labelMap[kerbal].shipLS.SetOptionText("DEAD");
                         labelMap[kerbal].evaLS.SetOptionText("DEAD");
+                        deadKerbals.Add(kerbal);
                         continue;
                     }
 
@@ -154,6 +160,9 @@ namespace SimpleSurvival
                     labelMap[kerbal].evaLS.SetOptionText(evastr);
                 }
             }
+
+            foreach (string kerbal in deadKerbals)
+                labelMap.Remove(kerbal);
         }
 
         public void OnGUI()
