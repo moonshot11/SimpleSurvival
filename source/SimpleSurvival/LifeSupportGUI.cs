@@ -21,7 +21,6 @@ namespace SimpleSurvival
         private static bool showgui = false;
         private static ApplicationLauncherButton toolbarButton = null;
         private static PopupDialog gui = null;
-        private static DialogGUILabel dtLabel = new DialogGUILabel("Time calculation");
         private static Vector2 position = new Vector2(0.5f, 0.5f);
         private static Vector2 size = new Vector2(500, 200);
         private static Dictionary<string, TwoLabels> labelMap
@@ -103,7 +102,7 @@ namespace SimpleSurvival
                 UISkinManager.defaultSkin,
                 false,
                 "ExtraTitle");
-            position = new Vector2(position.x, position.y);
+            // position = new Vector2(position.x, position.y);
 
             /*if (fdebugLabel == null)
             {
@@ -129,13 +128,8 @@ namespace SimpleSurvival
             gui.Dismiss();
         }
 
-        public void OnGUI()
+        private void UpdateGUI()
         {
-            //debugLabel.SetOptionText($"x: {position.x}\ny: {position.y}\nUI_SCALE: {GameSettings.UI_SCALE}");
-            if (!showgui)
-                return;
-
-            string msg = DateTime.Now.ToString() + "\n\n";
             var vessel = FlightGlobals.ActiveVessel;
             var parts = vessel.FindPartModulesImplementing<LifeSupportModule>();
             foreach (var module in parts)
@@ -145,15 +139,28 @@ namespace SimpleSurvival
                 crew.Sort(CompareCrewNames);
                 double perhead = part.Resources[C.NAME_LIFESUPPORT].amount / crew.Count;
                 string timestr = DaysToString(perhead / C.LS_PER_DAY_PER_KERBAL);
-                foreach (var kerbal in crew)
+                foreach (string kerbal in labelMap.Keys)
                 {
-                    double evaLS = EVALifeSupportTracker.GetEVALSInfo(kerbal.name).ls_current;
+                    if (!crew.Exists(a => a.name == kerbal))
+                    {
+                        labelMap[kerbal].shipLS.SetOptionText("DEAD");
+                        labelMap[kerbal].evaLS.SetOptionText("DEAD");
+                        continue;
+                    }
+
+                    double evaLS = EVALifeSupportTracker.GetEVALSInfo(kerbal).ls_current;
                     string evastr = DaysToString(evaLS / C.EVA_LS_DRAIN_PER_DAY);
-                    labelMap[kerbal.name].shipLS.SetOptionText(timestr);
-                    labelMap[kerbal.name].evaLS.SetOptionText(evastr);
+                    labelMap[kerbal].shipLS.SetOptionText(timestr);
+                    labelMap[kerbal].evaLS.SetOptionText(evastr);
                 }
             }
-            dtLabel.SetOptionText(msg);
+        }
+
+        public void OnGUI()
+        {
+            //debugLabel.SetOptionText($"x: {position.x}\ny: {position.y}\nUI_SCALE: {GameSettings.UI_SCALE}");
+            if (showgui)
+                UpdateGUI();
         }
 
         private static int CompareCrewNames(ProtoCrewMember c1, ProtoCrewMember c2)
