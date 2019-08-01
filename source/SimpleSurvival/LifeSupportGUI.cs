@@ -31,12 +31,28 @@ namespace SimpleSurvival
 
         public void Awake()
         {
+            Util.Log("LifeSupportGUI Awake");
             GameEvents.onGUIApplicationLauncherReady.Add(AddToolbar);
             GameEvents.onGUIApplicationLauncherDestroyed.Add(RemoveToolbar);
         }
 
+        public void OnDisable()
+        {
+            Util.Log("LifeSupportGUI OnDisable");
+            GameEvents.onGUIApplicationLauncherReady.Remove(AddToolbar);
+            GameEvents.onGUIApplicationLauncherDestroyed.Remove(RemoveToolbar);
+            // Ensure it's removed from the MainMenu scene
+            RemoveToolbar();
+        }
+
         public void AddToolbar()
         {
+            // Not sure why this is necessary in addition to the visibleInScenes
+            // arg below...
+            if (HighLogic.LoadedScene != GameScenes.FLIGHT)
+                return;
+
+            Util.Log("LifeSupportGUI AddToolbar: " + HighLogic.LoadedScene.Description());
             if (toolbarButton == null)
             {
                 Texture2D icon = GameDatabase.Instance.databaseTexture.Find(
@@ -53,6 +69,7 @@ namespace SimpleSurvival
 
         public void RemoveToolbar()
         {
+            Util.Log("LifeSupportGUI RemoveToolbar: " + HighLogic.LoadedScene.Description());
             if (toolbarButton != null)
             {
                 ApplicationLauncher.Instance.RemoveModApplication(toolbarButton);
