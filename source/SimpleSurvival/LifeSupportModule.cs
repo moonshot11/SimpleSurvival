@@ -9,7 +9,7 @@ namespace SimpleSurvival
     /// LifeSupport PartModule.
     /// </summary>
     [KSPModule("Life Support")]
-    public class LifeSupportModule : PartModule, IResourceConsumer
+    public class LifeSupportModule : LifeSupportReportable, IResourceConsumer
     {
         /// <summary>
         /// If true, part has already displayed warning that
@@ -253,6 +253,16 @@ namespace SimpleSurvival
             list.Add(def);
 
             return list;
+        }
+
+        /// <summary>
+        /// Return current life support for each crew as readable string.
+        /// </summary>
+        /// <returns></returns>
+        public override string ReportLifeSupport()
+        {
+            double perhead = part.Resources[C.NAME_LIFESUPPORT].amount / part.protoModuleCrew.Count;
+            return Util.DaysToString(perhead / C.LS_PER_DAY_PER_KERBAL);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace SimpleSurvival
     /// <summary>
     /// EVA LifeSupport PartModule, lives in EVA Kerbals.
     /// </summary>
-    public class EVALifeSupportModule : PartModule
+    public class EVALifeSupportModule : LifeSupportReportable
     {
         public override void OnStart(StartState state)
         {
@@ -135,6 +135,11 @@ namespace SimpleSurvival
                 Util.KillKerbals(this);
                 part.explode();
             }
+        }
+
+        public override string ReportLifeSupport()
+        {
+            return "--";
         }
     }
 }

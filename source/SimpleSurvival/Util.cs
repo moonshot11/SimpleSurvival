@@ -335,5 +335,30 @@ namespace SimpleSurvival
                 result = System.IO.Path.Combine(result, paths[i]);
             return result;
         }
+
+        /// <summary>
+        /// Converts Kerbal days (6 hrs) to string.
+        /// </summary>
+        /// <returns></returns>
+        public static string DaysToString(double value)
+        {
+            string PadInt(int v)
+            {
+                return v.ToString().PadLeft(2, '0');
+            }
+
+            int days = (int)value;
+            // Convert to hours
+            value = (value - days) * 6.0;
+            int hours = ((int)value);
+            // Convert to minutes
+            value = (value - hours) * 60.0;
+            int mins = (int)value;
+            // Convert to seconds
+            value = (value - mins) * 60.0;
+            int secs = (int)value;
+
+            return $"{days}d, {PadInt(hours)}:{PadInt(mins)}:{PadInt(secs)}";
+        }
     }
 }
