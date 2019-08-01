@@ -34,6 +34,7 @@ namespace SimpleSurvival
             Util.Log("LifeSupportGUI Awake");
             GameEvents.onGUIApplicationLauncherReady.Add(AddToolbar);
             GameEvents.onGUIApplicationLauncherDestroyed.Add(RemoveToolbar);
+            GameEvents.onVesselChange.Add(ToggleButton);
         }
 
         public void OnDisable()
@@ -41,8 +42,18 @@ namespace SimpleSurvival
             Util.Log("LifeSupportGUI OnDisable");
             GameEvents.onGUIApplicationLauncherReady.Remove(AddToolbar);
             GameEvents.onGUIApplicationLauncherDestroyed.Remove(RemoveToolbar);
+            GameEvents.onVesselChange.Remove(ToggleButton);
             // Ensure it's removed from the MainMenu scene
             RemoveToolbar();
+        }
+
+        public void ToggleButton(Vessel vessel)
+        {
+            if (toolbarButton?.isActiveAndEnabled ?? false)
+            {
+                ButtonOnFalse();
+                ButtonOnTrue();
+            }
         }
 
         public void AddToolbar()
