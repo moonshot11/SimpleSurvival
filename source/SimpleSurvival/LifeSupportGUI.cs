@@ -47,7 +47,7 @@ namespace SimpleSurvival
                     ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW,
                     icon);
             }
-            toolbarButton.SetFalse();
+            toolbarButton.SetFalse(false);
             showgui = false;
         }
 
@@ -55,7 +55,7 @@ namespace SimpleSurvival
         {
             if (toolbarButton != null)
             {
-                ApplicationLauncher.Instance.RemoveApplication(toolbarButton);
+                ApplicationLauncher.Instance.RemoveModApplication(toolbarButton);
                 toolbarButton = null;
             }
             showgui = false;
