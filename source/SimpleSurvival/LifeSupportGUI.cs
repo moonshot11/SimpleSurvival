@@ -164,6 +164,7 @@ namespace SimpleSurvival
         public static void PressFillEva(string name)
         {
             Util.PostUpperMessage("PRESS: " + name);
+            FillEVAResource(name);
         }
 
         /// <summary>
@@ -235,7 +236,7 @@ namespace SimpleSurvival
             return c1.name.CompareTo(c2.name);
         }
 
-        private int FillEVAResource()
+        private static int FillEVAResource(string kerbalName)
         {
             Vessel active = FlightGlobals.ActiveVessel;
 
@@ -332,13 +333,11 @@ namespace SimpleSurvival
             // Player is controlling EVA
             else
             {
-                Util.Log("FillEVA pressed for EVA: " + active.GetVesselCrew()[0].name);
-
-                string name = active.GetVesselCrew()[0].name;
+                Util.Log("FillEVA pressed for: " + kerbalName);
 
                 // This works right now because the tracker updates live.
                 // May break in the future.
-                var info = EVALifeSupportTracker.GetEVALSInfo(name);
+                var info = EVALifeSupportTracker.GetEVALSInfo(kerbalName);
                 double eva_request = 0;
 
                 switch (choice)
@@ -354,7 +353,7 @@ namespace SimpleSurvival
                 Cons2LSModule module = active.FindPartModuleImplementing<Cons2LSModule>();
                 double obtained = module.part.RequestResource(C.NAME_CONSUMABLES, conversion_rate * eva_request);
                 double add = obtained / conversion_rate;
-                active.rootPart.RequestResource(resource_name, -add);
+                EVALifeSupportTracker.AddEVAAmount(kerbalName, add, choice);
 
                 Util.Log("    EVA Request  = " + eva_request);
                 Util.Log("    Amt Obtained = " + obtained);
