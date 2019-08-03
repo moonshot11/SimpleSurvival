@@ -56,6 +56,9 @@ namespace SimpleSurvival
         private static Dictionary<string, GUIElements> labelMap
             = new Dictionary<string, GUIElements>();
 
+        private DialogGUILabel statusLabel = new DialogGUILabel("Status", true, true);
+        private DialogGUILabel consLabel = new DialogGUILabel("Consumables: x/x", true, true);
+
         // Temp for debugging
         private static DialogGUILabel debugLabel = null;
 
@@ -130,6 +133,11 @@ namespace SimpleSurvival
             kerbals.Sort(CompareCrewNames);
             bool buttonEnable = !FlightGlobals.ActiveVessel.isEVA &&
                 FlightGlobals.ActiveVessel.FindPartModulesImplementing<Cons2LSModule>().Count > 0;
+
+            entries.Add(statusLabel);
+            entries.Add(new DialogGUILabel("", true, true));
+            entries.Add(consLabel);
+            entries.Add(new DialogGUILabel("", true, true));
 
             foreach (ProtoCrewMember kerbal in kerbals)
             {
