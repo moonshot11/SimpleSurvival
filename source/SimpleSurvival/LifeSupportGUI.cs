@@ -16,14 +16,31 @@ namespace SimpleSurvival
         public DialogGUIButton fillEVAButton;
 
         private ProtoCrewMember kerbal;
+        /// <summary>
+        /// Is this NOT EVA, and do we have a converter?
+        /// </summary>
+        private bool buttonEnable;
 
-        public GUIElements(ProtoCrewMember kerbal)
+        public GUIElements(ProtoCrewMember kerbal, bool buttonEnable)
         {
             this.kerbal = kerbal;
+            this.buttonEnable = buttonEnable;
             fillEVAButton = new DialogGUIButton<string>(
                 "Fill EVA", LifeSupportGUI.PressFillEva, kerbal.name,
-                EnabledCondition: LifeSupportGUI.EnableFillButton,
+                EnabledCondition: EnableFillButton,
                 dismissOnSelect: false);
+        }
+
+        /// <summary>
+        /// Manages the true condition which enables the "Fill EVA" button.
+        /// </summary>
+        /// <returns></returns>
+        private bool EnableFillButton()
+        {
+            var info = EVALifeSupportTracker.GetEVALSInfo(kerbal.name);
+            return info.ls_current < info.ls_max &&
+                !FlightGlobals.ActiveVessel.isEVA &&
+                buttonEnable;
         }
     }
 
@@ -111,16 +128,17 @@ namespace SimpleSurvival
             List<DialogGUIBase> entries = new List<DialogGUIBase>();
             var kerbals = FlightGlobals.ActiveVessel.GetVesselCrew();
             kerbals.Sort(CompareCrewNames);
+            bool buttonEnable = !FlightGlobals.ActiveVessel.isEVA &&
+                FlightGlobals.ActiveVessel.FindPartModulesImplementing<Cons2LSModule>().Count > 0;
 
             foreach (ProtoCrewMember kerbal in kerbals)
             {
-                GUIElements elems = new GUIElements(kerbal);
+                GUIElements elems = new GUIElements(kerbal, buttonEnable);
                 labelMap.Add(kerbal.name, elems);
                 entries.Add(new DialogGUILabel(kerbal.name, true, true));
                 entries.Add(elems.shipLS);
                 entries.Add(elems.evaLS);
-                entries.Add(new DialogGUIButton<string>("Fill EVA", PressFillEva, kerbal.name,
-                    dismissOnSelect: false));
+                entries.Add(elems.fillEVAButton);
             }
 
             gui = PopupDialog.SpawnPopupDialog(
@@ -165,17 +183,6 @@ namespace SimpleSurvival
         {
             Util.PostUpperMessage("PRESS: " + name);
             FillEVAResource(name);
-        }
-
-        /// <summary>
-        /// Manages the true condition which enables the "Fill EVA" button.
-        /// </summary>
-        /// <returns></returns>
-        public static bool EnableFillButton()
-        {
-            // Technically should also check if on EVA, but this condition isn't possible
-            // while on EVA anyway.
-            return FlightGlobals.ActiveVessel.FindPartModulesImplementing<Cons2LSModule>().Count > 0;
         }
 
         private void ButtonOnFalse()
