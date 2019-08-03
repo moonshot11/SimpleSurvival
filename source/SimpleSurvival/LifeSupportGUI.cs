@@ -62,11 +62,10 @@ namespace SimpleSurvival
 
         public void ToggleButton(Vessel vessel)
         {
-            if (toolbarButton?.isActiveAndEnabled ?? false)
-            {
-                ButtonOnFalse();
-                ButtonOnTrue();
-            }
+            if (!showgui)
+                return;
+            ButtonOnFalse();
+            ButtonOnTrue();
         }
 
         public void AddToolbar()
@@ -212,7 +211,7 @@ namespace SimpleSurvival
             if (vessel.GetCrewCount() < labelMap.Count)
             {
                 List<string> fullcrew = vessel.GetVesselCrew().ConvertAll(a => a.name);
-                foreach (string name in labelMap.Keys)
+                foreach (string name in labelMap.Keys.ToArray())
                 {
                     if (!fullcrew.Contains(name))
                     {
