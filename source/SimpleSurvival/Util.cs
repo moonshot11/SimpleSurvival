@@ -121,10 +121,12 @@ namespace SimpleSurvival
             }
             else if (choice == EVA_Resource.LifeSupport)
             {
-                if (lvl == 1.0f)
-                    return C.EVA_LS_LVL_3;
-                else
+                if (lvl == 0f)
+                    return C.EVA_LS_LVL_1;
+                else if (lvl == 0.5f)
                     return C.EVA_LS_LVL_2;
+                else
+                    return C.EVA_LS_LVL_3;
             }
 
             Util.Log("CheckThis -> Incorrect index, throwing exception");

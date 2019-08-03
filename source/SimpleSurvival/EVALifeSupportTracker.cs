@@ -302,7 +302,8 @@ namespace SimpleSurvival
             // This is purely for safety. All ConfigNode values
             // should be added naturally over the normal course of play.
 
-            string astro_lvl = "3";
+            // Lvl "1" == fully upgraded complex
+            string astro_lvl = "1";
 
             if (HighLogic.CurrentGame?.Mode == Game.Modes.CAREER)
                 astro_lvl = HighLogic.CurrentGame.config

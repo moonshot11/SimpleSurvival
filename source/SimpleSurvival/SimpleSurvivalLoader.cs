@@ -24,6 +24,8 @@ namespace SimpleSurvival
             string url = "SimpleSurvival / settings / SIMPLESURVIVAL_SETTINGS";
             ConfigNode node = GameDatabase.Instance.GetConfigNode(url);
 
+            C.EVA_LS_LVL_1 = Convert.ToDouble(
+                Util.GetConfigNodeValue(node, "eva_ls_1", C.EVA_LS_LVL_1));
             C.EVA_LS_LVL_2 = Convert.ToDouble(
                 Util.GetConfigNodeValue(node, "eva_ls_2", C.EVA_LS_LVL_2));
             C.EVA_LS_LVL_3 = Convert.ToDouble(

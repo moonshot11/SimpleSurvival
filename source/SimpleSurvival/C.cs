@@ -80,6 +80,10 @@ namespace SimpleSurvival
         // -- EVA LifeSupport career values --
 
         /// <summary>
+        /// Max amount of EVA Life Support w/ Astronaut Complex Level 1
+        /// </summary>
+        public static double EVA_LS_LVL_1 = 1;
+        /// <summary>
         /// Max amount of EVA Life Support w/ Astronaut Complex Level 2
         /// </summary>
         public static double EVA_LS_LVL_2 = 10;
