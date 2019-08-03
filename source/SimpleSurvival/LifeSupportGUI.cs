@@ -192,33 +192,36 @@ namespace SimpleSurvival
         {
             Vessel vessel = FlightGlobals.ActiveVessel;
             var parts = vessel.FindPartModulesImplementing<LifeSupportReportable>();
-            List<string> deadKerbals = new List<string>();
 
             foreach (LifeSupportReportable module in parts)
             {
-                List<ProtoCrewMember> crew = module.part.protoModuleCrew;
-
                 string timestr = module.ReportLifeSupport();
 
-                foreach (string kerbal in labelMap.Keys)
+                foreach (ProtoCrewMember kerbal in module.part.protoModuleCrew)
                 {
-                    if (!crew.Exists(a => a.name == kerbal))
-                    {
-                        labelMap[kerbal].shipLS.SetOptionText("DEAD");
-                        labelMap[kerbal].evaLS.SetOptionText("DEAD");
-                        deadKerbals.Add(kerbal);
-                        continue;
-                    }
-
-                    double evaLS = EVALifeSupportTracker.GetEVALSInfo(kerbal).ls_current;
+                    double evaLS = EVALifeSupportTracker.GetEVALSInfo(kerbal.name).ls_current;
                     string evastr = Util.DaysToString(evaLS / C.EVA_LS_DRAIN_PER_DAY);
-                    labelMap[kerbal].shipLS.SetOptionText(timestr);
-                    labelMap[kerbal].evaLS.SetOptionText(evastr);
+                    labelMap[kerbal.name].shipLS.SetOptionText(timestr);
+                    labelMap[kerbal.name].evaLS.SetOptionText(evastr);
                 }
             }
 
-            foreach (string kerbal in deadKerbals)
-                labelMap.Remove(kerbal);
+            // Any Kerbals not found above are assumed KIA
+            // Would be great to move this to a GameEvent
+            // such as GameEvents.onKerbalRemoved()
+            if (vessel.GetCrewCount() < labelMap.Count)
+            {
+                List<string> fullcrew = vessel.GetVesselCrew().ConvertAll(a => a.name);
+                foreach (string name in labelMap.Keys)
+                {
+                    if (!fullcrew.Contains(name))
+                    {
+                        labelMap[name].shipLS.SetOptionText("KIA");
+                        labelMap[name].evaLS.SetOptionText("KIA");
+                        labelMap.Remove(name);
+                    }
+                }
+            }
         }
 
         public void OnGUI()
