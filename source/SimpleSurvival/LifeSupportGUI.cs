@@ -52,7 +52,7 @@ namespace SimpleSurvival
         private static ApplicationLauncherButton toolbarButton = null;
         private static PopupDialog gui = null;
         private static Vector2 position = new Vector2(0.5f, 0.5f);
-        private static Vector2 size = new Vector2(500, 200);
+        private static Vector2 size = new Vector2(470, 200);
         private static Dictionary<string, GUIElements> labelMap
             = new Dictionary<string, GUIElements>();
 
