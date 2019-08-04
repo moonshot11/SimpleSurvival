@@ -57,7 +57,7 @@ namespace SimpleSurvival
             = new Dictionary<string, GUIElements>();
 
         private DialogGUILabel statusLabel = new DialogGUILabel("Status", true, true);
-        private DialogGUILabel consLabel = new DialogGUILabel("Consumables: x/x", true, true);
+        private DialogGUILabel consLabel = new DialogGUILabel("Consumables: x/x", 200, 0);
 
         // Temp for debugging
         private static DialogGUILabel debugLabel = null;
@@ -134,11 +134,6 @@ namespace SimpleSurvival
             bool buttonEnable = !FlightGlobals.ActiveVessel.isEVA &&
                 FlightGlobals.ActiveVessel.FindPartModulesImplementing<Cons2LSModule>().Count > 0;
 
-            entries.Add(statusLabel);
-            entries.Add(new DialogGUILabel("", true, true));
-            entries.Add(consLabel);
-            entries.Add(new DialogGUILabel("", true, true));
-
             foreach (ProtoCrewMember kerbal in kerbals)
             {
                 GUIElements elems = new GUIElements(kerbal, buttonEnable);
@@ -149,24 +144,41 @@ namespace SimpleSurvival
                 entries.Add(elems.fillEVAButton);
             }
 
+            int cellWidth = 100;
+
+            DialogGUIGridLayout headerGrid =
+                new DialogGUIGridLayout(new RectOffset(),
+                    new Vector2(cellWidth * 2, 20),
+                    Vector2.zero,
+                    UnityEngine.UI.GridLayoutGroup.Corner.UpperLeft,
+                    UnityEngine.UI.GridLayoutGroup.Axis.Horizontal,
+                    TextAnchor.MiddleLeft,
+                    UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 2,
+                    statusLabel, consLabel);
+
+            DialogGUIGridLayout dataGrid =
+                new DialogGUIGridLayout(new RectOffset(),
+                    new Vector2(cellWidth, 20),
+                    Vector2.zero,
+                    UnityEngine.UI.GridLayoutGroup.Corner.UpperLeft,
+                    UnityEngine.UI.GridLayoutGroup.Axis.Horizontal,
+                    TextAnchor.MiddleLeft,
+                    UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 4,
+                    entries.ToArray());
+
             gui = PopupDialog.SpawnPopupDialog(
-                    new MultiOptionDialog(
-                    "lifesupport_readout",
-                    "",
-                    "LifeSupport Readout",
-                    UISkinManager.defaultSkin,
-                    new Rect(position, size),
-                        new DialogGUIContentSizer(UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize,
-                        UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize, true),
-                        new DialogGUIScrollList(Vector2.one, false, true,
-                            new DialogGUIGridLayout(new RectOffset(),
-                                new Vector2(100, 20),
-                                Vector2.zero,
-                                UnityEngine.UI.GridLayoutGroup.Corner.UpperLeft,
-                                UnityEngine.UI.GridLayoutGroup.Axis.Horizontal,
-                                TextAnchor.MiddleLeft,
-                                UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 4,
-                                entries.ToArray()))),
+                new MultiOptionDialog(
+                "lifesupport_readout",
+                "",
+                "LifeSupport Readout",
+                UISkinManager.defaultSkin,
+                new Rect(position, size),
+                    new DialogGUIContentSizer(UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize,
+                    UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize, true),
+                    new DialogGUIScrollList(Vector2.one, false, true,
+                        new DialogGUIVerticalLayout(false, false, 1f,
+                        new RectOffset(20,0,10,0), TextAnchor.UpperLeft,
+                            headerGrid, dataGrid))),
                 false,
                 UISkinManager.defaultSkin,
                 false,
@@ -208,6 +220,7 @@ namespace SimpleSurvival
             Vessel vessel = FlightGlobals.ActiveVessel;
             var parts = vessel.FindPartModulesImplementing<LifeSupportReportable>();
 
+            // Update live Kerbal numbers
             foreach (LifeSupportReportable module in parts)
             {
                 string timestr = module.ReportLifeSupport();
@@ -237,6 +250,13 @@ namespace SimpleSurvival
                     }
                 }
             }
+
+            // Update status
+            int recID = PartResourceLibrary.Instance.GetDefinition(C.NAME_CONSUMABLES).id;
+            double curr, max;
+            vessel.GetConnectedResourceTotals(recID, out curr, out max);
+            double consDays = curr / C.CONS_PER_LS;
+            consLabel.SetOptionText($"Consumables: {curr}/{max} ({Util.DaysToString(consDays)})");
         }
 
         public void OnGUI()

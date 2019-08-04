@@ -146,6 +146,10 @@ namespace SimpleSurvival
         /// LifeSupport generated per second from Consumables
         /// </summary>
         public const double CONV_LS_PER_SEC = CONV_CONS_PER_SEC;
+        /// <summary>
+        /// Conversation rate: Consumables per one LifeSupport
+        /// </summary>
+        public const double CONS_PER_LS = CONV_CONS_PER_SEC / CONV_LS_PER_SEC;
 
         /// <summary>
         /// Conversation rate of Consumables to EVA LifeSupport
