@@ -59,6 +59,9 @@ namespace SimpleSurvival
         private DialogGUILabel statusLabel = new DialogGUILabel("Status", true, true);
         private DialogGUILabel consLabel = new DialogGUILabel("Consumables: x/x", 200, 0);
 
+        private int consID = PartResourceLibrary.Instance.GetDefinition(C.NAME_CONSUMABLES).id;
+        private int lsID = PartResourceLibrary.Instance.GetDefinition(C.NAME_LIFESUPPORT).id;
+
         // Temp for debugging
         private static DialogGUILabel debugLabel = null;
 
@@ -218,6 +221,7 @@ namespace SimpleSurvival
         private void UpdateGUI()
         {
             Vessel vessel = FlightGlobals.ActiveVessel;
+            int crewCount = vessel.GetCrewCount();
             var parts = vessel.FindPartModulesImplementing<LifeSupportReportable>();
 
             // Update live Kerbal numbers
@@ -237,7 +241,7 @@ namespace SimpleSurvival
             // Any Kerbals not found above are assumed KIA
             // Would be great to move this to a GameEvent
             // such as GameEvents.onKerbalRemoved()
-            if (vessel.GetCrewCount() < labelMap.Count)
+            if (crewCount < labelMap.Count)
             {
                 List<string> fullcrew = vessel.GetVesselCrew().ConvertAll(a => a.name);
                 foreach (string name in labelMap.Keys.ToArray())
@@ -252,11 +256,20 @@ namespace SimpleSurvival
             }
 
             // Update status
-            int recID = PartResourceLibrary.Instance.GetDefinition(C.NAME_CONSUMABLES).id;
             double curr, max;
-            vessel.GetConnectedResourceTotals(recID, out curr, out max);
+            vessel.GetConnectedResourceTotals(lsID, out curr, out max);
+            string status;
+            if (crewCount == 0)
+                status = "No crew";
+            else if (Util.BreathableAir(vessel))
+                status = "Breathable air";
+            else
+                status = "Life support active";
+            statusLabel.SetOptionText($"Status:  {status}");
+
+            vessel.GetConnectedResourceTotals(consID, out curr, out max);
             double consDays = curr / C.CONS_PER_LS;
-            consLabel.SetOptionText($"Consumables: {curr}/{max} ({Util.DaysToString(consDays)})");
+            consLabel.SetOptionText($"Consumables:  {Util.DaysToString(consDays)}");
         }
 
         public void OnGUI()
