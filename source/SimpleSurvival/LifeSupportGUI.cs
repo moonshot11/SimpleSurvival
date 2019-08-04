@@ -62,9 +62,6 @@ namespace SimpleSurvival
         private int consID = PartResourceLibrary.Instance.GetDefinition(C.NAME_CONSUMABLES).id;
         private int lsID = PartResourceLibrary.Instance.GetDefinition(C.NAME_LIFESUPPORT).id;
 
-        // Temp for debugging
-        private static DialogGUILabel debugLabel = null;
-
         public void Awake()
         {
             Util.Log("LifeSupportGUI Awake");
@@ -131,23 +128,46 @@ namespace SimpleSurvival
 
             // Store labels in separate data structure for easy access when updating
             labelMap.Clear();
-            List<DialogGUIBase> entries = new List<DialogGUIBase>();
-            var kerbals = FlightGlobals.ActiveVessel.GetVesselCrew();
-            kerbals.Sort(CompareCrewNames);
+            List<LifeSupportReportable> modules =
+                FlightGlobals.ActiveVessel.FindPartModulesImplementing<LifeSupportReportable>();
             bool buttonEnable = !FlightGlobals.ActiveVessel.isEVA &&
                 FlightGlobals.ActiveVessel.FindPartModulesImplementing<Cons2LSModule>().Count > 0;
+            RectOffset offset = new RectOffset(20, 0, 10, 0);
+            int cellWidth = 100;
+            DialogGUIVerticalLayout vert = new DialogGUIVerticalLayout(
+                false, false, 1f,
+                new RectOffset(), TextAnchor.UpperLeft);
 
-            foreach (ProtoCrewMember kerbal in kerbals)
+            foreach (LifeSupportReportable module in modules)
             {
-                GUIElements elems = new GUIElements(kerbal, buttonEnable);
-                labelMap.Add(kerbal.name, elems);
-                entries.Add(new DialogGUILabel(kerbal.name, true, true));
-                entries.Add(elems.shipLS);
-                entries.Add(elems.evaLS);
-                entries.Add(elems.fillEVAButton);
+                if (module.part.protoModuleCrew.Count == 0)
+                    continue;
+
+                List<DialogGUIBase> entries = new List<DialogGUIBase>();
+                List<ProtoCrewMember> crew = new List<ProtoCrewMember>(module.part.protoModuleCrew);
+                crew.Sort(CompareCrewNames);
+                vert.AddChild(new DialogGUILabel($"<b>{module.part.partInfo.title}</b>"));
+
+                foreach (ProtoCrewMember kerbal in crew)
+                {
+                    GUIElements elems = new GUIElements(kerbal, buttonEnable);
+                    labelMap.Add(kerbal.name, elems);
+                    entries.Add(new DialogGUILabel(kerbal.name, true, true));
+                    entries.Add(elems.shipLS);
+                    entries.Add(elems.evaLS);
+                    entries.Add(elems.fillEVAButton);
+                }
+                vert.AddChild(
+                    new DialogGUIGridLayout(new RectOffset(),
+                        new Vector2(cellWidth, 20),
+                        Vector2.zero,
+                        UnityEngine.UI.GridLayoutGroup.Corner.UpperLeft,
+                        UnityEngine.UI.GridLayoutGroup.Axis.Horizontal,
+                        TextAnchor.MiddleLeft,
+                        UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 4,
+                        entries.ToArray()));
             }
 
-            int cellWidth = 100;
 
             DialogGUIGridLayout headerGrid =
                 new DialogGUIGridLayout(new RectOffset(),
@@ -158,16 +178,6 @@ namespace SimpleSurvival
                     TextAnchor.MiddleLeft,
                     UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 2,
                     statusLabel, consLabel);
-
-            DialogGUIGridLayout dataGrid =
-                new DialogGUIGridLayout(new RectOffset(),
-                    new Vector2(cellWidth, 20),
-                    Vector2.zero,
-                    UnityEngine.UI.GridLayoutGroup.Corner.UpperLeft,
-                    UnityEngine.UI.GridLayoutGroup.Axis.Horizontal,
-                    TextAnchor.MiddleLeft,
-                    UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 4,
-                    entries.ToArray());
 
             gui = PopupDialog.SpawnPopupDialog(
                 new MultiOptionDialog(
@@ -180,8 +190,8 @@ namespace SimpleSurvival
                     UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize, true),
                     new DialogGUIScrollList(Vector2.one, false, true,
                         new DialogGUIVerticalLayout(false, false, 1f,
-                        new RectOffset(20,0,10,0), TextAnchor.UpperLeft,
-                            headerGrid, dataGrid))),
+                        offset, TextAnchor.UpperLeft,
+                        headerGrid, vert))),
                 false,
                 UISkinManager.defaultSkin,
                 false,
