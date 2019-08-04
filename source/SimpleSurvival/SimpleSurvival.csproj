@@ -58,9 +58,9 @@
     <Compile Include="EVALifeSupportLoader.cs" />
     <Compile Include="EVALifeSupportModule.cs" />
     <Compile Include="EVALifeSupportTracker.cs" />
-    <Compile Include="ILifeSupportReportable.cs" />
     <Compile Include="LifeSupportGUI.cs" />
     <Compile Include="LifeSupportModule.cs" />
+    <Compile Include="LifeSupportReportable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleSurvivalLoader.cs" />
     <Compile Include="TechLoader.cs" />
