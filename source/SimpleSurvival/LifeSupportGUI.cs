@@ -130,8 +130,10 @@ namespace SimpleSurvival
             labelMap.Clear();
             List<LifeSupportReportable> modules =
                 FlightGlobals.ActiveVessel.FindPartModulesImplementing<LifeSupportReportable>();
+            // Calculate once on window generation, instead of each frame
             bool buttonEnable = !FlightGlobals.ActiveVessel.isEVA &&
                 FlightGlobals.ActiveVessel.FindPartModulesImplementing<Cons2LSModule>().Count > 0;
+            // Cell padding
             RectOffset offset = new RectOffset(20, 0, 10, 0);
             int cellWidth = 100;
             DialogGUIVerticalLayout vert = new DialogGUIVerticalLayout(
@@ -143,7 +145,7 @@ namespace SimpleSurvival
                 if (module.part.protoModuleCrew.Count == 0)
                     continue;
 
-                List<DialogGUIBase> entries = new List<DialogGUIBase>();
+                List<DialogGUIBase> kerbalCells = new List<DialogGUIBase>();
                 List<ProtoCrewMember> crew = new List<ProtoCrewMember>(module.part.protoModuleCrew);
                 crew.Sort(CompareCrewNames);
                 vert.AddChild(new DialogGUILabel($"<b>{module.part.partInfo.title}</b>"));
@@ -152,11 +154,12 @@ namespace SimpleSurvival
                 {
                     GUIElements elems = new GUIElements(kerbal, buttonEnable);
                     labelMap.Add(kerbal.name, elems);
-                    entries.Add(new DialogGUILabel(kerbal.name, true, true));
-                    entries.Add(elems.shipLS);
-                    entries.Add(elems.evaLS);
-                    entries.Add(elems.fillEVAButton);
+                    kerbalCells.Add(new DialogGUILabel(kerbal.name, true, true));
+                    kerbalCells.Add(elems.shipLS);
+                    kerbalCells.Add(elems.evaLS);
+                    kerbalCells.Add(elems.fillEVAButton);
                 }
+
                 vert.AddChild(
                     new DialogGUIGridLayout(new RectOffset(),
                         new Vector2(cellWidth, 20),
@@ -165,10 +168,11 @@ namespace SimpleSurvival
                         UnityEngine.UI.GridLayoutGroup.Axis.Horizontal,
                         TextAnchor.MiddleLeft,
                         UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 4,
-                        entries.ToArray()));
+                        kerbalCells.ToArray()));
             }
 
-
+            // Define the header which contains additional info
+            // (status, Consumables)
             DialogGUIGridLayout headerGrid =
                 new DialogGUIGridLayout(new RectOffset(),
                     new Vector2(cellWidth * 2, 20),
@@ -179,37 +183,24 @@ namespace SimpleSurvival
                     UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 2,
                     statusLabel, consLabel);
 
-            gui = PopupDialog.SpawnPopupDialog(
-                new MultiOptionDialog(
+            // Set up the pop window
+            MultiOptionDialog multi = new MultiOptionDialog(
                 "lifesupport_readout",
                 "",
                 "LifeSupport Readout",
                 UISkinManager.defaultSkin,
                 new Rect(position, size),
-                    new DialogGUIContentSizer(UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize,
-                    UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize, true),
-                    new DialogGUIScrollList(Vector2.one, false, true,
-                        new DialogGUIVerticalLayout(false, false, 1f,
+                new DialogGUIScrollList(Vector2.zero, false, true,
+                    new DialogGUIVerticalLayout(false, false, 1f,
                         offset, TextAnchor.UpperLeft,
-                        headerGrid, vert))),
+                        headerGrid, vert)));
+
+            gui = PopupDialog.SpawnPopupDialog(
+                multi,
                 false,
                 UISkinManager.defaultSkin,
                 false,
-                "ExtraTitle");
-            // position = new Vector2(position.x, position.y);
-
-            /*if (fdebugLabel == null)
-            {
-                debugLabel = new DialogGUILabel("");
-                PopupDialog.SpawnPopupDialog(
-                    new MultiOptionDialog(
-                        "Hello", "Hi", "Title",
-                        UISkinManager.defaultSkin,
-                        debugLabel),
-                    false,
-                    UISkinManager.defaultSkin,
-                    false);
-            }*/
+                "");
         }
 
         public static void PressFillEva(string name)
@@ -284,7 +275,6 @@ namespace SimpleSurvival
 
         public void OnGUI()
         {
-            //debugLabel.SetOptionText($"x: {position.x}\ny: {position.y}\nUI_SCALE: {GameSettings.UI_SCALE}");
             if (showgui)
                 UpdateGUI();
         }
