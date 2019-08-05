@@ -162,7 +162,7 @@ namespace SimpleSurvival
                 List<DialogGUIBase> kerbalCells = new List<DialogGUIBase>();
                 List<ProtoCrewMember> crew = new List<ProtoCrewMember>(module.part.protoModuleCrew);
                 crew.Sort(CompareCrewNames);
-                vert.AddChild(new DialogGUILabel($"<b>{module.part.partInfo.title}</b>"));
+                vert.AddChild(new DialogGUILabel($"<color=#f4b00c><b>{module.part.partInfo.title}</b></color>"));
 
                 foreach (ProtoCrewMember kerbal in crew)
                 {
@@ -187,7 +187,7 @@ namespace SimpleSurvival
 
             // Define the header which contains additional info
             // (status, Consumables)
-            DialogGUIGridLayout headerGrid =
+            DialogGUIGridLayout statusGrid =
                 new DialogGUIGridLayout(new RectOffset(),
                     new Vector2(cellWidth * 2, 20),
                     Vector2.zero,
@@ -204,10 +204,11 @@ namespace SimpleSurvival
                 "LifeSupport Readout",
                 UISkinManager.defaultSkin,
                 new Rect(position, size),
+                statusGrid,
                 new DialogGUIScrollList(Vector2.zero, false, true,
                     new DialogGUIVerticalLayout(false, false, 1f,
                         offset, TextAnchor.UpperLeft,
-                        headerGrid, vert)));
+                        vert)));
 
             gui = PopupDialog.SpawnPopupDialog(
                 multi,
@@ -280,7 +281,7 @@ namespace SimpleSurvival
                 status = "Breathable air";
             else
                 status = "Life support active";
-            statusLabel.SetOptionText($"Status:  {status}");
+            statusLabel.SetOptionText($"       Status:  {status}");
 
             vessel.GetConnectedResourceTotals(consID, out curr, out max);
             double consDays = curr / C.CONS_PER_LS;
