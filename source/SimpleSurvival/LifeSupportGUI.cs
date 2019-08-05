@@ -140,6 +140,20 @@ namespace SimpleSurvival
                 false, false, 1f,
                 new RectOffset(), TextAnchor.UpperLeft);
 
+            vert.AddChild(
+                new DialogGUIGridLayout(new RectOffset(),
+                    new Vector2(cellWidth, 20),
+                    Vector2.zero,
+                    UnityEngine.UI.GridLayoutGroup.Corner.UpperLeft,
+                    UnityEngine.UI.GridLayoutGroup.Axis.Horizontal,
+                    TextAnchor.MiddleLeft,
+                    UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 4,
+                    new DialogGUILabel("<b>Kerbal</b>", true, true),
+                    new DialogGUILabel("<b>Ship life support</b>", true, true),
+                    new DialogGUILabel("<b>Suit life support</b>", true, true),
+                    new DialogGUILabel("", true, true)
+                    ));
+
             foreach (LifeSupportReportable module in modules)
             {
                 if (module.part.protoModuleCrew.Count == 0)
