@@ -67,7 +67,8 @@ namespace SimpleSurvival
             Util.Log("LifeSupportGUI Awake");
             GameEvents.onGUIApplicationLauncherReady.Add(AddToolbar);
             GameEvents.onGUIApplicationLauncherDestroyed.Add(RemoveToolbar);
-            GameEvents.onVesselChange.Add(ToggleButton);
+            GameEvents.onVesselChange.Add(OnVesselChange);
+            GameEvents.onCrewTransferred.Add(OnCrewTransferred);
         }
 
         public void OnDisable()
@@ -75,12 +76,27 @@ namespace SimpleSurvival
             Util.Log("LifeSupportGUI OnDisable");
             GameEvents.onGUIApplicationLauncherReady.Remove(AddToolbar);
             GameEvents.onGUIApplicationLauncherDestroyed.Remove(RemoveToolbar);
-            GameEvents.onVesselChange.Remove(ToggleButton);
+            GameEvents.onVesselChange.Remove(OnVesselChange);
+            GameEvents.onCrewTransferred.Remove(OnCrewTransferred);
             // Ensure it's removed from the MainMenu scene
             RemoveToolbar();
         }
 
-        public void ToggleButton(Vessel vessel)
+        public void OnVesselChange(Vessel vessel)
+        {
+            RefreshGUI();
+        }
+
+        public void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> ev)
+        {
+            RefreshGUI();
+        }
+
+        /// <summary>
+        /// Update GUI components that cannot be changed live,
+        /// by "turning if off then on again."
+        /// </summary>
+        public void RefreshGUI()
         {
             if (!showgui)
                 return;
