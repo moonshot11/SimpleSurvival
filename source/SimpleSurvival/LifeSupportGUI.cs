@@ -79,6 +79,7 @@ namespace SimpleSurvival
             GameEvents.onGUIApplicationLauncherDestroyed.Add(RemoveToolbar);
             GameEvents.onVesselChange.Add(OnVesselChange);
             GameEvents.onCrewTransferred.Add(OnCrewTransferred);
+            GameEvents.onGamePause.Add(OnGamePause);
         }
 
         public void OnDisable()
@@ -88,6 +89,7 @@ namespace SimpleSurvival
             GameEvents.onGUIApplicationLauncherDestroyed.Remove(RemoveToolbar);
             GameEvents.onVesselChange.Remove(OnVesselChange);
             GameEvents.onCrewTransferred.Remove(OnCrewTransferred);
+            GameEvents.onGamePause.Remove(OnGamePause);
             // Ensure it's removed from the MainMenu scene
             RemoveToolbar();
         }
@@ -100,6 +102,13 @@ namespace SimpleSurvival
         public void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> ev)
         {
             RefreshGUI();
+        }
+
+        public void OnGamePause()
+        {
+            if (!showgui)
+                return;
+            toolbarButton.SetFalse(makeCall: true);
         }
 
         /// <summary>
