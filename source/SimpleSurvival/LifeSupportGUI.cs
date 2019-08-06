@@ -49,6 +49,16 @@ namespace SimpleSurvival
     {
 
         private static bool showgui = false;
+
+        // This is necessary to track when the GUI is refreshed 2+ times
+        // without being drawn to the screen. Otherwise, after the second
+        // cycle, a neutral position is assumed, and the saved position
+        // is lost.
+        /// <summary>
+        /// Has the GUI been draw in the current cycle?
+        /// </summary>
+        private static bool drewgui = false;
+
         private static ApplicationLauncherButton toolbarButton = null;
         private static PopupDialog gui = null;
         private static Vector2 position = new Vector2(0.5f, 0.5f);
@@ -124,6 +134,7 @@ namespace SimpleSurvival
             }
             toolbarButton.SetFalse(false);
             showgui = false;
+            drewgui = false;
         }
 
         public void RemoveToolbar()
@@ -140,7 +151,6 @@ namespace SimpleSurvival
         private void ButtonOnTrue()
         {
             Util.PostUpperMessage("CALL: ontrue");
-            showgui = true;
 
             // Store labels in separate data structure for easy access when updating
             labelMap.Clear();
@@ -232,6 +242,9 @@ namespace SimpleSurvival
                 UISkinManager.defaultSkin,
                 false,
                 "");
+
+            showgui = true;
+            drewgui = false;
         }
 
         public static void PressFillEva(string name)
@@ -243,15 +256,21 @@ namespace SimpleSurvival
         private void ButtonOnFalse()
         {
             Util.PostUpperMessage("CALL: onfalse");
-            position = gui.GetComponent<RectTransform>().position;
-            position.x = position.x / Screen.width + 0.5f;
-            position.y = position.y / Screen.height + 0.5f;
+            if (showgui && drewgui)
+            {
+                position = gui.GetComponent<RectTransform>().position;
+                position.x = position.x / Screen.width + 0.5f;
+                position.y = position.y / Screen.height + 0.5f;
+                Util.Log("Save GUI pos: " + position.ToString());
+            }
             showgui = false;
             gui.Dismiss();
         }
 
         private void UpdateGUI()
         {
+            drewgui = true;
+
             Vessel vessel = FlightGlobals.ActiveVessel;
             int crewCount = vessel.GetCrewCount();
             var parts = vessel.FindPartModulesImplementing<LifeSupportReportable>();
