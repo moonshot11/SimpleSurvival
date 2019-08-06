@@ -71,6 +71,7 @@ namespace SimpleSurvival
 
         private int consID = PartResourceLibrary.Instance.GetDefinition(C.NAME_CONSUMABLES).id;
         private int lsID = PartResourceLibrary.Instance.GetDefinition(C.NAME_LIFESUPPORT).id;
+        private int evapropID = PartResourceLibrary.Instance.GetDefinition(C.NAME_EVA_PROPELLANT).id;
 
         public void Awake()
         {
@@ -327,9 +328,25 @@ namespace SimpleSurvival
                 status = "Life support active";
             statusLabel.SetOptionText($"       Status:  {status}");
 
-            vessel.GetConnectedResourceTotals(consID, out curr, out max);
-            double consDays = curr / C.CONS_PER_LS;
-            consLabel.SetOptionText($"Consumables:  {Util.DaysToString(consDays)}");
+            if (FlightGlobals.ActiveVessel.isEVA)
+            {
+                string prefix = "";
+                string suffix = "</color>";
+                if (curr < 0.5)
+                    prefix = C.GUI_HARDWARN_COLOR;
+                else if (curr < 1.0)
+                    prefix = C.GUI_LITEWARN_COLOR;
+                else
+                    suffix = "";
+                vessel.GetConnectedResourceTotals(evapropID, out curr, out max);
+                consLabel.SetOptionText($"Propellant:  {prefix}{string.Format("{0:0.00}", curr)}{suffix}");
+            }
+            else
+            {
+                vessel.GetConnectedResourceTotals(consID, out curr, out max);
+                double consDays = curr / C.CONS_PER_LS;
+                consLabel.SetOptionText($"Consumables:  {Util.DaysToString(consDays)}");
+            }
         }
 
         public void OnGUI()
