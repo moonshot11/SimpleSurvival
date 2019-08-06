@@ -349,6 +349,16 @@ namespace SimpleSurvival
                 return v.ToString().PadLeft(2, '0');
             }
 
+            string prefix = "";
+            string suffix = "</color>";
+
+            if (value < C.GUI_HARDWARN_LIMIT)
+                prefix = C.GUI_HARDWARN_COLOR;
+            else if (value < C.GUI_LITEWARN_LIMIT)
+                prefix = C.GUI_LITEWARN_COLOR;
+            else
+                suffix = "";
+
             int days = (int)value;
             // Convert to hours
             value = (value - days) * 6.0;
@@ -360,7 +370,7 @@ namespace SimpleSurvival
             value = (value - mins) * 60.0;
             int secs = (int)value;
 
-            return $"{days}d, {PadInt(hours)}:{PadInt(mins)}:{PadInt(secs)}";
+            return $"{prefix}{days}d, {PadInt(hours)}:{PadInt(mins)}:{PadInt(secs)}{suffix}";
         }
     }
 }

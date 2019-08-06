@@ -185,5 +185,17 @@ namespace SimpleSurvival
         /// The flow mode when requesting LifeSupport in-game
         /// </summary>
         public const ResourceFlowMode FLOWMODE_LIFESUPPORT = ResourceFlowMode.NO_FLOW;
+
+        /// <summary>
+        /// When to warn player (yellow), in days.
+        /// </summary>
+        public const double GUI_LITEWARN_LIMIT = 1.0 / 6.0;
+        /// <summary>
+        /// When to warn player (red), in days.
+        /// </summary>
+        public const double GUI_HARDWARN_LIMIT = 1.0 / 6.0 / 12.0;
+
+        public const string GUI_HARDWARN_COLOR = "<color=#ff3322>";
+        public const string GUI_LITEWARN_COLOR = "<color=#ffee11>";
     }
 }
