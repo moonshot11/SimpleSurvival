@@ -126,10 +126,20 @@ namespace SimpleSurvival
 
         private void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> action)
         {
-            if (action.from.vessel.isEVA || action.to.vessel.isEVA)
+            if (action.to.vessel.isEVA)
                 return;
 
             ProtoCrewMember kerbal = action.host;
+
+            if (action.from.vessel.isEVA &&
+                action.to.vessel.HasModule<Cons2LSModule>())
+            {
+                double max = evals_info[kerbal.name].prop_max;
+                Util.Log($"Filling {kerbal.name}'s EVA prop to {max}");
+                AddKerbalToTracking(kerbal.name);
+                evals_info[kerbal.name].prop_current = max;
+                return;
+            }
 
             // It's possible Kerbal is coming from a part that does not have a LifeSupportModule
             // Alternative solution is to add LifeSupportModule + default resource values

@@ -372,5 +372,20 @@ namespace SimpleSurvival
 
             return $"{prefix}{days}d, {PadInt(hours)}:{PadInt(mins)}:{PadInt(secs)}{suffix}";
         }
+
+        /// <summary>
+        /// Check if this vessel implements a module.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="vessel"></param>
+        /// <returns></returns>
+        public static bool HasModule<T>(this Vessel vessel) where T : class
+        {
+            foreach (var part in vessel.Parts)
+                foreach (var module in part.Modules)
+                    if (module is T)
+                        return true;
+            return false;
+        }
     }
 }
