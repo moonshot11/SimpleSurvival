@@ -155,10 +155,6 @@ namespace SimpleSurvival
         /// Conversation rate of Consumables to EVA LifeSupport
         /// </summary>
         public const double CONS_TO_EVA_LS = 1.0;
-        /// <summary>
-        /// Conversion rate of Consumables to EVA Propellant
-        /// </summary>
-        public const double CONS_TO_EVA_PROP = 1.0;
 
         /// <summary>
         /// Medium priority - Orange

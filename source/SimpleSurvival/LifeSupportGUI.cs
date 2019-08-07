@@ -366,21 +366,8 @@ namespace SimpleSurvival
 
             double conversion_rate;
             string resource_name;
-            EVA_Resource choice = EVA_Resource.LifeSupport;
-
-            switch (choice)
-            {
-                case EVA_Resource.LifeSupport:
-                    conversion_rate = C.CONS_TO_EVA_LS;
-                    resource_name = C.NAME_EVA_LIFESUPPORT;
-                    break;
-                case EVA_Resource.Propellant:
-                    conversion_rate = C.CONS_TO_EVA_PROP;
-                    resource_name = C.NAME_EVA_PROPELLANT;
-                    break;
-                default:
-                    throw new ArgumentException("Cons2LSModule.FillEVAResource, request enum not properly set");
-            }
+            conversion_rate = C.CONS_TO_EVA_LS;
+            resource_name = C.NAME_EVA_LIFESUPPORT;
 
             Util.Log("Processing FillEVA resource request for " + resource_name);
 
@@ -403,15 +390,7 @@ namespace SimpleSurvival
                     var info = EVALifeSupportTracker.GetEVALSInfo(kerbal.name);
                     double request = 0;
 
-                    switch (choice)
-                    {
-                        case EVA_Resource.Propellant:
-                            request = info.prop_max - info.prop_current;
-                            break;
-                        case EVA_Resource.LifeSupport:
-                            request = info.ls_max - info.ls_current;
-                            break;
-                    }
+                    request = info.ls_max - info.ls_current;
 
                     eva_request_total += request;
                     kerbal_requests.Add(kerbal.name, request);
@@ -442,7 +421,7 @@ namespace SimpleSurvival
                 foreach (string name in kerbal_requests.Keys)
                 {
                     double add = kerbal_requests[name] * frac;
-                    EVALifeSupportTracker.AddEVAAmount(name, add, choice);
+                    EVALifeSupportTracker.AddEVAAmount(name, add, EVA_Resource.LifeSupport);
 
                     Util.Log("    Adding " + add + " to " + name);
                 }
@@ -463,21 +442,12 @@ namespace SimpleSurvival
                 // May break in the future.
                 var info = EVALifeSupportTracker.GetEVALSInfo(kerbalName);
                 double eva_request = 0;
-
-                switch (choice)
-                {
-                    case EVA_Resource.Propellant:
-                        eva_request = info.prop_max - info.prop_current;
-                        break;
-                    case EVA_Resource.LifeSupport:
-                        eva_request = info.ls_max - info.ls_current;
-                        break;
-                }
+                eva_request = info.ls_max - info.ls_current;
 
                 Cons2LSModule module = active.FindPartModuleImplementing<Cons2LSModule>();
                 double obtained = module.part.RequestResource(C.NAME_CONSUMABLES, conversion_rate * eva_request);
                 double add = obtained / conversion_rate;
-                EVALifeSupportTracker.AddEVAAmount(kerbalName, add, choice);
+                EVALifeSupportTracker.AddEVAAmount(kerbalName, add, EVA_Resource.LifeSupport);
 
                 Util.Log("    EVA Request  = " + eva_request);
                 Util.Log("    Amt Obtained = " + obtained);
