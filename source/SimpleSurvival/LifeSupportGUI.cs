@@ -65,6 +65,15 @@ namespace SimpleSurvival
         private static Vector2 size = new Vector2(470, 200);
         private static Dictionary<string, GUIElements> labelMap
             = new Dictionary<string, GUIElements>();
+        private static bool allowBadTransfer = false;
+
+        private static DialogGUIToggle riskButton = new DialogGUIToggle(
+            !allowBadTransfer,
+            "Prevent unsafe crew transfer",
+            RiskButtonSelected);
+
+        private static DialogGUIHorizontalLayout riskLayout = new DialogGUIHorizontalLayout(
+            false, false, 0f, new RectOffset(20, 0, 0, 0), TextAnchor.MiddleLeft, riskButton);
 
         private DialogGUILabel statusLabel = new DialogGUILabel("Status", true, true);
         private DialogGUILabel consLabel = new DialogGUILabel("Consumables: x/x", 200, 0);
@@ -158,6 +167,11 @@ namespace SimpleSurvival
             showgui = false;
         }
 
+        private static void RiskButtonSelected(bool arg)
+        {
+            Util.PostUpperMessage("Button: " + arg.ToString());
+        }
+
         private void ButtonOnTrue()
         {
             Util.PostUpperMessage("CALL: ontrue");
@@ -231,7 +245,7 @@ namespace SimpleSurvival
                     UnityEngine.UI.GridLayoutGroup.Axis.Horizontal,
                     TextAnchor.MiddleLeft,
                     UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 2,
-                    statusLabel, consLabel);
+                    statusLabel, consLabel, riskLayout);
 
             // Set up the pop window
             MultiOptionDialog multi = new MultiOptionDialog(
