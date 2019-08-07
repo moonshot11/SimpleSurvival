@@ -236,16 +236,19 @@ namespace SimpleSurvival
         /// <returns>Returns the amount of EVA LS after adding</returns>
         public static double AddEVAAmount(string name, double amount, EVA_Resource choice)
         {
-            EvaInfo info = evals_info[name];
             try
             {
                 switch (choice)
                 {
                     case EVA_Resource.LifeSupport:
-                        info.ls_current = Math.Min(info.ls_current + amount, info.ls_max);
+                        evals_info[name].ls_current =
+                            Math.Min(evals_info[name].ls_current + amount,
+                            evals_info[name].ls_max);
                         break;
                     case EVA_Resource.Propellant:
-                        info.prop_current = Math.Min(info.prop_current + amount, info.prop_max);
+                        evals_info[name].prop_current =
+                            Math.Min(evals_info[name].prop_current + amount,
+                            evals_info[name].prop_max);
                         break;
                 }
             }
