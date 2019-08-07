@@ -330,6 +330,7 @@ namespace SimpleSurvival
 
             if (FlightGlobals.ActiveVessel.isEVA)
             {
+                vessel.GetConnectedResourceTotals(evapropID, out curr, out max);
                 string prefix = "";
                 string suffix = "</color>";
                 if (curr < 0.5)
@@ -338,7 +339,6 @@ namespace SimpleSurvival
                     prefix = C.GUI_LITEWARN_COLOR;
                 else
                     suffix = "";
-                vessel.GetConnectedResourceTotals(evapropID, out curr, out max);
                 consLabel.SetOptionText($"Propellant:  {prefix}{string.Format("{0:0.00}", curr)}{suffix}");
             }
             else
