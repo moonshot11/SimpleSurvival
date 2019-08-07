@@ -168,7 +168,7 @@ namespace SimpleSurvival
                 FlightGlobals.ActiveVessel.FindPartModulesImplementing<LifeSupportReportable>();
             // Calculate once on window generation, instead of each frame
             bool buttonEnable = !FlightGlobals.ActiveVessel.isEVA &&
-                FlightGlobals.ActiveVessel.FindPartModulesImplementing<Cons2LSModule>().Count > 0;
+                FlightGlobals.ActiveVessel.HasModule<Cons2LSModule>();
             // Cell padding
             RectOffset offset = new RectOffset(20, 0, 10, 0);
             int cellWidth = 100;
