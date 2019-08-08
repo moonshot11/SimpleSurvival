@@ -15,6 +15,10 @@ namespace SimpleSurvival
         public DialogGUILabel evaLS = new DialogGUILabel("BB", true, true);
         public DialogGUIButton fillEVAButton;
 
+        // -- Debug values --
+        public DialogGUILabel evaLS_Value = new DialogGUILabel("CC", true, true);
+        public DialogGUILabel evaProp = new DialogGUILabel("DD", true, true);
+
         private ProtoCrewMember kerbal;
         /// <summary>
         /// Is this NOT EVA, and do we have a converter?
@@ -222,6 +226,16 @@ namespace SimpleSurvival
                     kerbalCells.Add(elems.shipLS);
                     kerbalCells.Add(elems.evaLS);
                     kerbalCells.Add(elems.fillEVAButton);
+
+                    // Add raw EVA tracking values
+                    if (C.DEBUG_SHOW_EVA)
+                    {
+                        DialogGUILabel emptyLabel = new DialogGUILabel("", true, true);
+                        kerbalCells.Add(emptyLabel);
+                        kerbalCells.Add(elems.evaLS_Value);
+                        kerbalCells.Add(elems.evaProp);
+                        kerbalCells.Add(emptyLabel);
+                    }
                 }
 
                 vert.AddChild(
@@ -258,6 +272,10 @@ namespace SimpleSurvival
                 new DialogGUIScrollList(Vector2.zero, false, true,
                     new DialogGUIVerticalLayout(false, false, 1f,
                         offset, TextAnchor.UpperLeft,
+                        new DialogGUIContentSizer(
+                            UnityEngine.UI.ContentSizeFitter.FitMode.Unconstrained,
+                            UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize,
+                            true),
                         vert)));
 
             gui = PopupDialog.SpawnPopupDialog(
@@ -310,6 +328,14 @@ namespace SimpleSurvival
                     string evastr = Util.DaysToString(evaLS / C.EVA_LS_DRAIN_PER_DAY);
                     labelMap[kerbal.name].shipLS.SetOptionText(timestr);
                     labelMap[kerbal.name].evaLS.SetOptionText(evastr);
+
+                    if (C.DEBUG_SHOW_EVA)
+                    {
+                        var info = EVALifeSupportTracker.GetEVALSInfo(kerbal.name);
+                        labelMap[kerbal.name].evaLS_Value.SetOptionText(info.ls_current.ToString());
+                        labelMap[kerbal.name].evaProp.SetOptionText(info.prop_current.ToString());
+
+                    }
                 }
             }
 
