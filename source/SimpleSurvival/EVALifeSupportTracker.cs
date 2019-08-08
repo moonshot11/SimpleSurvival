@@ -87,6 +87,9 @@ namespace SimpleSurvival
             GameEvents.onVesselRecovered.Add(OnVesselRecovered);
             GameEvents.onKerbalStatusChange.Add(OnKerbalStatusChange);
             GameEvents.onKerbalRemoved.Add(OnKerbalRemoved);
+
+            // Refill EVA
+            GameEvents.onDockingComplete.Add(OnDockingComplete);
         }
 
         /// <summary>
@@ -124,22 +127,41 @@ namespace SimpleSurvival
             evals_info.Add(name, info);
         }
 
+        private void OnDockingComplete(GameEvents.FromToAction<Part, Part> action)
+        {
+            FillEVAProp(action.to.vessel);
+        }
+
+        /// <summary>
+        /// Fill all Kerbals' EVA prop to full
+        /// </summary>
+        /// <param name="vessel"></param>
+        private void FillEVAProp(Vessel vessel)
+        {
+            if (!vessel.HasModule<Cons2LSModule>())
+                return;
+
+            foreach (ProtoCrewMember kerbal in vessel.GetVesselCrew())
+            {
+                AddKerbalToTracking(kerbal.name);
+                evals_info[kerbal.name].prop_current = evals_info[kerbal.name].prop_max
+                    = Util.CurrentEVAMax(EVA_Resource.Propellant);
+                Util.Log($"Filling {kerbal.name}'s EVA prop to {evals_info[kerbal.name].prop_max}");
+            }
+        }
+
         private void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> action)
         {
-            if (action.to.vessel.isEVA)
+
+            if (action.from.vessel.isEVA != action.to.vessel.isEVA &&
+                (!action.from.vessel.isEVA && action.from.vessel.HasModule<Cons2LSModule>() ||
+                 !action.to.vessel.isEVA && action.to.vessel.HasModule<Cons2LSModule>()))
+                FillEVAProp(action.to.vessel);
+
+            if (!action.from.vessel.isEVA && action.to.vessel.isEVA)
                 return;
 
             ProtoCrewMember kerbal = action.host;
-
-            if (action.from.vessel.isEVA &&
-                action.to.vessel.HasModule<Cons2LSModule>())
-            {
-                double max = evals_info[kerbal.name].prop_max;
-                Util.Log($"Filling {kerbal.name}'s EVA prop to {max}");
-                AddKerbalToTracking(kerbal.name);
-                evals_info[kerbal.name].prop_current = max;
-                return;
-            }
 
             // It's possible Kerbal is coming from a part that does not have a LifeSupportModule
             // Alternative solution is to add LifeSupportModule + default resource values
