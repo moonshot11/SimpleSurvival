@@ -90,6 +90,7 @@ namespace SimpleSurvival
 
             // Refill EVA
             GameEvents.onDockingComplete.Add(OnDockingComplete);
+            GameEvents.onVesselLoaded.Add(OnVesselLoaded);
         }
 
         /// <summary>
@@ -130,6 +131,13 @@ namespace SimpleSurvival
         private void OnDockingComplete(GameEvents.FromToAction<Part, Part> action)
         {
             FillEVAProp(action.to.vessel);
+        }
+
+        private void OnVesselLoaded(Vessel vessel)
+        {
+            if (vessel.isEVA)
+                return;
+            FillEVAProp(vessel);
         }
 
         /// <summary>
