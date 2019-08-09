@@ -14,6 +14,11 @@ namespace SimpleSurvival
         /// Show EVA stats in GUI
         /// </summary>
         public static bool DEBUG_SHOW_EVA = false;
+        /// <summary>
+        /// Update EVA max values without returning to KSC?
+        /// </summary>
+        public static bool INSTANT_EVA_UPDATE = false;
+
 
         // -- EVA Propellant career values --
 

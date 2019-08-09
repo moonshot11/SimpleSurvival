@@ -144,8 +144,9 @@ namespace SimpleSurvival
             foreach (ProtoCrewMember kerbal in vessel.GetVesselCrew())
             {
                 AddKerbalToTracking(kerbal.name);
-                evals_info[kerbal.name].prop_current = evals_info[kerbal.name].prop_max
-                    = Util.CurrentEVAMax(EVA_Resource.Propellant);
+                if (Config.INSTANT_EVA_UPDATE)
+                    evals_info[kerbal.name].prop_max = Util.CurrentEVAMax(EVA_Resource.Propellant);
+                evals_info[kerbal.name].prop_current = evals_info[kerbal.name].prop_max;
                 Util.Log($"Filling {kerbal.name}'s EVA prop to {evals_info[kerbal.name].prop_max}");
             }
         }

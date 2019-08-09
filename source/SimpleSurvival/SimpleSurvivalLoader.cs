@@ -36,6 +36,8 @@ namespace SimpleSurvival
                 Util.GetConfigNodeValue(node, "eva_prop_3", Config.EVA_PROP_LVL_3));
             Config.DEBUG_SHOW_EVA = Convert.ToBoolean(
                 Util.GetConfigNodeValue(node, "debug", false));
+            Config.INSTANT_EVA_UPDATE = Convert.ToBoolean(
+                Util.GetConfigNodeValue(node, "instant_eva_upgrade", false));
 
             GameEvents.onGameStateCreated.Add(OnLoad);
             GameEvents.onGameStateSave.Add(OnSave);
