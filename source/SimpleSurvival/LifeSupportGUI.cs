@@ -228,7 +228,7 @@ namespace SimpleSurvival
                     kerbalCells.Add(elems.fillEVAButton);
 
                     // Add raw EVA tracking values
-                    if (C.DEBUG_SHOW_EVA)
+                    if (Config.DEBUG_SHOW_EVA)
                     {
                         DialogGUILabel emptyLabel = new DialogGUILabel("", true, true);
                         kerbalCells.Add(emptyLabel);
@@ -329,7 +329,7 @@ namespace SimpleSurvival
                     labelMap[kerbal.name].shipLS.SetOptionText(timestr);
                     labelMap[kerbal.name].evaLS.SetOptionText(evastr);
 
-                    if (C.DEBUG_SHOW_EVA)
+                    if (Config.DEBUG_SHOW_EVA)
                     {
                         var info = EVALifeSupportTracker.GetEVALSInfo(kerbal.name);
                         labelMap[kerbal.name].evaLS_Value.SetOptionText(info.ls_current.ToString());

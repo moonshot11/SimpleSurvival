@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="C.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="Cons2LSModule.cs" />
     <Compile Include="ContractChecker.cs" />
     <Compile Include="EVALifeSupportLoader.cs" />

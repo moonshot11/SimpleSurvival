@@ -77,31 +77,8 @@ namespace SimpleSurvival
         /// </summary>
         public const double EVA_LS_30_SECONDS = EVA_LS_DRAIN_PER_SEC * 30;
 
-        // -- EVA LifeSupport career values --
-
-        /// <summary>
-        /// Max amount of EVA Life Support w/ Astronaut Complex Level 1
-        /// </summary>
-        public static double EVA_LS_LVL_1 = 1;
-        /// <summary>
-        /// Max amount of EVA Life Support w/ Astronaut Complex Level 2
-        /// </summary>
-        public static double EVA_LS_LVL_2 = 10;
-        /// <summary>
-        /// Max amount of EVA Life Support w/ Astronaut Complex Level 3
-        /// </summary>
-        public static double EVA_LS_LVL_3 = 300;
-
         // -- EVA Propellant values --
 
-        /// <summary>
-        /// Max amount of EVA Propellant w/ Astronaut Complex Level 2
-        /// </summary>
-        public static double EVA_PROP_LVL_2 = 5;
-        /// <summary>
-        /// Max amount of EVA Propellant w/ Astronaut Complex Level 3
-        /// </summary>
-        public static double EVA_PROP_LVL_3 = 5;
         /// <summary>
         /// If EVA Propellant is less than this, set to this to avoid cases
         /// where player EVAs and consequently "bricks" a Kerbal
@@ -193,10 +170,5 @@ namespace SimpleSurvival
 
         public const string GUI_HARDWARN_COLOR = "<color=#ff3322>";
         public const string GUI_LITEWARN_COLOR = "<color=#ffee11>";
-
-        /// <summary>
-        /// Show EVA stats in GUI
-        /// </summary>
-        public static bool DEBUG_SHOW_EVA = false;
     }
 }
