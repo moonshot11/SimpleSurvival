@@ -130,11 +130,13 @@ namespace SimpleSurvival
 
         private void OnDockingComplete(GameEvents.FromToAction<Part, Part> action)
         {
+            Util.Log("Call EVALSTrack -> OnDockingComplete()");
             FillEVAProp(action.to.vessel);
         }
 
         private void OnVesselLoaded(Vessel vessel)
         {
+            Util.Log("Call EVALSTrack -> OnVesselLoaded()");
             if (vessel.isEVA)
                 return;
             FillEVAProp(vessel);
@@ -146,14 +148,28 @@ namespace SimpleSurvival
         /// <param name="vessel"></param>
         private void FillEVAProp(Vessel vessel)
         {
-            if (!vessel.HasModule<Cons2LSModule>())
-                return;
+            if (vessel == null)
+                throw new NullReferenceException();
+
+            Util.Log($"Call EVALSTrack -> FillEVAProp({vessel.vesselName})");
+
+            bool updateMax = vessel.CanUpdateEVAMaxValues();
 
             foreach (ProtoCrewMember kerbal in vessel.GetVesselCrew())
             {
                 AddKerbalToTracking(kerbal.name);
-                if (Config.INSTANT_EVA_UPDATE)
+                if (updateMax)
+                {
+                    double propmax = Util.CurrentEVAMax(EVA_Resource.Propellant);
+                    double lsmax = Util.CurrentEVAMax(EVA_Resource.LifeSupport);
+
+                    Util.Log($"Updating Kerbal max values for: {kerbal.name}");
+                    Util.Log($"  LS max -> {lsmax}");
+                    Util.Log($"  Prop max -> {propmax}");
+
                     evals_info[kerbal.name].prop_max = Util.CurrentEVAMax(EVA_Resource.Propellant);
+                    evals_info[kerbal.name].ls_max = Util.CurrentEVAMax(EVA_Resource.LifeSupport);
+                }
                 evals_info[kerbal.name].prop_current = evals_info[kerbal.name].prop_max;
                 Util.Log($"Filling {kerbal.name}'s EVA prop to {evals_info[kerbal.name].prop_max}");
             }
@@ -161,11 +177,15 @@ namespace SimpleSurvival
 
         private void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> action)
         {
+            Util.Log("Call EVALSTrack -> OnCrewTransferred()");
 
-            if (action.from.vessel.isEVA != action.to.vessel.isEVA &&
-                (!action.from.vessel.isEVA && action.from.vessel.HasModule<Cons2LSModule>() ||
-                 !action.to.vessel.isEVA && action.to.vessel.HasModule<Cons2LSModule>()))
-                FillEVAProp(action.to.vessel);
+            if (action.from.vessel.isEVA != action.to.vessel.isEVA)
+            {
+                if (!action.from.vessel.isEVA)
+                    FillEVAProp(action.from.vessel);
+                else
+                    FillEVAProp(action.to.vessel);
+            }
 
             if (!action.from.vessel.isEVA && action.to.vessel.isEVA)
                 return;

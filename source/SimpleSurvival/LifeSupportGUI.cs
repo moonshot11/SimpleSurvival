@@ -91,8 +91,14 @@ namespace SimpleSurvival
             Util.Log("LifeSupportGUI Awake");
             GameEvents.onGUIApplicationLauncherReady.Add(AddToolbar);
             GameEvents.onGUIApplicationLauncherDestroyed.Add(RemoveToolbar);
+
+            // -- State changes that require GUI refresh --
             GameEvents.onVesselChange.Add(OnVesselChange);
             GameEvents.onCrewTransferred.Add(OnCrewTransferred);
+            GameEvents.onDockingComplete.Add(OnDockingComplete);
+            GameEvents.onPartUndockComplete.Add(OnPartUndockComplete);
+            GameEvents.onPartDeCoupleComplete.Add(OnPartDecoupleComplete);
+
             GameEvents.onGamePause.Add(OnGamePause);
         }
 
@@ -103,18 +109,41 @@ namespace SimpleSurvival
             GameEvents.onGUIApplicationLauncherDestroyed.Remove(RemoveToolbar);
             GameEvents.onVesselChange.Remove(OnVesselChange);
             GameEvents.onCrewTransferred.Remove(OnCrewTransferred);
+            GameEvents.onDockingComplete.Remove(OnDockingComplete);
+            GameEvents.onPartUndockComplete.Remove(OnPartUndockComplete);
+            GameEvents.onPartDeCoupleComplete.Remove(OnPartDecoupleComplete);
             GameEvents.onGamePause.Remove(OnGamePause);
             // Ensure it's removed from the MainMenu scene
             RemoveToolbar();
         }
 
+        public void OnDockingComplete(GameEvents.FromToAction<Part, Part> ev)
+        {
+            Util.PostUpperMessage("ON DOCKING COMPLETE");
+            RefreshGUI();
+        }
+
+        public void OnPartUndockComplete(Part part)
+        {
+            Util.PostUpperMessage("ON PART UNDOCK");
+            RefreshGUI();
+        }
+
+        public void OnPartDecoupleComplete(Part part)
+        {
+            Util.PostUpperMessage("ON VESSEL DECOUPLE");
+            RefreshGUI();
+        }
+
         public void OnVesselChange(Vessel vessel)
         {
+            Util.PostUpperMessage("ON VESSEL CHANGE");
             RefreshGUI();
         }
 
         public void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> ev)
         {
+            Util.PostUpperMessage("ON CREW TRANSFER");
             RefreshGUI();
         }
 
