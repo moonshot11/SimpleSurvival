@@ -435,7 +435,7 @@ namespace SimpleSurvival
 
             double conversion_rate;
             string resource_name;
-            conversion_rate = C.CONS_TO_EVA_LS;
+            conversion_rate = C.CONS_PER_EVA_LS;
             resource_name = C.NAME_EVA_LIFESUPPORT;
 
             Util.Log("Processing FillEVA resource request for " + resource_name);
