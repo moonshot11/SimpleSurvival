@@ -17,7 +17,7 @@ namespace SimpleSurvival
         /// <summary>
         /// Update EVA max values without returning to KSC?
         /// </summary>
-        public static bool INSTANT_EVA_UPDATE = false;
+        public static EVAUpdateMode INSTANT_EVA_UPDATE = EVAUpdateMode.RequiresHitchhiker;
 
 
         // -- EVA Propellant career values --

@@ -387,5 +387,18 @@ namespace SimpleSurvival
                         return true;
             return false;
         }
+
+        /// <summary>
+        /// Is criteria met to auto-upgrade max EVA values?
+        /// </summary>
+        /// <param name="vessel"></param>
+        /// <returns></returns>
+        public static bool CanUpdateEVAMaxValues(this Vessel vessel)
+        {
+            if (Config.INSTANT_EVA_UPDATE == EVAUpdateMode.RequiresHitchhiker)
+                return vessel.HasModule<Cons2LSModule>();
+            else
+                return Config.INSTANT_EVA_UPDATE == EVAUpdateMode.Always;
+        }
     }
 }

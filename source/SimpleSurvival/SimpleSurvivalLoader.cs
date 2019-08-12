@@ -6,6 +6,13 @@ using UnityEngine;
 
 namespace SimpleSurvival
 {
+    public enum EVAUpdateMode
+    {
+        Never,
+        RequiresHitchhiker,
+        Always
+    }
+
     /// <summary>
     /// Manages loading/saving of global tracking data.
     /// </summary>
@@ -36,8 +43,24 @@ namespace SimpleSurvival
                 Util.GetConfigNodeValue(node, "eva_prop_3", Config.EVA_PROP_LVL_3));
             Config.DEBUG_SHOW_EVA = Convert.ToBoolean(
                 Util.GetConfigNodeValue(node, "debug", false));
-            Config.INSTANT_EVA_UPDATE = Convert.ToBoolean(
-                Util.GetConfigNodeValue(node, "instant_eva_upgrade", false));
+
+            string eva_update = Util.GetConfigNodeValue(node, "instant_eva_update", null);
+            switch (eva_update)
+            {
+                case "never":
+                    Config.INSTANT_EVA_UPDATE = EVAUpdateMode.Never;
+                    break;
+                case "hitchhiker":
+                    Config.INSTANT_EVA_UPDATE = EVAUpdateMode.RequiresHitchhiker;
+                    break;
+                case "always":
+                    Config.INSTANT_EVA_UPDATE = EVAUpdateMode.Always;
+                    break;
+                default:
+                    if (eva_update != null)
+                        Util.Warn($"Did not recognize instant_eva_update value: {eva_update}");
+                    break;
+            }
 
             GameEvents.onGameStateCreated.Add(OnLoad);
             GameEvents.onGameStateSave.Add(OnSave);

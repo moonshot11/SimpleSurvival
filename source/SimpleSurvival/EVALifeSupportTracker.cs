@@ -88,7 +88,7 @@ namespace SimpleSurvival
             GameEvents.onKerbalStatusChange.Add(OnKerbalStatusChange);
             GameEvents.onKerbalRemoved.Add(OnKerbalRemoved);
 
-            // Refill EVA
+            // Refill EVA prop / Refresh EVA Max
             GameEvents.onDockingComplete.Add(OnDockingComplete);
             GameEvents.onVesselLoaded.Add(OnVesselLoaded);
         }
