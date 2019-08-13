@@ -22,7 +22,10 @@ namespace SimpleSurvival
         /// Refill EVA prop without returning to KSC?
         /// </summary>
         public static EVAUpdateMode EVA_PROP_REFILL = EVAUpdateMode.RequiresHitchhiker;
-
+        /// <summary>
+        /// Requirement for enabling Converter.
+        /// </summary>
+        public static ConverterReq CONV_REQ = ConverterReq.IfKerbalExpEnabled;
 
         // -- EVA Propellant career values --
 

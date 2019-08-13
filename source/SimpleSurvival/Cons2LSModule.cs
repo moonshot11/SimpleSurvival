@@ -5,18 +5,38 @@ using System.Text;
 
 namespace SimpleSurvival
 {
+    public enum ConverterReq
+    {
+        /// <summary>
+        /// Converter can be used, even if unmanned.
+        /// </summary>
+        AlwaysReady,
+        /// <summary>
+        /// Converter must be manned. Any Kerbal will do.
+        /// </summary>
+        RequiresAnyKerbal,
+        /// <summary>
+        /// Converter must be manned by an Engineer.
+        /// </summary>
+        RequiresEngineer,
+        /// <summary>
+        /// Converter must be manned by an Engineer if exp enabled in-game,
+        /// otherwise any Kerbal will do.
+        /// </summary>
+        IfKerbalExpEnabled
+    }
+
     /// <summary>
     /// The Consumables -> LifeSupport converter PartModule.
     /// </summary>
     [KSPModule("Converter")]
     public class Cons2LSModule : ModuleResourceConverter, IResourceConsumer
     {
-        private const string CONV_SPECIALIST = "Engineer";
         private string msgMissing = "";
 
         public override void OnStart(StartState state)
         {
-            string specialist = (Util.AdvParams.EnableKerbalExperience ? CONV_SPECIALIST : "Kerbal");
+            string specialist = (Util.AdvParams.EnableKerbalExperience ? C.CONV_SPECIALIST : "Kerbal");
             msgMissing = "Missing " + specialist;
             base.OnStart(state);
         }
@@ -27,17 +47,25 @@ namespace SimpleSurvival
         /// <returns></returns>
         internal bool ProperlyManned()
         {
-            // If game isn't in Career Mode, Kerbal specializations
-            // aren't supposed to matter. Just check if converter is manned.
-            if (!Util.AdvParams.EnableKerbalExperience && part.protoModuleCrew.Count > 0)
+            if (Config.CONV_REQ == ConverterReq.AlwaysReady)
                 return true;
 
-            foreach (ProtoCrewMember kerbal in part.protoModuleCrew)
+            if (Config.CONV_REQ == ConverterReq.RequiresAnyKerbal ||
+                Config.CONV_REQ == ConverterReq.IfKerbalExpEnabled &&
+                    !Util.AdvParams.EnableKerbalExperience)
+                return part.protoModuleCrew.Count > 0;
+
+            if (Config.CONV_REQ == ConverterReq.RequiresEngineer ||
+                Config.CONV_REQ == ConverterReq.IfKerbalExpEnabled &&
+                    Util.AdvParams.EnableKerbalExperience)
             {
-                // kerbal.experienceTrait.Title also returns "Engineer"
-                // kerbal.experienceLevel [0..5] to add experience check
-                if (kerbal.experienceTrait.TypeName == CONV_SPECIALIST)
-                    return true;
+                for (int i = 0; i < part.protoModuleCrew.Count; i++)
+                {
+                    // kerbal.experienceTrait.Title also returns "Engineer"
+                    // kerbal.experienceLevel [0..5] to add experience check
+                    if (part.protoModuleCrew[i].experienceTrait.TypeName == C.CONV_SPECIALIST)
+                        return true;
+                }
             }
 
             return false;

@@ -170,5 +170,7 @@ namespace SimpleSurvival
 
         public const string GUI_HARDWARN_COLOR = "<color=#ff3322>";
         public const string GUI_LITEWARN_COLOR = "<color=#ffee11>";
+
+        public const string CONV_SPECIALIST = "Engineer";
     }
 }

@@ -61,6 +61,9 @@ namespace SimpleSurvival
             string evaProp = Util.GetConfigNodeValue(node, "eva_prop_refill", null);
             Config.EVA_PROP_REFILL = (EVAUpdateMode)Enum.Parse(typeof(EVAUpdateMode), evaProp, true);
 
+            string convReq = Util.GetConfigNodeValue(node, "converter_req", null);
+            Config.CONV_REQ = (ConverterReq) Enum.Parse(typeof(ConverterReq), convReq, true);
+
             GameEvents.onGameStateCreated.Add(OnLoad);
             GameEvents.onGameStateSave.Add(OnSave);
         }
