@@ -6,11 +6,23 @@ using UnityEngine;
 
 namespace SimpleSurvival
 {
+    /// <summary>
+    /// Selects the behavior by which to update EVA stats
+    /// </summary>
     public enum EVAUpdateMode
     {
-        Never,
+        /// <summary>
+        /// Never update in-flight (Kerbal must be recovered)
+        /// </summary>
+        OnRecovery,
+        /// <summary>
+        /// Update as long as vessel has Hitchhiker module
+        /// </summary>
         RequiresHitchhiker,
-        Always
+        /// <summary>
+        /// Update as long as Kerbal has boarded any vessel
+        /// </summary>
+        OnShip
     }
 
     /// <summary>
@@ -44,23 +56,10 @@ namespace SimpleSurvival
             Config.DEBUG_SHOW_EVA = Convert.ToBoolean(
                 Util.GetConfigNodeValue(node, "debug", false));
 
-            string eva_update = Util.GetConfigNodeValue(node, "instant_eva_update", null);
-            switch (eva_update)
-            {
-                case "never":
-                    Config.INSTANT_EVA_UPDATE = EVAUpdateMode.Never;
-                    break;
-                case "hitchhiker":
-                    Config.INSTANT_EVA_UPDATE = EVAUpdateMode.RequiresHitchhiker;
-                    break;
-                case "always":
-                    Config.INSTANT_EVA_UPDATE = EVAUpdateMode.Always;
-                    break;
-                default:
-                    if (eva_update != null)
-                        Util.Warn($"Did not recognize instant_eva_update value: {eva_update}");
-                    break;
-            }
+            string evaMax = Util.GetConfigNodeValue(node, "eva_max_upgrade", null);
+            Config.EVA_MAX_UPDATE = (EVAUpdateMode)Enum.Parse(typeof(EVAUpdateMode), evaMax, true);
+            string evaProp = Util.GetConfigNodeValue(node, "eva_prop_refill", null);
+            Config.EVA_PROP_REFILL = (EVAUpdateMode)Enum.Parse(typeof(EVAUpdateMode), evaProp, true);
 
             GameEvents.onGameStateCreated.Add(OnLoad);
             GameEvents.onGameStateSave.Add(OnSave);

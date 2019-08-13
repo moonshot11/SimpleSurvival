@@ -103,8 +103,8 @@ namespace SimpleSurvival
         {
             Log("Call -> AddKerbal(..) for " + name);
 
-            double prop_max = Util.CurrentEVAMax(EVA_Resource.Propellant);
-            double eva_max = Util.CurrentEVAMax(EVA_Resource.LifeSupport);
+            double prop_max = Util.MaxAllowedEVA(EVA_Resource.Propellant);
+            double eva_max = Util.MaxAllowedEVA(EVA_Resource.LifeSupport);
 
             // Assume that this Kerbal's info should be reset,
             // but warn in the log file just in case.
@@ -153,25 +153,36 @@ namespace SimpleSurvival
 
             Util.Log($"Call EVALSTrack -> FillEVAProp({vessel.vesselName})");
 
-            bool updateMax = vessel.CanUpdateEVAMaxValues();
+            var crew = vessel.GetVesselCrew();
+            if (crew.Count == 0)
+                return;
 
-            foreach (ProtoCrewMember kerbal in vessel.GetVesselCrew())
+            bool updateMax = vessel.CanUpdateEVAStat(Config.EVA_MAX_UPDATE);
+            bool updateProp =
+                Config.EVA_PROP_REFILL == EVAUpdateMode.RequiresHitchhiker &&
+                updateMax && Config.EVA_MAX_UPDATE == EVAUpdateMode.RequiresHitchhiker ||
+                vessel.CanUpdateEVAStat(Config.EVA_PROP_REFILL);
+
+            foreach (ProtoCrewMember kerbal in crew)
             {
                 AddKerbalToTracking(kerbal.name);
                 if (updateMax)
                 {
-                    double propmax = Util.CurrentEVAMax(EVA_Resource.Propellant);
-                    double lsmax = Util.CurrentEVAMax(EVA_Resource.LifeSupport);
+                    double propmax = Util.MaxAllowedEVA(EVA_Resource.Propellant);
+                    double lsmax = Util.MaxAllowedEVA(EVA_Resource.LifeSupport);
 
                     Util.Log($"Updating Kerbal max values for: {kerbal.name}");
                     Util.Log($"  LS max -> {lsmax}");
                     Util.Log($"  Prop max -> {propmax}");
 
-                    evals_info[kerbal.name].prop_max = Util.CurrentEVAMax(EVA_Resource.Propellant);
-                    evals_info[kerbal.name].ls_max = Util.CurrentEVAMax(EVA_Resource.LifeSupport);
+                    evals_info[kerbal.name].prop_max = Util.MaxAllowedEVA(EVA_Resource.Propellant);
+                    evals_info[kerbal.name].ls_max = Util.MaxAllowedEVA(EVA_Resource.LifeSupport);
                 }
-                evals_info[kerbal.name].prop_current = evals_info[kerbal.name].prop_max;
-                Util.Log($"Filling {kerbal.name}'s EVA prop to {evals_info[kerbal.name].prop_max}");
+                if (updateProp)
+                {
+                    Util.Log($"Filling {kerbal.name}'s EVA prop to {evals_info[kerbal.name].prop_max}");
+                    evals_info[kerbal.name].prop_current = evals_info[kerbal.name].prop_max;
+                }
             }
         }
 
@@ -374,8 +385,8 @@ namespace SimpleSurvival
                 .GetNode("SCENARIO", "name", "ScenarioUpgradeableFacilities")
                 .GetNode("SpaceCenter/AstronautComplex").GetValue("lvl");
 
-            double game_prop_max = Util.CurrentEVAMax(EVA_Resource.Propellant, astro_lvl);
-            double game_ls_max = Util.CurrentEVAMax(EVA_Resource.LifeSupport, astro_lvl);
+            double game_prop_max = Util.MaxAllowedEVA(EVA_Resource.Propellant, astro_lvl);
+            double game_ls_max = Util.MaxAllowedEVA(EVA_Resource.LifeSupport, astro_lvl);
 
             foreach (ConfigNode node in scenario_node.GetNodes(NODE_EVA_TRACK))
             {

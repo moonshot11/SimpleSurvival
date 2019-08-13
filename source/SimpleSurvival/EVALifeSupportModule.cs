@@ -91,10 +91,10 @@ namespace SimpleSurvival
 
             // If difficulty option "Immediate Level Up" is selected,
             // immediately set this Kerbal's EVA to new max
-            if (this.vessel.CanUpdateEVAMaxValues())
+            if (this.vessel.CanUpdateEVAStat(Config.EVA_MAX_UPDATE))
             {
-                ls_resource.maxAmount = Util.CurrentEVAMax(EVA_Resource.LifeSupport);
-                prop_resource.maxAmount = Util.CurrentEVAMax(EVA_Resource.Propellant);
+                ls_resource.maxAmount = Util.MaxAllowedEVA(EVA_Resource.LifeSupport);
+                prop_resource.maxAmount = Util.MaxAllowedEVA(EVA_Resource.Propellant);
             }
 
             base.OnStart(state);

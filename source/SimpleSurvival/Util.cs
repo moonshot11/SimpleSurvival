@@ -95,7 +95,7 @@ namespace SimpleSurvival
         /// </summary>
         /// <param name="choice">Which resource to return</param>
         /// <returns></returns>
-        public static double CurrentEVAMax(EVA_Resource choice, string astro_level = "")
+        public static double MaxAllowedEVA(EVA_Resource choice, string astro_level = "")
         {
             // Default astro_level value is "" instead of null
             // to capture the case where the input to this method
@@ -393,12 +393,12 @@ namespace SimpleSurvival
         /// </summary>
         /// <param name="vessel"></param>
         /// <returns></returns>
-        public static bool CanUpdateEVAMaxValues(this Vessel vessel)
+        public static bool CanUpdateEVAStat(this Vessel vessel, EVAUpdateMode mode)
         {
-            if (Config.INSTANT_EVA_UPDATE == EVAUpdateMode.RequiresHitchhiker)
+            if (mode == EVAUpdateMode.RequiresHitchhiker)
                 return vessel.HasModule<Cons2LSModule>();
             else
-                return Config.INSTANT_EVA_UPDATE == EVAUpdateMode.Always;
+                return mode == EVAUpdateMode.OnShip;
         }
     }
 }
