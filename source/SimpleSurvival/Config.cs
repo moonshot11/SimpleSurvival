@@ -6,6 +6,46 @@ using System.Text;
 namespace SimpleSurvival
 {
     /// <summary>
+    /// Selects the behavior by which to update EVA stats
+    /// </summary>
+    public enum EVAUpdateMode
+    {
+        /// <summary>
+        /// Never update in-flight (Kerbal must be recovered)
+        /// </summary>
+        Recovered,
+        /// <summary>
+        /// Update as long as vessel has Hitchhiker module
+        /// </summary>
+        IfHitchhiker,
+        /// <summary>
+        /// Update as long as Kerbal is aboard any vessel
+        /// </summary>
+        Aboard
+    }
+
+    public enum ConverterReq
+    {
+        /// <summary>
+        /// Converter can be used, even if unmanned.
+        /// </summary>
+        None,
+        /// <summary>
+        /// Converter must be manned. Any Kerbal will do.
+        /// </summary>
+        AnyKerbal,
+        /// <summary>
+        /// Converter must be manned by an Engineer.
+        /// </summary>
+        Engineer,
+        /// <summary>
+        /// Converter must be manned by an Engineer if exp enabled in-game,
+        /// otherwise any Kerbal will do.
+        /// </summary>
+        IfKerbalExpEnabled
+    }
+
+    /// <summary>
     /// Variable config values
     /// </summary>
     public class Config
@@ -17,11 +57,11 @@ namespace SimpleSurvival
         /// <summary>
         /// Update EVA max values without returning to KSC?
         /// </summary>
-        public static EVAUpdateMode EVA_MAX_UPDATE = EVAUpdateMode.RequiresHitchhiker;
+        public static EVAUpdateMode EVA_MAX_UPDATE = EVAUpdateMode.IfHitchhiker;
         /// <summary>
         /// Refill EVA prop without returning to KSC?
         /// </summary>
-        public static EVAUpdateMode EVA_PROP_REFILL = EVAUpdateMode.RequiresHitchhiker;
+        public static EVAUpdateMode EVA_PROP_REFILL = EVAUpdateMode.IfHitchhiker;
         /// <summary>
         /// Requirement for enabling Converter.
         /// </summary>

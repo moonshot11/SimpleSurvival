@@ -5,27 +5,6 @@ using System.Text;
 
 namespace SimpleSurvival
 {
-    public enum ConverterReq
-    {
-        /// <summary>
-        /// Converter can be used, even if unmanned.
-        /// </summary>
-        AlwaysReady,
-        /// <summary>
-        /// Converter must be manned. Any Kerbal will do.
-        /// </summary>
-        RequiresAnyKerbal,
-        /// <summary>
-        /// Converter must be manned by an Engineer.
-        /// </summary>
-        RequiresEngineer,
-        /// <summary>
-        /// Converter must be manned by an Engineer if exp enabled in-game,
-        /// otherwise any Kerbal will do.
-        /// </summary>
-        IfKerbalExpEnabled
-    }
-
     /// <summary>
     /// The Consumables -> LifeSupport converter PartModule.
     /// </summary>
@@ -47,15 +26,15 @@ namespace SimpleSurvival
         /// <returns></returns>
         internal bool ProperlyManned()
         {
-            if (Config.CONV_REQ == ConverterReq.AlwaysReady)
+            if (Config.CONV_REQ == ConverterReq.None)
                 return true;
 
-            if (Config.CONV_REQ == ConverterReq.RequiresAnyKerbal ||
+            if (Config.CONV_REQ == ConverterReq.AnyKerbal ||
                 Config.CONV_REQ == ConverterReq.IfKerbalExpEnabled &&
                     !Util.AdvParams.EnableKerbalExperience)
                 return part.protoModuleCrew.Count > 0;
 
-            if (Config.CONV_REQ == ConverterReq.RequiresEngineer ||
+            if (Config.CONV_REQ == ConverterReq.Engineer ||
                 Config.CONV_REQ == ConverterReq.IfKerbalExpEnabled &&
                     Util.AdvParams.EnableKerbalExperience)
             {

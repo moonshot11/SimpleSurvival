@@ -395,10 +395,10 @@ namespace SimpleSurvival
         /// <returns></returns>
         public static bool CanUpdateEVAStat(this Vessel vessel, EVAUpdateMode mode)
         {
-            if (mode == EVAUpdateMode.RequiresHitchhiker)
+            if (mode == EVAUpdateMode.IfHitchhiker)
                 return vessel.HasModule<Cons2LSModule>();
             else
-                return mode == EVAUpdateMode.OnShip;
+                return mode == EVAUpdateMode.Aboard;
         }
     }
 }

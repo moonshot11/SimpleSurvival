@@ -159,8 +159,8 @@ namespace SimpleSurvival
 
             bool updateMax = vessel.CanUpdateEVAStat(Config.EVA_MAX_UPDATE);
             bool updateProp =
-                Config.EVA_PROP_REFILL == EVAUpdateMode.RequiresHitchhiker &&
-                updateMax && Config.EVA_MAX_UPDATE == EVAUpdateMode.RequiresHitchhiker ||
+                Config.EVA_PROP_REFILL == EVAUpdateMode.IfHitchhiker &&
+                updateMax && Config.EVA_MAX_UPDATE == EVAUpdateMode.IfHitchhiker ||
                 vessel.CanUpdateEVAStat(Config.EVA_PROP_REFILL);
 
             foreach (ProtoCrewMember kerbal in crew)

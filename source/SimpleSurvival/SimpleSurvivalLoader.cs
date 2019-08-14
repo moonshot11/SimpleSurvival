@@ -7,25 +7,6 @@ using UnityEngine;
 namespace SimpleSurvival
 {
     /// <summary>
-    /// Selects the behavior by which to update EVA stats
-    /// </summary>
-    public enum EVAUpdateMode
-    {
-        /// <summary>
-        /// Never update in-flight (Kerbal must be recovered)
-        /// </summary>
-        OnRecovery,
-        /// <summary>
-        /// Update as long as vessel has Hitchhiker module
-        /// </summary>
-        RequiresHitchhiker,
-        /// <summary>
-        /// Update as long as Kerbal has boarded any vessel
-        /// </summary>
-        OnShip
-    }
-
-    /// <summary>
     /// Manages loading/saving of global tracking data.
     /// </summary>
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
