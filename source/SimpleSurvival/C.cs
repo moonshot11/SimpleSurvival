@@ -54,6 +54,10 @@ namespace SimpleSurvival
         /// </summary>
         public const double LS_PER_DAY_PER_KERBAL = 1.0;
         /// <summary>
+        /// LS required to support one Kerbal for 30 seconds.
+        /// </summary>
+        public const double LS_30_SECONDS = LS_PER_DAY_PER_KERBAL / 6.0 / 60.0 / 2.0;
+        /// <summary>
         /// Life Support drain rate per second. Multiply for seconds -> days.
         /// </summary>
         public const double LS_DRAIN_PER_SEC = LS_PER_DAY_PER_KERBAL / 21600.0;

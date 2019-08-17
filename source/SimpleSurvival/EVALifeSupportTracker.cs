@@ -95,13 +95,13 @@ namespace SimpleSurvival
             GameEvents.onVesselLoaded.Add(OnVesselLoaded);
 
             // Block unsafe actions
-            //GameEvents.onAttemptTransfer.Add(OnAttemptTransfer);
+            GameEvents.onCrewTransferSelected.Add(OnCrewTransferSelected);
             GameEvents.onAttemptEva.Add(OnAttemptEva);
         }
 
         private void OnAttemptEva(ProtoCrewMember kerbal, Part part, Transform xform)
         {
-            if (AllowUnsafeActivity)
+            if (AllowUnsafeActivity || FlightEVA.fetch.overrideEVA)
                 return;
 
             Util.Log($"OnAttemptEva: LS = {evals_info[kerbal.name].ls_current}");
@@ -112,15 +112,27 @@ namespace SimpleSurvival
                 FlightEVA.fetch.overrideEVA = true;
                 Util.PostUpperMessage($"{kerbal.name} has less than 30 seconds of EVA life support!");
             }
-
         }
 
-        private void OnAttemptTransfer(ProtoCrewMember kerbal, Part part, CrewHatchController controller)
+        private void OnCrewTransferSelected(CrewTransfer.CrewTransferData data)
         {
-            if (AllowUnsafeActivity)
+            Util.Log($"OnAttemptTransfer: {data.destPart.partInfo.title}");
+            if (AllowUnsafeActivity || !data.canTransfer)
                 return;
 
-            controller.overrideTransfer = false;
+            // Calculate whether total part+suit LS is less than 30 seconds
+            double evaFactor = evals_info[data.crewMember.name].ls_current / C.EVA_LS_30_SECONDS;
+            double partFactor = data.destPart.Resources[C.NAME_LIFESUPPORT].amount / C.LS_30_SECONDS / (data.destPart.protoModuleCrew.Count+1);
+
+            Util.Log($"eva factor  = {evaFactor}");
+            Util.Log($"part factor = {partFactor}");
+            Util.Log($"crew count  = {data.destPart.protoModuleCrew.Count}");
+
+            if (partFactor + evaFactor < 1.0)
+            {
+                data.canTransfer = false;
+                Util.PostUpperMessage($"Moving to part is unsafe!");
+            }
         }
 
         /// <summary>
