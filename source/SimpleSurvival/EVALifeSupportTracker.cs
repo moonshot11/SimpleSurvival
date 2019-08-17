@@ -121,14 +121,16 @@ namespace SimpleSurvival
                 return;
 
             // Calculate whether total part+suit LS is less than 30 seconds
+            double destLS = data.destPart.Resources[C.NAME_LIFESUPPORT].amount;
+            double partFactor = destLS / C.LS_30_SECONDS / (data.destPart.protoModuleCrew.Count + 1);
             double evaFactor = evals_info[data.crewMember.name].ls_current / C.EVA_LS_30_SECONDS;
-            double partFactor = data.destPart.Resources[C.NAME_LIFESUPPORT].amount / C.LS_30_SECONDS / (data.destPart.protoModuleCrew.Count+1);
 
             Util.Log($"eva factor  = {evaFactor}");
             Util.Log($"part factor = {partFactor}");
             Util.Log($"crew count  = {data.destPart.protoModuleCrew.Count}");
 
-            if (partFactor + evaFactor < 1.0)
+            if (partFactor + evaFactor < 1.0 &&
+                destLS < data.sourcePart.Resources[C.NAME_LIFESUPPORT].amount)
             {
                 data.canTransfer = false;
                 Util.PostUpperMessage($"Moving to part is unsafe!");
