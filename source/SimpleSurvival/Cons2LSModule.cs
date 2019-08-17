@@ -15,7 +15,13 @@ namespace SimpleSurvival
 
         public override void OnStart(StartState state)
         {
-            string specialist = (Util.AdvParams.EnableKerbalExperience ? C.CONV_SPECIALIST : "Kerbal");
+            string specialist;
+
+            if (Config.CONV_REQ == ConverterReq.IfKerbalExpEnabled && Util.AdvParams.EnableKerbalExperience ||
+                Config.CONV_REQ == ConverterReq.Engineer)
+                specialist = "Engineer";
+            else
+                specialist = "Kerbal";
             msgMissing = "Missing " + specialist;
             base.OnStart(state);
         }
@@ -59,7 +65,7 @@ namespace SimpleSurvival
             }
             else if (status == msgMissing)
             {
-                status = "Inactive"; // Stock default status
+                status = "Ready"; // Stock default status
             }
             base.FixedUpdate();
         }
