@@ -23,6 +23,8 @@ namespace SimpleSurvival
         /// </summary>
         private const string NODE_EVA_TRACK = "KERBAL_EVA_LS";
 
+        public static bool AllowUnsafeActivity = false;
+
         /// <summary>
         /// Stores the EVA info for a Kerbal
         /// </summary>
@@ -91,6 +93,34 @@ namespace SimpleSurvival
             // Refill EVA prop / Refresh EVA Max
             GameEvents.onDockingComplete.Add(OnDockingComplete);
             GameEvents.onVesselLoaded.Add(OnVesselLoaded);
+
+            // Block unsafe actions
+            //GameEvents.onAttemptTransfer.Add(OnAttemptTransfer);
+            GameEvents.onAttemptEva.Add(OnAttemptEva);
+        }
+
+        private void OnAttemptEva(ProtoCrewMember kerbal, Part part, Transform xform)
+        {
+            if (AllowUnsafeActivity)
+                return;
+
+            Util.Log($"OnAttemptEva: LS = {evals_info[kerbal.name].ls_current}");
+            Util.Log($"OnAttemptEva: 30s = {C.EVA_LS_30_SECONDS}");
+
+            if (evals_info[kerbal.name].ls_current < C.EVA_LS_30_SECONDS)
+            {
+                FlightEVA.fetch.overrideEVA = true;
+                Util.PostUpperMessage($"{kerbal.name} has less than 30 seconds of EVA life support!");
+            }
+
+        }
+
+        private void OnAttemptTransfer(ProtoCrewMember kerbal, Part part, CrewHatchController controller)
+        {
+            if (AllowUnsafeActivity)
+                return;
+
+            controller.overrideTransfer = false;
         }
 
         /// <summary>
@@ -190,16 +220,17 @@ namespace SimpleSurvival
         {
             Util.Log("Call EVALSTrack -> OnCrewTransferred()");
 
+            // If transfer is to/from EVA, manage EVA resources
+            // and return. Main case below is for part-to-part
+            // transfers within same vessel.
             if (action.from.vessel.isEVA != action.to.vessel.isEVA)
             {
                 if (!action.from.vessel.isEVA)
                     FillEVAProp(action.from.vessel);
                 else
                     FillEVAProp(action.to.vessel);
-            }
-
-            if (!action.from.vessel.isEVA && action.to.vessel.isEVA)
                 return;
+            }
 
             ProtoCrewMember kerbal = action.host;
 

@@ -69,15 +69,9 @@ namespace SimpleSurvival
         private static Vector2 size = new Vector2(470, 200);
         private static Dictionary<string, GUIElements> labelMap
             = new Dictionary<string, GUIElements>();
-        private static bool allowBadTransfer = false;
 
-        private static DialogGUIToggle riskButton = new DialogGUIToggle(
-            !allowBadTransfer,
-            "Prevent unsafe crew transfer",
-            RiskButtonSelected);
-
-        private static DialogGUIHorizontalLayout riskLayout = new DialogGUIHorizontalLayout(
-            false, false, 0f, new RectOffset(20, 0, 0, 0), TextAnchor.MiddleLeft, riskButton);
+        private static DialogGUIToggle riskButton;
+        private static DialogGUIHorizontalLayout riskLayout;
 
         private DialogGUILabel statusLabel = new DialogGUILabel("Status", true, true);
         private DialogGUILabel consLabel = new DialogGUILabel("Consumables: x/x", 200, 0);
@@ -202,7 +196,8 @@ namespace SimpleSurvival
 
         private static void RiskButtonSelected(bool arg)
         {
-            Util.PostUpperMessage("Button: " + arg.ToString());
+            Util.PostUpperMessage("Button set to " + arg.ToString());
+            EVALifeSupportTracker.AllowUnsafeActivity = arg;
         }
 
         private void ButtonOnTrue()
@@ -277,6 +272,13 @@ namespace SimpleSurvival
                         UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 4,
                         kerbalCells.ToArray()));
             }
+
+            riskButton = new DialogGUIToggle(
+                EVALifeSupportTracker.AllowUnsafeActivity,
+                "Allow unsafe crew transfer",
+                RiskButtonSelected);
+            riskLayout = new DialogGUIHorizontalLayout(
+                false, false, 0f, new RectOffset(20, 0, 0, 0), TextAnchor.MiddleLeft, riskButton);
 
             // Define the header which contains additional info
             // (status, Consumables)
