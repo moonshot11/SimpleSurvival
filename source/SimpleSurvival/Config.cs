@@ -93,5 +93,18 @@ namespace SimpleSurvival
         /// Max amount of EVA Life Support w/ Astronaut Complex Level 3
         /// </summary>
         public static double EVA_LS_LVL_3 = 300;
+
+        /// <summary>
+        /// Reduce Covnerter config requirement. Essentially converts
+        /// ConverterReq.IfKerbalExpEnabled to Engineer or AnyKerbal.
+        /// </summary>
+        /// <returns></returns>
+        public static ConverterReq ReduceConvReq()
+        {
+            if (CONV_REQ != ConverterReq.IfKerbalExpEnabled)
+                return CONV_REQ;
+
+            return Util.AdvParams.EnableKerbalExperience ? ConverterReq.Engineer : ConverterReq.AnyKerbal;
+    }
     }
 }

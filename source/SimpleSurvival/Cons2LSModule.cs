@@ -96,13 +96,21 @@ namespace SimpleSurvival
         {
             string info = base.GetInfo();
 
-            info += "\n\nPart must be manned by an Engineer.\n" +
-                "(Can be manned by any Kerbal if \"Enable Kerbal Experience\" is unchecked.)\n\n" +
+            ConverterReq req = Config.ReduceConvReq();
+            string active = "";
+            if (req == ConverterReq.AnyKerbal)
+                active = "Part must be manned.\n";
+            else if (req == ConverterReq.Engineer)
+                active = "Part must be manned by an Engineer.\n";
+
+            info += "\n\n" + active +
                 C.HTML_VAB_GREEN + "EVA conversion rate:</color>\n" +
-                "  " + Util.FormatForGetInfo(C.CONS_PER_EVA_LS) + " " + C.NAME_CONSUMABLES +
+                $"  {Util.FormatForGetInfo(C.CONS_PER_EVA_LS)} {C.NAME_CONSUMABLES}" +
                 "\n  = 1.0 " + C.NAME_EVA_LIFESUPPORT +
-                "\n\nEVA refill has no crew requirement and is instantaneous. " +
-                C.NAME_EVA_PROPELLANT + " is refilled for free.\n\n";
+                "\n\nEVA life support refill has no crew requirement and is instantaneous. ";
+
+            if (Config.EVA_PROP_REFILL == EVAUpdateMode.IfHitchhiker)
+                info += $"Required for {C.NAME_EVA_PROPELLANT} refill.\n\n";
 
             return info;
         }
