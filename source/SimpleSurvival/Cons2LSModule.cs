@@ -96,13 +96,12 @@ namespace SimpleSurvival
         {
             string info = base.GetInfo();
 
-            info += "\n\nPart must be manned by an Engineer.\n" +
-                "(Can be manned by any Kerbal if \"Enable Kerbal Experience\" is unchecked.)\n\n" +
-                C.HTML_VAB_GREEN + "EVA conversion rate:</color>\n" +
-                "  " + Util.FormatForGetInfo(C.CONS_PER_EVA_LS) + " " + C.NAME_CONSUMABLES +
-                "\n  = 1.0 " + C.NAME_EVA_LIFESUPPORT +
-                "\n\nEVA refill has no crew requirement and is instantaneous. " +
-                C.NAME_EVA_PROPELLANT + " is refilled for free.\n\n";
+            info += "\n\nConverter may require Kerbal, see mod settings.\n\n" +
+                $"Can refill {C.NAME_EVA_PROPELLANT} automatically based on settings, and refill\n" +
+                $"{C.NAME_EVA_LIFESUPPORT} from toolbar.\n\n" +
+                C.HTML_VAB_GREEN + "Consumables conversion:</color>\n" +
+                $"One unit of {C.NAME_CONSUMABLES} is equal to one day of {C.NAME_LIFESUPPORT}, " +
+                $"or one day of {C.NAME_EVA_LIFESUPPORT}.";
 
             return info;
         }
