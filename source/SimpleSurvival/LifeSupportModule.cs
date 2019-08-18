@@ -261,7 +261,8 @@ namespace SimpleSurvival
         /// <returns></returns>
         public override string ReportLifeSupport()
         {
-            double perhead = part.Resources[C.NAME_LIFESUPPORT].amount / part.protoModuleCrew.Count;
+            int count = part.protoModuleCrew.Count == 0 ? 1 : part.protoModuleCrew.Count;
+            double perhead = part.Resources[C.NAME_LIFESUPPORT].amount / count;
             return Util.DaysToString(perhead / C.LS_PER_DAY_PER_KERBAL);
         }
     }

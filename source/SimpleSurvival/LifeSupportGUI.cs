@@ -80,6 +80,12 @@ namespace SimpleSurvival
         private int lsID = PartResourceLibrary.Instance.GetDefinition(C.NAME_LIFESUPPORT).id;
         private int evapropID = PartResourceLibrary.Instance.GetDefinition(C.NAME_EVA_PROPELLANT).id;
 
+        private const int cellWidth = 100;
+        private const string ORANGE = "<color=#f4b00c>";
+
+        private Dictionary<Part, DialogGUILabel> emptyPartLabels =
+            new Dictionary<Part, DialogGUILabel>();
+
         public void Awake()
         {
             Util.Log("LifeSupportGUI Awake");
@@ -213,7 +219,6 @@ namespace SimpleSurvival
                 FlightGlobals.ActiveVessel.HasModule<Cons2LSModule>();
             // Cell padding
             RectOffset offset = new RectOffset(20, 0, 10, 0);
-            int cellWidth = 100;
             DialogGUIVerticalLayout vert = new DialogGUIVerticalLayout(
                 false, false, 1f,
                 new RectOffset(), TextAnchor.UpperLeft);
@@ -232,15 +237,22 @@ namespace SimpleSurvival
                     new DialogGUILabel("", true, true)
                     ));
 
+            emptyPartLabels.Clear();
+
+            DialogGUILabel emptyLabel = new DialogGUILabel("", true, true);
+
             foreach (LifeSupportReportable module in modules)
             {
                 if (module.part.protoModuleCrew.Count == 0)
+                {
+                    emptyPartLabels.Add(module.part, new DialogGUILabel("EE", true, true));
                     continue;
+                }
 
-                List<DialogGUIBase> kerbalCells = new List<DialogGUIBase>();
                 List<ProtoCrewMember> crew = new List<ProtoCrewMember>(module.part.protoModuleCrew);
+                List<DialogGUIBase> kerbalCells = new List<DialogGUIBase>();
                 crew.Sort(CompareCrewNames);
-                vert.AddChild(new DialogGUILabel($"<color=#f4b00c><b>{module.part.partInfo.title}</b></color>"));
+                vert.AddChild(new DialogGUILabel($"{ORANGE}<b>{module.part.partInfo.title}</b></color>"));
 
                 foreach (ProtoCrewMember kerbal in crew)
                 {
@@ -254,7 +266,6 @@ namespace SimpleSurvival
                     // Add raw EVA tracking values
                     if (Config.DEBUG_SHOW_EVA)
                     {
-                        DialogGUILabel emptyLabel = new DialogGUILabel("", true, true);
                         kerbalCells.Add(emptyLabel);
                         kerbalCells.Add(elems.evaLS_Value);
                         kerbalCells.Add(elems.evaProp);
@@ -271,6 +282,26 @@ namespace SimpleSurvival
                         TextAnchor.MiddleLeft,
                         UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 4,
                         kerbalCells.ToArray()));
+            }
+
+            if (emptyPartLabels.Count > 0)
+            {
+                vert.AddChild(new DialogGUISpace(20));
+
+                foreach (Part part in emptyPartLabels.Keys)
+                {
+                    vert.AddChild(
+                           new DialogGUIGridLayout(new RectOffset(),
+                               new Vector2(cellWidth * 2, 20),
+                               Vector2.zero,
+                               UnityEngine.UI.GridLayoutGroup.Corner.UpperLeft,
+                               UnityEngine.UI.GridLayoutGroup.Axis.Horizontal,
+                               TextAnchor.MiddleLeft,
+                               UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 2,
+                               new DialogGUILabel($"{ORANGE}{part.partInfo.title}</color>"),
+                               emptyPartLabels[part]
+                               ));
+                }
             }
 
             riskButton = new DialogGUIToggle(
@@ -352,6 +383,12 @@ namespace SimpleSurvival
             foreach (LifeSupportReportable module in parts)
             {
                 string timestr = module.ReportLifeSupport();
+
+                if (emptyPartLabels.ContainsKey(module.part))
+                {
+                    emptyPartLabels[module.part].SetOptionText($"{ORANGE}{timestr}</color>");
+                    continue;
+                }
 
                 foreach (ProtoCrewMember kerbal in module.part.protoModuleCrew)
                 {
