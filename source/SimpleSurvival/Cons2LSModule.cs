@@ -12,6 +12,8 @@ namespace SimpleSurvival
     public class Cons2LSModule : ModuleResourceConverter, IResourceConsumer
     {
         private string msgMissing = "";
+        private const string STATUS_RUNNING = "Running";
+        private const string STATUS_STANDBY = "Ready";
 
         public override void OnStart(StartState state)
         {
@@ -58,16 +60,32 @@ namespace SimpleSurvival
 
         public override void FixedUpdate()
         {
+            base.FixedUpdate();
+
             if (!ProperlyManned())
             {
                 StopResourceConverter();
                 status = msgMissing;
             }
-            else if (status == msgMissing)
+            else if (IsActivated)
             {
-                status = "Ready"; // Stock default status
+                // statusPercent is load, out of 100 (i.e. % times 100)
+                if (statusPercent < 1.0)
+                {
+                    StopResourceConverter();
+                    status = STATUS_STANDBY;
+                }
+                else
+                    status = STATUS_RUNNING;
             }
-            base.FixedUpdate();
+            else if (status == msgMissing) // && ProperlyManned()
+            {
+                // By this point, converter must be manned,
+                // so no need to check again
+                status = STATUS_STANDBY;
+            }
+
+            UpdateConverterStatus();
         }
 
         /// <summary>
