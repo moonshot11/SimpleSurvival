@@ -39,7 +39,7 @@ namespace SimpleSurvival
             Graphics.Blit(texture, rt);
             RenderTexture.active = rt;
             Texture2D newtex = new Texture2D(width, height);
-            newtex.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
+            newtex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
             newtex.Apply();
 
             // Restore previously active RenderTexture
