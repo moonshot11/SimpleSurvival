@@ -32,7 +32,7 @@ namespace SimpleSurvival
         /// Check if the converter has the proper crew to operate
         /// </summary>
         /// <returns></returns>
-        internal bool ProperlyManned()
+        internal bool IsOperational()
         {
             if (Config.CONV_REQ == ConverterReq.None)
                 return true;
@@ -62,7 +62,7 @@ namespace SimpleSurvival
         {
             base.FixedUpdate();
 
-            if (!ProperlyManned())
+            if (!IsOperational())
             {
                 StopResourceConverter();
                 status = msgMissing;

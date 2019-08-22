@@ -79,26 +79,18 @@ namespace SimpleSurvival
             // -- 2. Deduct from Consumables if vessel has Converter --
             bool has_manned_converter = false;
 
-            // Check if vessel has a Converter
-            foreach (Part part in vessel.Parts)
+            List<Cons2LSModule> consParts = vessel.FindPartModulesImplementing<Cons2LSModule>();
+            foreach (Cons2LSModule converter in consParts)
             {
-                List<Cons2LSModule> conv_list = part.FindModulesImplementing<Cons2LSModule>();
-
-                foreach (Cons2LSModule converter in conv_list)
+                if (converter.IsOperational())
                 {
-                    if (converter.ProperlyManned())
-                    {
-                        has_manned_converter = true;
-                        break;
-                    }
-                }
-
-                if (has_manned_converter)
+                    has_manned_converter = true;
                     break;
+                }
             }
 
             // Found Converter, convert Consumables.
-            // Ignore ElectricChanrge here. Too many escapes re. capacity,
+            // Ignore ElectricCharge here. Too many escapes re. capacity,
             // charge rate, LOS to sun, etc. Assume Kerbals have been
             // converting slowly while player is away.
             if (has_manned_converter)
