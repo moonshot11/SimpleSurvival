@@ -10,6 +10,6 @@ namespace SimpleSurvival
     /// </summary>
     public abstract class LifeSupportReportable : PartModule
     {
-        public abstract string ReportLifeSupport();
+        public abstract string ReportLifeSupport(out bool isEmpty);
     }
 }

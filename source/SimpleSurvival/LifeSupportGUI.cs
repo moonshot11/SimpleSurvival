@@ -18,8 +18,11 @@ namespace SimpleSurvival
         // -- Debug values --
         public DialogGUILabel evaLS_Value = new DialogGUILabel("CC", true, true);
         public DialogGUILabel evaProp = new DialogGUILabel("DD", true, true);
+        public DialogGUILabel nameLabel = new DialogGUILabel("", true, true);
 
+        public string[] compressNames;
         private ProtoCrewMember kerbal;
+
         /// <summary>
         /// Is this NOT EVA, and do we have a converter?
         /// </summary>
@@ -33,6 +36,11 @@ namespace SimpleSurvival
                 "Fill EVA", LifeSupportGUI.PressFillEva, kerbal.name,
                 EnabledCondition: EnableFillButton,
                 dismissOnSelect: false);
+            compressNames = new string[2]
+            {
+                kerbal.name.Replace(" Kerman", " (Ship)"),
+                kerbal.name.Replace(" Kerman", $" {C.GUI_LITEWARN_COLOR}(Suit)</color>")
+            };
         }
 
         /// <summary>
@@ -62,15 +70,21 @@ namespace SimpleSurvival
         /// Has the GUI been draw in the current cycle?
         /// </summary>
         private static bool drewgui = false;
+        /// <summary>
+        /// Show the minimal GUI instead of the full GUI?
+        /// </summary>
+        private static bool compress = true;
 
         private static ApplicationLauncherButton toolbarButton = null;
         private static PopupDialog gui = null;
         private static Vector2 position = new Vector2(0.5f, 0.5f);
         private static Vector2 size = new Vector2(470, 200);
+        private readonly RectOffset headerOffset = new RectOffset(20, 0, 0, 0);
+        private readonly RectOffset noOffset = new RectOffset(0, 0, 0, 0);
         private static Dictionary<string, GUIElements> labelMap
             = new Dictionary<string, GUIElements>();
 
-        private static DialogGUIToggle riskButton;
+        private static DialogGUIToggle riskToggle;
         private static DialogGUIHorizontalLayout riskLayout;
 
         private DialogGUILabel statusLabel = new DialogGUILabel("Status", true, true);
@@ -206,6 +220,12 @@ namespace SimpleSurvival
             EVALifeSupportTracker.AllowUnsafeActivity = arg;
         }
 
+        private void ToggleCompressGUI(bool arg)
+        {
+            compress = !compress;
+            RefreshGUI();
+        }
+
         private void ButtonOnTrue()
         {
             Util.PostUpperMessage("CALL: ontrue");
@@ -223,6 +243,27 @@ namespace SimpleSurvival
                 false, false, 1f,
                 new RectOffset(), TextAnchor.UpperLeft);
 
+            DialogGUIBase[] vertHeader;
+
+            if (compress)
+            {
+                vertHeader = new DialogGUIBase[2]
+                {
+                    new DialogGUILabel("<b>Kerbal</b>", true, true),
+                    new DialogGUILabel("<b>Life Support</b>", true, true)
+                };
+            }
+            else
+            {
+                vertHeader = new DialogGUIBase[4]
+                {
+                    new DialogGUILabel("<b>Kerbal</b>", true, true),
+                    new DialogGUILabel("<b>Ship Life Support</b>", true, true),
+                    new DialogGUILabel("<b>Suit Life Support</b>", true, true),
+                    new DialogGUILabel("", true, true)
+                };
+            }
+
             vert.AddChild(
                 new DialogGUIGridLayout(new RectOffset(),
                     new Vector2(cellWidth, 20),
@@ -230,11 +271,9 @@ namespace SimpleSurvival
                     UnityEngine.UI.GridLayoutGroup.Corner.UpperLeft,
                     UnityEngine.UI.GridLayoutGroup.Axis.Horizontal,
                     TextAnchor.MiddleLeft,
-                    UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 4,
-                    new DialogGUILabel("<b>Kerbal</b>", true, true),
-                    new DialogGUILabel("<b>Ship life support</b>", true, true),
-                    new DialogGUILabel("<b>Suit life support</b>", true, true),
-                    new DialogGUILabel("", true, true)
+                    UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount,
+                    compress ? 2 : 4,
+                    vertHeader
                     ));
 
             emptyPartLabels.Clear();
@@ -258,10 +297,14 @@ namespace SimpleSurvival
                 {
                     GUIElements elems = new GUIElements(kerbal, buttonEnable);
                     labelMap.Add(kerbal.name, elems);
-                    kerbalCells.Add(new DialogGUILabel(kerbal.name, true, true));
+                    kerbalCells.Add(elems.nameLabel);
                     kerbalCells.Add(elems.shipLS);
-                    kerbalCells.Add(elems.evaLS);
-                    kerbalCells.Add(elems.fillEVAButton);
+                    if (!compress)
+                    {
+                        elems.nameLabel.SetOptionText(kerbal.name);
+                        kerbalCells.Add(elems.evaLS);
+                        kerbalCells.Add(elems.fillEVAButton);
+                    }
 
                     // Add raw EVA tracking values
                     if (Config.DEBUG_SHOW_EVA)
@@ -280,11 +323,12 @@ namespace SimpleSurvival
                         UnityEngine.UI.GridLayoutGroup.Corner.UpperLeft,
                         UnityEngine.UI.GridLayoutGroup.Axis.Horizontal,
                         TextAnchor.MiddleLeft,
-                        UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 4,
+                        UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount,
+                        compress ? 2 : 4,
                         kerbalCells.ToArray()));
             }
 
-            if (emptyPartLabels.Count > 0)
+            if (emptyPartLabels.Count > 0 && !compress)
             {
                 vert.AddChild(new DialogGUISpace(20));
 
@@ -304,26 +348,34 @@ namespace SimpleSurvival
                 }
             }
 
-            riskButton = new DialogGUIToggle(
+            DialogGUIToggleButton compressButton = new DialogGUIToggleButton(
+                compress, "Minimize", ToggleCompressGUI, w: 70);
+            DialogGUIHorizontalLayout compressLayout = new DialogGUIHorizontalLayout(
+                false, true, 0f, noOffset, TextAnchor.MiddleLeft,
+                compressButton);
+
+            riskToggle = new DialogGUIToggle(
                 EVALifeSupportTracker.AllowUnsafeActivity,
                 "Allow unsafe crew transfer",
                 RiskButtonSelected);
             riskLayout = new DialogGUIHorizontalLayout(
-                false, false, 0f, new RectOffset(20, 0, 0, 0), TextAnchor.MiddleLeft, riskButton);
+                true, false, 0f, noOffset, TextAnchor.MiddleLeft,
+                riskToggle);
 
             // Define the header which contains additional info
             // (status, Consumables)
             DialogGUIGridLayout statusGrid =
-                new DialogGUIGridLayout(new RectOffset(),
-                    new Vector2(cellWidth * 2, 20),
+                new DialogGUIGridLayout(headerOffset,
+                    new Vector2(cellWidth * (compress ? 1 : 2), 20),
                     Vector2.zero,
                     UnityEngine.UI.GridLayoutGroup.Corner.UpperLeft,
                     UnityEngine.UI.GridLayoutGroup.Axis.Horizontal,
                     TextAnchor.MiddleLeft,
                     UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 2,
-                    statusLabel, consLabel, riskLayout);
+                    statusLabel, compressLayout, consLabel, riskLayout);
 
             // Set up the pop window
+            size.x = compress ? 270 : 470;
             MultiOptionDialog multi = new MultiOptionDialog(
                 "lifesupport_readout",
                 "",
@@ -382,7 +434,8 @@ namespace SimpleSurvival
             // Update live Kerbal numbers
             foreach (LifeSupportReportable module in parts)
             {
-                string timestr = module.ReportLifeSupport();
+                bool empty;
+                string timestr = module.ReportLifeSupport(out empty);
 
                 if (emptyPartLabels.ContainsKey(module.part))
                 {
@@ -393,9 +446,27 @@ namespace SimpleSurvival
                 foreach (ProtoCrewMember kerbal in module.part.protoModuleCrew)
                 {
                     double evaLS = EVALifeSupportTracker.GetEVALSInfo(kerbal.name).ls_current;
-                    string evastr = Util.DaysToString(evaLS / C.EVA_LS_DRAIN_PER_DAY);
-                    labelMap[kerbal.name].shipLS.SetOptionText(timestr);
-                    labelMap[kerbal.name].evaLS.SetOptionText(evastr);
+
+                    if (compress)
+                    {
+                        if (!vessel.isEVA && !empty)
+                        {
+                            labelMap[kerbal.name].nameLabel.SetOptionText(labelMap[kerbal.name].compressNames[0]);
+                            labelMap[kerbal.name].shipLS.SetOptionText(timestr);
+                        }
+                        else
+                        {
+                            labelMap[kerbal.name].nameLabel.SetOptionText(labelMap[kerbal.name].compressNames[1]);
+                            string evastr = Util.DaysToString(evaLS / C.EVA_LS_DRAIN_PER_DAY);
+                            labelMap[kerbal.name].shipLS.SetOptionText(evastr);
+                        }
+                    }
+                    else
+                    {
+                        string evastr = Util.DaysToString(evaLS / C.EVA_LS_DRAIN_PER_DAY);
+                        labelMap[kerbal.name].shipLS.SetOptionText(timestr);
+                        labelMap[kerbal.name].evaLS.SetOptionText(evastr);
+                    }
 
                     if (Config.DEBUG_SHOW_EVA)
                     {
@@ -433,8 +504,8 @@ namespace SimpleSurvival
             else if (Util.BreathableAir(vessel))
                 status = "Breathable air";
             else
-                status = "Life support active";
-            statusLabel.SetOptionText($"       Status:  {status}");
+                status = "ACTIVE";
+            statusLabel.SetOptionText($"{(compress ? "" : "Status:  ")}{status}");
 
             if (FlightGlobals.ActiveVessel.isEVA)
             {
@@ -453,7 +524,7 @@ namespace SimpleSurvival
             {
                 vessel.GetConnectedResourceTotals(consID, out curr, out max);
                 double consDays = curr / C.CONS_PER_LS;
-                consLabel.SetOptionText($"Consumables:  {Util.DaysToString(consDays)}");
+                consLabel.SetOptionText($"{(compress ? "" : "Consumables:  ")}{Util.DaysToString(consDays)}");
             }
         }
 

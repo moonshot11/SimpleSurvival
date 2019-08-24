@@ -251,10 +251,11 @@ namespace SimpleSurvival
         /// Return current life support for each crew as readable string.
         /// </summary>
         /// <returns></returns>
-        public override string ReportLifeSupport()
+        public override string ReportLifeSupport(out bool isEmpty)
         {
             int count = part.protoModuleCrew.Count == 0 ? 1 : part.protoModuleCrew.Count;
             double perhead = part.Resources[C.NAME_LIFESUPPORT].amount / count;
+            isEmpty = perhead < C.DOUBLE_MARGIN;
             return Util.DaysToString(perhead / C.LS_PER_DAY_PER_KERBAL);
         }
     }

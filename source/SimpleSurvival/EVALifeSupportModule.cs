@@ -137,8 +137,9 @@ namespace SimpleSurvival
             }
         }
 
-        public override string ReportLifeSupport()
+        public override string ReportLifeSupport(out bool isEmpty)
         {
+            isEmpty = false;
             return "--";
         }
     }
