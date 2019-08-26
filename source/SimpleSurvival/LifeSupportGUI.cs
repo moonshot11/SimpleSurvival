@@ -78,6 +78,7 @@ namespace SimpleSurvival
         private static ApplicationLauncherButton toolbarButton = null;
         private static PopupDialog gui = null;
         private static Vector2 position = new Vector2(0.5f, 0.5f);
+        private static Vector2 posInitOffset = Vector2.zero;
         private static Vector2 size = new Vector2(470, 200);
         private readonly RectOffset headerOffset = new RectOffset(20, 0, 0, 0);
         private readonly RectOffset noOffset = new RectOffset(0, 0, 0, 0);
@@ -188,13 +189,17 @@ namespace SimpleSurvival
         public void SizeUp()
         {
             size.y += HEIGHT_INCR;
+            posInitOffset.y = -HEIGHT_INCR / 2;
             RefreshGUI();
+            posInitOffset.y = 0;
         }
 
         public void SizeDown()
         {
             size.y -= HEIGHT_INCR;
+            posInitOffset.y = HEIGHT_INCR / 2;
             RefreshGUI();
+            posInitOffset.y = 0;
         }
 
         public bool CanSizeUp() => size.y + HEIGHT_INCR <= HEIGHT_MAX;
@@ -441,8 +446,8 @@ namespace SimpleSurvival
             if (showgui && drewgui)
             {
                 position = gui.GetComponent<RectTransform>().position;
-                position.x = position.x / Screen.width + 0.5f;
-                position.y = position.y / Screen.height + 0.5f;
+                position.x = (position.x + posInitOffset.x) / Screen.width + 0.5f;
+                position.y = (position.y + posInitOffset.y) / Screen.height + 0.5f;
                 Util.Log("Save GUI pos: " + position.ToString());
             }
             showgui = false;
