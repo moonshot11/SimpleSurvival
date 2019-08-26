@@ -84,6 +84,8 @@ namespace SimpleSurvival
         private static Dictionary<string, GUIElements> labelMap
             = new Dictionary<string, GUIElements>();
 
+        private DialogGUIButton sizeUpButton;
+        private DialogGUIButton sizeDownButton;
         private static DialogGUIToggle riskToggle;
         private static DialogGUIHorizontalLayout riskLayout;
 
@@ -95,6 +97,9 @@ namespace SimpleSurvival
         private int evapropID = PartResourceLibrary.Instance.GetDefinition(C.NAME_EVA_PROPELLANT).id;
 
         private const int cellWidth = 100;
+        private const int HEIGHT_INCR = 50;
+        private const int HEIGHT_MIN = 150;
+        private const int HEIGHT_MAX = 900000;
         private const string ORANGE = "<color=#f4b00c>";
 
         private Dictionary<Part, DialogGUILabel> emptyPartLabels =
@@ -179,6 +184,21 @@ namespace SimpleSurvival
             ButtonOnFalse();
             ButtonOnTrue();
         }
+
+        public void SizeUp()
+        {
+            size.y += HEIGHT_INCR;
+            RefreshGUI();
+        }
+
+        public void SizeDown()
+        {
+            size.y -= HEIGHT_INCR;
+            RefreshGUI();
+        }
+
+        public bool CanSizeUp() => size.y + HEIGHT_INCR <= HEIGHT_MAX;
+        public bool CanSizeDown() => size.y - HEIGHT_INCR >= HEIGHT_MIN;
 
         public void AddToolbar()
         {
@@ -348,11 +368,17 @@ namespace SimpleSurvival
                 }
             }
 
+            // How can the SizeUp() -> RefreshGUI() -> OnButtonTrue() dependency
+            // be altered to make these fields static, so that they don't have
+            // to be re-initialized each time?
+            sizeUpButton = new DialogGUIButton("+", SizeUp, CanSizeUp, false);
+            sizeDownButton = new DialogGUIButton("-", SizeDown, CanSizeDown, false);
+
             DialogGUIToggleButton compressButton = new DialogGUIToggleButton(
                 compress, "Minimize", ToggleCompressGUI, w: 70);
             DialogGUIHorizontalLayout compressLayout = new DialogGUIHorizontalLayout(
                 false, true, 0f, noOffset, TextAnchor.MiddleLeft,
-                compressButton);
+                compressButton, sizeDownButton, sizeUpButton);
 
             riskToggle = new DialogGUIToggle(
                 EVALifeSupportTracker.AllowUnsafeActivity,
