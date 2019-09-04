@@ -146,6 +146,10 @@ namespace SimpleSurvival
                 string progname = prog[2];
                 int tokenIndex = 3;
 
+                bool setIcon = partname.Last() == '*';
+                if (setIcon)
+                    partname = partname.Remove(partname.Length - 1);
+
                 Util.Log("Modifying part " + partname);
                 Util.Log("  Prog: " + progname);
 
@@ -262,8 +266,41 @@ namespace SimpleSurvival
                     continue;
                 }
 
+                System.IO.File.WriteAllBytes("asdf", result.EncodeToPNG());
+                GameDatabase.Instance.databaseTexture.Add(
+                    new GameDatabase.TextureInfo(new UrlDir.UrlFile(null, new FileInfo("asdf")), result, false, true, false));
+
                 result.Apply(true);
-                part.Variants[variant].Materials[0].mainTexture = result;
+                //part.Variants[variant].Materials[0].mainTexture = result;
+                part.Variants[variant].Materials[0].SetTexture("asdf", result);
+                if (variant == 0)
+                {
+                    part.partPrefab.baseVariant.Materials[0].mainTexture = result;
+                    part.variant.Materials[0].mainTexture = result;
+                }
+
+                for (int i = 0; i < part.Variants.Count; i++)
+                    for (int j = 0; j < part.Variants[i].Materials.Count; j++)
+                        Util.Log($"i = {i}, j = {j}");
+
+                if (setIcon)
+                {
+                    Util.Log($"Setting RDicon for {part.title}");
+
+                    // Util.Log("RelinkPrefab()");
+                    // part.partPrefab.RelinkPrefab();
+
+                    TechLoader.PartIcons.Add(part, result);
+                    Util.Log("aa");
+                    //part.variant = part.Variants[variant];
+                    Util.Log("bb");
+                    //part.partPrefab.baseVariant = part.variant;
+                    Util.Log("cc");
+                    //part.partPrefab.variants.SetVariant(part.Variants[variant].Name);
+                    Util.Log("dd");
+                    //VariantSetter.NewVariants[part] = part.Variants[3];
+
+                }
             }
 
             Util.Log("Completed setup of EVA LifeSupport");

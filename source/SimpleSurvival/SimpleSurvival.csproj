@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="C.cs" />
+    <Compile Include="VariantSetter.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Cons2LSModule.cs" />
     <Compile Include="ContractChecker.cs" />
@@ -69,6 +70,9 @@
     <Compile Include="Util.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(TargetPath)" "D:\Games\Kerbal Space Program 1.7.3\GameData\SimpleSurvival\SimpleSurvival.dll"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

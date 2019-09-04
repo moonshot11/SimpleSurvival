@@ -33,6 +33,44 @@ namespace SimpleSurvival
             KSPLog.print("SimpleSurvival: WARN " + message);
         }
 
+        public static void PrintComponents(UnityEngine.GameObject obj, string title = " ")
+        {
+            if (obj == null)
+            {
+                Warn($"  Object is null! {title}");
+                return;
+            }
+            if (title != " ")
+                title = ' ' + title;
+
+            UnityEngine.Component[] arr = obj.GetComponents(typeof(UnityEngine.Component));
+            Log($"Printing componenets for{title}: {obj.name} ({arr.Length})");
+            foreach (UnityEngine.Component comp in arr)
+                if (comp == null)
+                    Log("  -> NULL");
+                else
+                    Log($"  -> {comp.GetType()}: {comp.name}");
+        }
+
+        public static void PrintComponents(UnityEngine.Component obj, string title = " ")
+        {
+            if (obj == null)
+            {
+                Warn($"  Object is null! {title}");
+                return;
+            }
+            if (title != " ")
+                title = ' ' + title;
+
+            UnityEngine.Component[] arr = obj.GetComponents(typeof(UnityEngine.Component));
+            Log($"Printing componenets for{title}: {obj.name} ({arr.Length})");
+            foreach (UnityEngine.Component comp in arr)
+                if (comp == null)
+                    Log("  -> NULL");
+                else
+                    Log($"  -> {comp.GetType()}: {comp.name}");
+        }
+
         /// <summary>
         /// This kills the Kerbal.
         /// </summary>

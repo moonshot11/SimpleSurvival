@@ -75,6 +75,15 @@ namespace SimpleSurvival
 
             EVALifeSupportTracker.Load(scenario_node);
             ContractChecker.Load(scenario_node);
+
+            Util.Log($"TechLoader try count {VariantSetter.NewVariants.Count}");
+            foreach (var pair in VariantSetter.NewVariants)
+            {
+                Util.Log($"  Loader updating variant {pair.Key.name} -> {pair.Value.Name}");
+                AvailablePart part = pair.Key;
+                PartVariant variant = pair.Value;
+                //part.variant = variant;
+            }
         }
     }
 }
