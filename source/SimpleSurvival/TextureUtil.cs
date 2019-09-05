@@ -264,6 +264,32 @@ namespace SimpleSurvival
 
                 result.Apply(true);
                 part.Variants[variant].Materials[0].mainTexture = result;
+                TechLoader.NewTextures[part] = result;
+
+                string filename = $"testtex_{part.name}_{part.Variants[variant].Name}.png";
+                File.WriteAllBytes(filename, result.EncodeToPNG());
+
+                var loader = PartLoader.Instance;
+                /*GameDatabase.Instance.databaseTexture.Add(
+                    new GameDatabase.TextureInfo(null, result, false, true, false)
+                    );*/
+                result.name = filename;
+                part.Variants[variant].Materials[0].SetTexture(result.name, result);
+                part.partPrefab.baseVariant.Materials[0].SetTexture(result.name, result);
+                Util.PrintComponents(part.iconPrefab, "iconPrefab", children: false);
+                Util.PrintComponents(part.iconPrefab, "iconPrefab children", children: true);
+
+                Util.Log("Bulkhead = " + part.bulkheadProfiles);
+                Util.Log("Config full filename = " + part.configFileFullName);
+                Util.Log("variant = " + part.variant.Name);
+                Util.Log("Mod'd variant = " + part.Variants[variant].Name);
+                foreach (var thing in GameDatabase.Instance.databaseTexture)
+                {
+                    Util.Log($"  Name = {thing.name}");
+                    Util.Log($"  URL = {thing.file.fullPath} || {thing.file.url}");
+                    Util.Log($"  Tex name = {thing.texture.name}");
+                    Util.Log();
+                }
             }
 
             Util.Log("Completed setup of EVA LifeSupport");

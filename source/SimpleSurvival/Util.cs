@@ -33,7 +33,8 @@ namespace SimpleSurvival
             KSPLog.print("SimpleSurvival: WARN " + message);
         }
 
-        public static void PrintComponents(UnityEngine.GameObject obj, string title = " ")
+        public static void PrintComponents(UnityEngine.GameObject obj,
+            string title = " ", bool children = false)
         {
             if (obj == null)
             {
@@ -43,7 +44,11 @@ namespace SimpleSurvival
             if (title != " ")
                 title = ' ' + title;
 
-            UnityEngine.Component[] arr = obj.GetComponents(typeof(UnityEngine.Component));
+            UnityEngine.Component[] arr;
+            if (children)
+                arr = obj.GetComponentsInChildren(typeof(UnityEngine.Component));
+            else
+                arr = obj.GetComponents(typeof(UnityEngine.Component));
             Log($"Printing componenets for{title}: {obj.name} ({arr.Length})");
             foreach (UnityEngine.Component comp in arr)
                 if (comp == null)
@@ -52,7 +57,8 @@ namespace SimpleSurvival
                     Log($"  -> {comp.GetType()}: {comp.name}");
         }
 
-        public static void PrintComponents(UnityEngine.Component obj, string title = " ")
+        public static void PrintComponents(UnityEngine.Component obj,
+            string title = " ", bool children = false)
         {
             if (obj == null)
             {
@@ -62,7 +68,11 @@ namespace SimpleSurvival
             if (title != " ")
                 title = ' ' + title;
 
-            UnityEngine.Component[] arr = obj.GetComponents(typeof(UnityEngine.Component));
+            UnityEngine.Component[] arr;
+            if (children)
+                arr = obj.GetComponentsInChildren(typeof(UnityEngine.Component));
+            else
+                arr = obj.GetComponents(typeof(UnityEngine.Component));
             Log($"Printing componenets for{title}: {obj.name} ({arr.Length})");
             foreach (UnityEngine.Component comp in arr)
                 if (comp == null)

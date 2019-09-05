@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using KSP.UI.Screens;
 
 namespace SimpleSurvival
 {
@@ -12,9 +13,59 @@ namespace SimpleSurvival
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class TechLoader : MonoBehaviour
     {
+        public static Dictionary<AvailablePart, Texture2D> NewTextures =
+            new Dictionary<AvailablePart, Texture2D>();
+
         public void Awake()
         {
-            KSP.UI.Screens.RDController.OnRDTreeSpawn.Add(OnRDTreeSpawn);
+            RDController.OnRDTreeSpawn.Add(OnRDTreeSpawn);
+            RDNode.OnNodeSelected.Add(OnNodeSelected);
+        }
+
+        private void OnNodeSelected(RDNode node)
+        {
+            //if (!node.name.Contains("survival"))
+            //    return;
+
+            foreach (AvailablePart part in NewTextures.Keys)
+            {
+                Texture2D tex = NewTextures[part];
+                Util.Log("ONS a");
+                MeshRenderer mesh = part.iconPrefab.GetComponentInChildren<MeshRenderer>();
+                Util.Log("ONS b");
+                try
+                {
+                    Util.Log("ONS Getting mateiral 1");
+                    var aa = mesh.material;
+                    Util.Log("ONS Setting material 1");
+                    aa.mainTexture = tex;
+                }
+                catch (NullReferenceException e)
+                {
+                    Util.Warn("ONS NRE on material");
+                }
+                Util.Log("ONS c");
+                try
+                {
+                    Util.Log("ONS Getting sharedMaterial 1");
+                    var aa = mesh.sharedMaterial;
+                    Util.Log("ONS Setting sharedMaterial 1");
+                    aa.mainTexture = tex;
+                }
+                catch (NullReferenceException e)
+                {
+                    Util.Warn("ONS NRE on sharedMaterial");
+                }
+                Util.Log("ONS d");
+
+                /*var arr = part.iconPrefab.GetComponentsInChildren<Transform>();
+                Util.Log($"ONS e length = {arr.Length}");
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    Util.PrintComponents(arr[i], $"Transform[{i}]", false);
+                    Util.PrintComponents(arr[i], $"Transform[{i}] children", true);
+                }*/
+            }
         }
 
         private void OnRDTreeSpawn(KSP.UI.Screens.RDController rd)
