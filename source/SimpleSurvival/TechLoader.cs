@@ -12,12 +12,59 @@ namespace SimpleSurvival
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class TechLoader : MonoBehaviour
     {
+        /// <summary>
+        /// Part->Texture dict to apply to RnD part icons
+        /// </summary>
+        public static Dictionary<AvailablePart, Texture2D> IconTextures =
+            new Dictionary<AvailablePart, Texture2D>();
+
         public void Awake()
         {
             KSP.UI.Screens.RDController.OnRDTreeSpawn.Add(OnRDTreeSpawn);
         }
 
         private void OnRDTreeSpawn(KSP.UI.Screens.RDController rd)
+        {
+            Util.Log("Call: OnRDTreeSpawn");
+
+            SetPartIcons();
+            SetNodeIcon(rd);
+        }
+
+        /// <summary>
+        /// Update the RnD part icons that have had their textures
+        /// procedurally modified.
+        /// </summary>
+        private void SetPartIcons()
+        {
+            foreach (AvailablePart part in IconTextures.Keys)
+            {
+                Util.Log($"Updating iconPrefab for {part.name}");
+                MeshRenderer mesh = part.iconPrefab.GetComponentInChildren<MeshRenderer>();
+
+                if (mesh == null)
+                {
+                    Util.Warn($"MeshRenderer is null for {part.name}, skipping...");
+                    continue;
+                }
+                try
+                {
+                    mesh.material.mainTexture = IconTextures[part];
+                    mesh.sharedMaterial.mainTexture = IconTextures[part];
+                }
+                catch (NullReferenceException)
+                {
+                    Util.Warn($"Caught NRE while updating iconPrefab for {part.name}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Set the tech tree node icon for the new node.
+        /// </summary>
+        /// <param name="rd"></param>
+        /// <param name="iconName"></param>
+        private void SetNodeIcon(KSP.UI.Screens.RDController rd)
         {
             string refname = "RD_node_icon_simplesurvivalbasic";
             Texture2D texture = GameDatabase.Instance.GetTexture("SimpleSurvival/Tech/RD_node_icon_simplesurvivalbasic", false);
@@ -27,7 +74,7 @@ namespace SimpleSurvival
 
             // Custom nodes will be last on the list.
             // Speed up load time by beginning iteration backwards.
-            for (int i = rd.nodes.Count-1; i >= 0; i--)
+            for (int i = rd.nodes.Count - 1; i >= 0; i--)
             {
                 KSP.UI.Screens.RDNode node = rd.nodes[i];
 
@@ -44,9 +91,8 @@ namespace SimpleSurvival
                     node.graphics.SetIcon(icon);
 
                     node.UpdateGraphics();
-                    break;
+                    return;
                 }
-                
             }
         }
     }

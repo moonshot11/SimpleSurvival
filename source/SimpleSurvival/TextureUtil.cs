@@ -264,6 +264,11 @@ namespace SimpleSurvival
 
                 result.Apply(true);
                 part.Variants[variant].Materials[0].mainTexture = result;
+
+                // The 0th variant is the first to be selected, so this variant
+                // should always be the icon presented in RnD
+                if (variant == 0)
+                    TechLoader.IconTextures[part] = result;
             }
 
             Util.Log("Completed setup of EVA LifeSupport");
