@@ -139,31 +139,26 @@ namespace SimpleSurvival
 
         public void OnDockingComplete(GameEvents.FromToAction<Part, Part> ev)
         {
-            Util.PostUpperMessage("ON DOCKING COMPLETE");
             RefreshGUI();
         }
 
         public void OnPartUndockComplete(Part part)
         {
-            Util.PostUpperMessage("ON PART UNDOCK");
             RefreshGUI();
         }
 
         public void OnPartDecoupleComplete(Part part)
         {
-            Util.PostUpperMessage("ON VESSEL DECOUPLE");
             RefreshGUI();
         }
 
         public void OnVesselChange(Vessel vessel)
         {
-            Util.PostUpperMessage("ON VESSEL CHANGE");
             RefreshGUI();
         }
 
         public void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> ev)
         {
-            Util.PostUpperMessage("ON CREW TRANSFER");
             RefreshGUI();
         }
 
@@ -241,7 +236,6 @@ namespace SimpleSurvival
 
         private static void RiskButtonSelected(bool arg)
         {
-            Util.PostUpperMessage("Button set to " + arg.ToString());
             EVALifeSupportTracker.AllowUnsafeActivity = arg;
         }
 
@@ -253,8 +247,6 @@ namespace SimpleSurvival
 
         private void ButtonOnTrue()
         {
-            Util.PostUpperMessage("CALL: ontrue");
-
             // Store labels in separate data structure for easy access when updating
             labelMap.Clear();
             List<LifeSupportReportable> modules =
@@ -436,14 +428,12 @@ namespace SimpleSurvival
 
         public static void PressFillEva(string name)
         {
-            Util.PostUpperMessage("PRESS: " + name);
             Util.Log("FillEVA pressed for: " + name);
             FillEVAResource(name);
         }
 
         private void ButtonOnFalse()
         {
-            Util.PostUpperMessage("CALL: onfalse");
             if (showgui && drewgui)
             {
                 position = gui.GetComponent<RectTransform>().position;
