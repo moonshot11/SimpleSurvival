@@ -67,7 +67,11 @@ namespace SimpleSurvival
         private void SetNodeIcon(KSP.UI.Screens.RDController rd)
         {
             string refname = "RD_node_icon_simplesurvivalbasic";
-            Texture2D texture = GameDatabase.Instance.GetTexture("SimpleSurvival/Tech/RD_node_icon_simplesurvivalbasic", false);
+            // This file has the .truecolor extension in order to force KSP
+            // to use this icon without mipmaps. The stock toolbar and RnD icons
+            // do not scale down with lower user-set texture resolutions,
+            // so neither should this.
+            Texture2D texture = GameDatabase.Instance.GetTexture($"SimpleSurvival/Tech/{refname}", false);
             RUI.Icons.Simple.Icon icon = new RUI.Icons.Simple.Icon(refname, texture);
 
             rd.iconLoader.iconDictionary.Add(refname, icon);
