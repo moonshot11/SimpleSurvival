@@ -21,17 +21,17 @@ namespace SimpleSurvival
         public DialogGUILabel nameLabel = new DialogGUILabel("", true, true);
 
         public string[] compressNames;
-        private ProtoCrewMember kerbal;
+        private readonly ProtoCrewMember kerbal;
 
         /// <summary>
         /// Is this NOT EVA, and do we have a converter?
         /// </summary>
-        private bool buttonEnable;
+        private readonly bool fillButtonEnable;
 
-        public GUIElements(ProtoCrewMember kerbal, bool buttonEnable)
+        public GUIElements(ProtoCrewMember kerbal, bool fillButtonEnable)
         {
             this.kerbal = kerbal;
-            this.buttonEnable = buttonEnable;
+            this.fillButtonEnable = fillButtonEnable;
             fillEVAButton = new DialogGUIButton<string>(
                 "Fill EVA", LifeSupportGUI.PressFillEva, kerbal.name,
                 EnabledCondition: EnableFillButton,
@@ -52,14 +52,13 @@ namespace SimpleSurvival
             var info = EVALifeSupportTracker.GetEVALSInfo(kerbal.name);
             return info.ls_current < info.ls_max &&
                 !FlightGlobals.ActiveVessel.isEVA &&
-                buttonEnable;
+                fillButtonEnable;
         }
     }
 
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class LifeSupportGUI : MonoBehaviour
     {
-
         private static bool showgui = false;
 
         // This is necessary to track when the GUI is refreshed 2+ times
@@ -90,11 +89,11 @@ namespace SimpleSurvival
         private static DialogGUIToggle riskToggle;
         private static DialogGUIHorizontalLayout riskLayout;
 
-        private DialogGUILabel statusLabel = new DialogGUILabel("Status", true, true);
+        private readonly DialogGUILabel statusLabel = new DialogGUILabel("Status", true, true);
 
-        private int consID = PartResourceLibrary.Instance.GetDefinition(C.NAME_CONSUMABLES).id;
-        private int lsID = PartResourceLibrary.Instance.GetDefinition(C.NAME_LIFESUPPORT).id;
-        private int evapropID = PartResourceLibrary.Instance.GetDefinition(C.NAME_EVA_PROPELLANT).id;
+        private readonly int consID = PartResourceLibrary.Instance.GetDefinition(C.NAME_CONSUMABLES).id;
+        private readonly int lsID = PartResourceLibrary.Instance.GetDefinition(C.NAME_LIFESUPPORT).id;
+        private readonly int evapropID = PartResourceLibrary.Instance.GetDefinition(C.NAME_EVA_PROPELLANT).id;
 
         private const int cellWidth = 100;
         // Also used as width for +/- buttons
