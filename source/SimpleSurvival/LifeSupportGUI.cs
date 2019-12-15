@@ -80,7 +80,7 @@ namespace SimpleSurvival
         private static Vector2 position = new Vector2(0.5f, 0.5f);
         private static Vector2 posInitOffset = Vector2.zero;
         private static Vector2 size = new Vector2(470, 200);
-        private readonly RectOffset headerOffset = new RectOffset(20, 0, 0, 0);
+        private readonly RectOffset statusOffset = new RectOffset(20, 0, 0, 0);
         private readonly RectOffset noOffset = new RectOffset(0, 0, 0, 0);
         private static Dictionary<string, GUIElements> labelMap
             = new Dictionary<string, GUIElements>();
@@ -91,13 +91,14 @@ namespace SimpleSurvival
         private static DialogGUIHorizontalLayout riskLayout;
 
         private DialogGUILabel statusLabel = new DialogGUILabel("Status", true, true);
-        private DialogGUILabel consLabel = new DialogGUILabel("Consumables: x/x", 200, 0);
 
         private int consID = PartResourceLibrary.Instance.GetDefinition(C.NAME_CONSUMABLES).id;
         private int lsID = PartResourceLibrary.Instance.GetDefinition(C.NAME_LIFESUPPORT).id;
         private int evapropID = PartResourceLibrary.Instance.GetDefinition(C.NAME_EVA_PROPELLANT).id;
 
         private const int cellWidth = 100;
+        // Also used as width for +/- buttons
+        private const int buttonHeight = 30;
         private const int HEIGHT_INCR = 50;
         private const int HEIGHT_MIN = 150;
         private const int HEIGHT_MAX = 900000;
@@ -368,11 +369,11 @@ namespace SimpleSurvival
             // How can the SizeUp() -> RefreshGUI() -> OnButtonTrue() dependency
             // be altered to make these fields static, so that they don't have
             // to be re-initialized each time?
-            sizeUpButton = new DialogGUIButton("+", SizeUp, CanSizeUp, false);
-            sizeDownButton = new DialogGUIButton("-", SizeDown, CanSizeDown, false);
+            sizeUpButton = new DialogGUIButton("+", SizeUp, CanSizeUp, buttonHeight, buttonHeight, false);
+            sizeDownButton = new DialogGUIButton("-", SizeDown, CanSizeDown, buttonHeight, buttonHeight, false);
 
             DialogGUIToggleButton compressButton = new DialogGUIToggleButton(
-                compress, "Minimize", ToggleCompressGUI, w: 70);
+                compress, "Minimize", ToggleCompressGUI, w: 70, h: buttonHeight);
             DialogGUIHorizontalLayout compressLayout = new DialogGUIHorizontalLayout(
                 false, true, 0f, noOffset, TextAnchor.MiddleLeft,
                 compressButton, sizeDownButton, sizeUpButton);
@@ -382,20 +383,31 @@ namespace SimpleSurvival
                 "Allow unsafe crew transfer",
                 RiskButtonSelected);
             riskLayout = new DialogGUIHorizontalLayout(
-                true, false, 0f, noOffset, TextAnchor.MiddleLeft,
+                0f, 0f, 0f, noOffset, TextAnchor.MiddleLeft,
                 riskToggle);
 
             // Define the header which contains additional info
             // (status, Consumables)
             DialogGUIGridLayout statusGrid =
-                new DialogGUIGridLayout(headerOffset,
-                    new Vector2(cellWidth * (compress ? 1 : 2), 20),
+                new DialogGUIGridLayout(noOffset,
+                    new Vector2(cellWidth * (compress ? 1 : 2), 25),
                     Vector2.zero,
                     UnityEngine.UI.GridLayoutGroup.Corner.UpperLeft,
                     UnityEngine.UI.GridLayoutGroup.Axis.Horizontal,
                     TextAnchor.MiddleLeft,
                     UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 2,
-                    statusLabel, compressLayout, consLabel, riskLayout);
+                    statusLabel, compressLayout);
+
+            // Contains the statusGrid and the "unsafe" toggle
+            DialogGUIGridLayout masterGrid =
+                new DialogGUIGridLayout(statusOffset,
+                    new Vector2(cellWidth * (compress ? 2 : 4), 25),
+                    new Vector2(0f, 5f),
+                    UnityEngine.UI.GridLayoutGroup.Corner.UpperLeft,
+                    UnityEngine.UI.GridLayoutGroup.Axis.Horizontal,
+                    TextAnchor.MiddleLeft,
+                    UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount, 1,
+                    statusGrid, riskLayout);
 
             // Set up the pop window
             size.x = compress ? 270 : 470;
@@ -405,7 +417,7 @@ namespace SimpleSurvival
                 "LifeSupport Readout",
                 UISkinManager.defaultSkin,
                 new Rect(position, size),
-                statusGrid,
+                masterGrid,
                 new DialogGUIScrollList(Vector2.zero, false, true,
                     new DialogGUIVerticalLayout(false, false, 1f,
                         offset, TextAnchor.UpperLeft,
@@ -520,14 +532,18 @@ namespace SimpleSurvival
             // Update status
             double curr, max;
             vessel.GetConnectedResourceTotals(lsID, out curr, out max);
-            string status;
+
+            string statusOne; // Status (no crew/breathable/active)
+            string statusTwo; // Remaining Consumables/EVA Life Support
+            string lsActive;
+
             if (crewCount == 0)
-                status = "No crew";
+                lsActive = "No crew";
             else if (Util.BreathableAir(vessel))
-                status = "Breathable air";
+                lsActive = "Breathable air";
             else
-                status = "ACTIVE";
-            statusLabel.SetOptionText($"{(compress ? "" : "Status:  ")}{status}");
+                lsActive = "ACTIVE";
+            statusOne = $"{(compress ? "" : "Status: ")}{lsActive}";
 
             if (FlightGlobals.ActiveVessel.isEVA)
             {
@@ -540,14 +556,16 @@ namespace SimpleSurvival
                     prefix = C.GUI_LITEWARN_COLOR;
                 else
                     suffix = "";
-                consLabel.SetOptionText($"Propellant:  {prefix}{string.Format("{0:0.00}", curr)}{suffix}");
+                statusTwo = $"Propellant:  {prefix}{string.Format("{0:0.00}", curr)}{suffix}";
             }
             else
             {
                 vessel.GetConnectedResourceTotals(consID, out curr, out max);
                 double consDays = curr / C.CONS_PER_LS;
-                consLabel.SetOptionText($"{(compress ? "" : "Consumables:  ")}{Util.DaysToString(consDays)}");
+                statusTwo = $"{(compress ? "" : "Consumables:  ")}{Util.DaysToString(consDays)}";
             }
+
+            statusLabel.SetOptionText($"{statusOne}\n{statusTwo}");
         }
 
         public void OnGUI()
