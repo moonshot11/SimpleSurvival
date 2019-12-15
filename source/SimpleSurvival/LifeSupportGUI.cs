@@ -437,6 +437,7 @@ namespace SimpleSurvival
         public static void PressFillEva(string name)
         {
             Util.PostUpperMessage("PRESS: " + name);
+            Util.Log("FillEVA pressed for: " + name);
             FillEVAResource(name);
         }
 
@@ -570,108 +571,20 @@ namespace SimpleSurvival
             return c1.name.CompareTo(c2.name);
         }
 
-        private static int FillEVAResource(string kerbalName)
+        private static void FillEVAResource(string kerbalName)
         {
-            Vessel active = FlightGlobals.ActiveVessel;
+            // This works right now because the tracker updates live.
+            // May break in the future.
+            var info = EVALifeSupportTracker.GetEVALSInfo(kerbalName);
+            double eva_request = info.ls_max - info.ls_current;
 
-            double conversion_rate;
-            string resource_name;
-            conversion_rate = C.CONS_PER_EVA_LS;
-            resource_name = C.NAME_EVA_LIFESUPPORT;
+            Cons2LSModule module = FlightGlobals.ActiveVessel.FindPartModuleImplementing<Cons2LSModule>();
+            double obtained = module.part.RequestResource(C.NAME_CONSUMABLES, C.CONS_PER_EVA_LS * eva_request);
+            double add = obtained / C.CONS_PER_EVA_LS;
+            EVALifeSupportTracker.AddEVAAmount(kerbalName, add, EVA_Resource.LifeSupport);
 
-            Util.Log("Processing FillEVA resource request for " + resource_name);
-
-            // Player is controlling ship
-            if (false)
-            {
-                Util.Log("FillEVA pressed for active vessel " + active.name);
-
-                double eva_request_total = 0;
-
-                // Map of kerbals in tracking, and how much they're requesting
-                Dictionary<string, double> kerbal_requests = new Dictionary<string, double>();
-
-                foreach (ProtoCrewMember kerbal in active.GetVesselCrew())
-                {
-                    // Previously had a check here if Kerbal was in EVA tracking.
-                    // This should now be covered by LifeSupportModule adding
-                    // all missing Kerbals to tracking in OnStart.
-
-                    var info = EVALifeSupportTracker.GetEVALSInfo(kerbal.name);
-                    double request = 0;
-
-                    request = info.ls_max - info.ls_current;
-
-                    eva_request_total += request;
-                    kerbal_requests.Add(kerbal.name, request);
-
-                    Util.Log("    Kerbal " + kerbal.name + " has EVA need for " + request);
-                }
-
-                // If no EVA request, exit early
-                if (eva_request_total < C.DOUBLE_MARGIN)
-                {
-                    Util.Log("All crewmembers full! Skipping EVA refill");
-                    Util.PostUpperMessage("EVA resources already full!");
-                    return -1;
-                }
-
-                // Have to update this!
-                Cons2LSModule module = new Cons2LSModule();
-                // Deduct Consumables
-                double obtained = module.part.RequestResource(C.NAME_CONSUMABLES, conversion_rate * eva_request_total);
-                double frac = obtained / eva_request_total;
-
-                Util.Log("    EVA request total  = " + eva_request_total);
-                Util.Log("    Request * factor   = " + conversion_rate * eva_request_total);
-                Util.Log("    Obtained           = " + obtained);
-                Util.Log("    Fraction available = " + frac);
-
-                // Distribute EVA LS proportionally
-                foreach (string name in kerbal_requests.Keys)
-                {
-                    double add = kerbal_requests[name] * frac;
-                    EVALifeSupportTracker.AddEVAAmount(name, add, EVA_Resource.LifeSupport);
-
-                    Util.Log("    Adding " + add + " to " + name);
-                }
-
-                if (frac > C.DOUBLE_ALMOST_ONE)
-                    return 0;
-                else if (frac < C.DOUBLE_MARGIN)
-                    return 2;
-                else
-                    return 1;
-            }
-            // Player is controlling EVA
-            else
-            {
-                Util.Log("FillEVA pressed for: " + kerbalName);
-
-                // This works right now because the tracker updates live.
-                // May break in the future.
-                var info = EVALifeSupportTracker.GetEVALSInfo(kerbalName);
-                double eva_request = 0;
-                eva_request = info.ls_max - info.ls_current;
-
-                Cons2LSModule module = active.FindPartModuleImplementing<Cons2LSModule>();
-                double obtained = module.part.RequestResource(C.NAME_CONSUMABLES, conversion_rate * eva_request);
-                double add = obtained / conversion_rate;
-                EVALifeSupportTracker.AddEVAAmount(kerbalName, add, EVA_Resource.LifeSupport);
-
-                Util.Log("    EVA Request  = " + eva_request);
-                Util.Log("    Amt Obtained = " + obtained);
-
-                // If enough resources were added
-                if (add > eva_request - C.DOUBLE_MARGIN)
-                    return 0;
-                // If Consumables are empty
-                else if (add < C.DOUBLE_MARGIN)
-                    return 2;
-                // If Consumables are almost empty, partial refill
-                else
-                    return 1;
-            }
+            Util.Log("    EVA Request  = " + eva_request);
+            Util.Log("    Amt Obtained = " + obtained);
         }
     }
 }
