@@ -202,6 +202,9 @@ namespace SimpleSurvival
                 return;
 
             bool updateMax = vessel.CanUpdateEVAStat(Config.EVA_MAX_UPDATE);
+            // If LS and prop modes are both IfHitchhiker, then can just use
+            // the updateMax result instead of calling CanUpateEVAStat a
+            // second time (which scans the whole vessel).
             bool updateProp =
                 Config.EVA_PROP_REFILL == EVAUpdateMode.IfHitchhiker &&
                 updateMax && Config.EVA_MAX_UPDATE == EVAUpdateMode.IfHitchhiker ||
