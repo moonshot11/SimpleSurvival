@@ -42,3 +42,11 @@ SimpleSurvival is a Kerbal Space Program mod which aims to encourage roleplaying
 ----------------------
 
 ![User Guide 9](/docs/img/Slide9.PNG)
+
+----------------------
+
+![User Guide 10](/docs/img/Slide10.PNG)
+
+----------------------
+
+![User Guide 11](/docs/img/Slide11.PNG)
