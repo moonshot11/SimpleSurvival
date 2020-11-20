@@ -1,0 +1,4 @@
+Update README.md
+Update changelog
+Update version number and blob links in docs/Readme.txt
+Update assembly version in AssemblyInfo.cs
