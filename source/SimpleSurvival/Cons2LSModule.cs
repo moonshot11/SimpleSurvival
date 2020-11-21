@@ -17,14 +17,16 @@ namespace SimpleSurvival
 
         public override void OnStart(StartState state)
         {
-            string specialist;
+            // Give player context-sensitive feedback on what is required for
+            // converter to operate
+            string reqdKerbal;
 
             if (Config.CONV_REQ == ConverterReq.IfKerbalExpEnabled && Util.AdvParams.EnableKerbalExperience ||
                 Config.CONV_REQ == ConverterReq.Engineer)
-                specialist = "Engineer";
+                reqdKerbal = "Engineer";
             else
-                specialist = "Kerbal";
-            msgMissing = "Missing " + specialist;
+                reqdKerbal = "Kerbal";
+            msgMissing = "Missing " + reqdKerbal;
             base.OnStart(state);
         }
 
