@@ -10,7 +10,7 @@
 
 For an illustrated user guide, please visit this URL:
 
-https://github.com/moonshot11/SimpleSurvival/blob/aa91c1e48b0ca861fd510ba582d99957d2ae1a50/README.md
+https://github.com/moonshot11/SimpleSurvival/blob/24909e59c6b15bb7902e694f2e475909921eab4b/README.md
 
 VERSION INFO
     SimpleSurvival v0.1.0

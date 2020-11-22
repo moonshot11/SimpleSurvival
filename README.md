@@ -4,7 +4,8 @@
 SimpleSurvival is a Kerbal Space Program mod which adds a simple life support mechanic with the goal of encouraging roleplaying in the following ways:
 
 - Give purpose to different command modules. (A Mk1 capsule can get to orbit, but can it go to the Mun?)
-- Require the Hitchhiker's module for long journeys (no trips to Eeloo in a Mk1 capsule!).
+- Require the Hitchhiker's module for long journeys. No trips to Eeloo in a Mk1 capsule!
+- Make Engineers more useful. Only they can operate the Converter!
 - Create persistent resources for the Kerbals' EVA suits.
 
 ![User Guide 1](/docs/img/Slide1.PNG)
