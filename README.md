@@ -1,5 +1,5 @@
 # SimpleSurvival
-**v0.1.0 for KSP 1.10.1**
+**v0.1.1 for KSP 1.10.1**
 
 SimpleSurvival is a Kerbal Space Program mod which adds a simple life support mechanic with the goal of encouraging roleplaying in the following ways:
 
