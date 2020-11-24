@@ -49,3 +49,7 @@ SimpleSurvival is a Kerbal Space Program mod which adds a simple life support me
 ----------------------
 
 ![User Guide 11](/docs/img/Slide11.PNG)
+
+----------------------
+
+![User Guide 11](/docs/img/Slide12.PNG)
