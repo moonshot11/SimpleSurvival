@@ -1,7 +1,7 @@
 //==========================================//
 //                                          //
 //              SimpleSurvival              //
-//                  v0.1.1                  //
+//                  v0.1.2                  //
 //                                          //
 //      A mod for Kerbal Space Program      //
 //              by moonshot11               //
@@ -10,10 +10,10 @@
 
 For an illustrated user guide, please visit this URL:
 
-https://github.com/moonshot11/SimpleSurvival/blob/24909e59c6b15bb7902e694f2e475909921eab4b/README.md
+https://github.com/moonshot11/SimpleSurvival
 
 VERSION INFO
-    SimpleSurvival v0.1.1
+    SimpleSurvival v0.1.2
     Tested with Kerbal Space Program version 1.10.1
 
 LICENSE
