@@ -1,0 +1,25 @@
+Basic idea: store associative data structure:
+
+STRUCT
+    Vessel1
+        Part1
+            1 (index in storedParts collection)
+                Propellant: 2.1
+            3
+                Propellant: 1.1
+        Part2
+            1
+                Propellant: 1.0
+    Vessel2
+        Part1
+            1
+                Propellant: 1.5
+
+Questions
+- Can this abstract away to an EVAKerbal without any hardcoding?
+- How do I save/load this data?
+- How do I prevent/override the game resetting the EVA amounts in the jetpack/containers
+
+Item names:
+- evaJetpack
+- evaCylinder

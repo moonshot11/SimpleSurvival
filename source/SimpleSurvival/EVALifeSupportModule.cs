@@ -102,17 +102,41 @@ namespace SimpleSurvival
 
         public void FixedUpdate()
         {
+            Util.Log("EVALifeSupportModule :: FixedUpdate()");
             PartResource resource = part.Resources[C.NAME_EVA_LIFESUPPORT];
             double initial_value = resource.amount;
             string kerbal_name = part.protoModuleCrew[0].name;
+            Util.Log("After initial declarations");
 
             // Update tracking info.
             // While Kerbal is in EVA, PartResource contains the "primary" value,
             // and tracking is only updated as a consequence.
             // It will be a frame behind, but that should be okay.
+            if (kerbal_name == null) Util.Log("kerbal_name");
+            if (part == null) Util.Log("part");
+            if (part.Resources == null) Util.Log("part.Resources");
+            foreach (var key in part.Resources)
+            {
+                Util.Log("R Name = " + key.resourceName);
+            }
+            List<StoredPart> propellantParts = new List<StoredPart>();
+            foreach (StoredPart sp in part.protoModuleCrew[0].KerbalInventoryModule.storedParts.Values)
+            {
+                if (sp.snapshot.resources.Any(x => x.resourceName == C.NAME_EVA_PROPELLANT))
+                    propellantParts.Add(sp);
+            }
+            var kerbal = part.protoModuleCrew[0];
+            Util.Log("Inventory str? = " + kerbal.KerbalInventoryModule.Inventory);
+            foreach (int k in kerbal.KerbalInventoryModule.storedParts.Keys)
+            {
+                StoredPart v = kerbal.KerbalInventoryModule.storedParts[k];
+                Util.Log("Inv Part Name = " + v.partName);
+            }
+            if (part.Resources[C.NAME_EVA_PROPELLANT] == null) Util.Log("part.Resources[C.NAME_EVA_PROPELLANT]");
+            if (part == null) Util.Log("IT'S NULL!!!");
             EVALifeSupportTracker.SetCurrentAmount(kerbal_name, initial_value, EVA_Resource.LifeSupport);
             EVALifeSupportTracker.SetCurrentAmount(kerbal_name, part.Resources[C.NAME_EVA_PROPELLANT].amount, EVA_Resource.Propellant);
-
+            Util.Log("After SetCurrentAmount");
             // If Kerbal is below this altitude in an atmosphere with oxygen,
             // LifeSupport is irrelevant
             if (Util.BreathableAir(vessel))
@@ -120,7 +144,7 @@ namespace SimpleSurvival
 
             // -- Reduce resource --
             double retd = part.RequestResource(C.NAME_EVA_LIFESUPPORT, C.EVA_LS_DRAIN_PER_SEC * TimeWarp.fixedDeltaTime);
-
+            
             if (initial_value > C.EVA_LS_30_SECONDS &&
                 resource.amount <= C.EVA_LS_30_SECONDS)
             {
