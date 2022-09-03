@@ -130,7 +130,10 @@ namespace SimpleSurvival
             foreach (int k in kerbal.KerbalInventoryModule.storedParts.Keys)
             {
                 StoredPart v = kerbal.KerbalInventoryModule.storedParts[k];
+                ProtoPartSnapshot snap = v.snapshot;
                 Util.Log("Inv Part Name = " + v.partName);
+                Util.Log("snap.craftID = " + snap.craftID.ToString());
+                Util.Log("snap.persistentId = " + snap.persistentId.ToString());
             }
             if (part.Resources[C.NAME_EVA_PROPELLANT] == null) Util.Log("part.Resources[C.NAME_EVA_PROPELLANT]");
             if (part == null) Util.Log("IT'S NULL!!!");
