@@ -74,6 +74,7 @@ namespace SimpleSurvival
 
             // Necessary to override game's default behavior, which refills
             // EVA Propellant automatically every time EVA Kerbal is reset
+            // 9/3/22: Is this still necessary since propellant has been removed?
             var eva_info = EVALifeSupportTracker.GetEVALSInfo(kerbal_name);
 
             // If difficulty option "Immediate Level Up" is selected,

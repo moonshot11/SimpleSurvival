@@ -77,7 +77,7 @@ namespace SimpleSurvival
             GameEvents.onKerbalStatusChange.Add(OnKerbalStatusChange);
             GameEvents.onKerbalRemoved.Add(OnKerbalRemoved);
 
-            // Refill EVA prop / Refresh EVA Max
+            // Refresh EVA Max
             GameEvents.onDockingComplete.Add(OnDockingComplete);
             GameEvents.onVesselLoaded.Add(OnVesselLoaded);
 
@@ -161,7 +161,7 @@ namespace SimpleSurvival
         private void OnDockingComplete(GameEvents.FromToAction<Part, Part> action)
         {
             Util.Log("Call EVALSTrack -> OnDockingComplete()");
-            FillEVAProp(action.to.vessel);
+            RefreshEVALSMax(action.to.vessel);
         }
 
         private void OnVesselLoaded(Vessel vessel)
@@ -169,19 +169,19 @@ namespace SimpleSurvival
             Util.Log("Call EVALSTrack -> OnVesselLoaded()");
             if (vessel.isEVA)
                 return;
-            FillEVAProp(vessel);
+            RefreshEVALSMax(vessel);
         }
 
         /// <summary>
-        /// Fill all Kerbals' EVA prop to full
+        /// Refresh EVA LS max value
         /// </summary>
         /// <param name="vessel"></param>
-        private void FillEVAProp(Vessel vessel)
+        private void RefreshEVALSMax(Vessel vessel)
         {
             if (vessel == null)
                 throw new NullReferenceException();
 
-            Util.Log($"Call EVALSTrack -> FillEVAProp({vessel.vesselName})");
+            Util.Log($"Call EVALSTrack -> FillEVALS({vessel.vesselName})");
 
             var crew = vessel.GetVesselCrew();
             if (crew.Count == 0)
@@ -214,9 +214,9 @@ namespace SimpleSurvival
             if (action.from.vessel.isEVA != action.to.vessel.isEVA)
             {
                 if (!action.from.vessel.isEVA)
-                    FillEVAProp(action.from.vessel);
+                    RefreshEVALSMax(action.from.vessel);
                 else
-                    FillEVAProp(action.to.vessel);
+                    RefreshEVALSMax(action.to.vessel);
                 return;
             }
 

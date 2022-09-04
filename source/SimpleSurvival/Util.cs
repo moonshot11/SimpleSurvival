@@ -118,9 +118,6 @@ namespace SimpleSurvival
                 return Config.EVA_LS_LVL_2;
             else
                 return Config.EVA_LS_LVL_3;
-
-            Util.Log("CheckThis -> Incorrect index, throwing exception");
-            throw new ArgumentException("Index for SimpleSurvival Util.CurrentEVAMax must be [0,1].");
         }
 
         /// <summary>

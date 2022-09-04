@@ -17,7 +17,6 @@ namespace SimpleSurvival
 
         // -- Debug values --
         public DialogGUILabel evaLS_Value = new DialogGUILabel("CC", true, true);
-        public DialogGUILabel evaProp = new DialogGUILabel("DD", true, true);
         public DialogGUILabel nameLabel = new DialogGUILabel("", true, true);
 
         public string[] compressNames;
@@ -33,7 +32,7 @@ namespace SimpleSurvival
             this.kerbal = kerbal;
             this.fillButtonEnable = fillButtonEnable;
             fillEVAButton = new DialogGUIButton<string>(
-                "Fill EVA", LifeSupportGUI.PressFillEva, kerbal.name,
+                "Fill EVA LS", LifeSupportGUI.PressFillEva, kerbal.name,
                 EnabledCondition: EnableFillButton,
                 dismissOnSelect: false);
             compressNames = new string[2]
@@ -327,8 +326,6 @@ namespace SimpleSurvival
                     {
                         kerbalCells.Add(emptyLabel);
                         kerbalCells.Add(elems.evaLS_Value);
-                        kerbalCells.Add(elems.evaProp);
-                        kerbalCells.Add(emptyLabel);
                     }
                 }
 
@@ -544,15 +541,7 @@ namespace SimpleSurvival
 
             if (FlightGlobals.ActiveVessel.isEVA)
             {
-                string prefix = "";
-                string suffix = "</color>";
-                if (curr < 0.5)
-                    prefix = C.GUI_HARDWARN_COLOR;
-                else if (curr < 1.0)
-                    prefix = C.GUI_LITEWARN_COLOR;
-                else
-                    suffix = "";
-                statusTwo = $"Propellant:  {prefix}{string.Format("{0:0.00}", curr)}{suffix}";
+                statusTwo = "";
             }
             else
             {
