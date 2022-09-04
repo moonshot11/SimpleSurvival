@@ -6,12 +6,6 @@ using UnityEngine;
 
 namespace SimpleSurvival
 {
-    public enum EVA_Resource
-    {
-        Propellant,
-        LifeSupport
-    }
-
     /// <summary>
     /// Global tracking of EVA LifeSupport when Kerbals are not in EVA.
     /// </summary>
@@ -40,17 +34,10 @@ namespace SimpleSurvival
             /// </summary>
             public double ls_max;
 
-            public double prop_current;
-            public double prop_max;
-
-            public EvaInfo(double prop_current, double prop_max,
-                double ls_current, double ls_max)
+            public EvaInfo(double ls_current, double ls_max)
             {
                 this.ls_current = ls_current;
                 this.ls_max = ls_max;
-
-                this.prop_current = prop_current;
-                this.prop_max = prop_max;
             }
 
             /// <summary>
@@ -59,7 +46,7 @@ namespace SimpleSurvival
             /// <returns></returns>
             public EvaInfo Copy()
             {
-                return new EvaInfo(prop_current, prop_max, ls_current, ls_max);
+                return new EvaInfo(ls_current, ls_max);
             }
         }
 
@@ -147,8 +134,7 @@ namespace SimpleSurvival
         {
             Log("Call -> AddKerbal(..) for " + name);
 
-            double prop_max = Util.MaxAllowedEVA(EVA_Resource.Propellant);
-            double eva_max = Util.MaxAllowedEVA(EVA_Resource.LifeSupport);
+            double eva_max = Util.MaxAllowedEvaLS();
 
             // Assume that this Kerbal's info should be reset,
             // but warn in the log file just in case.
@@ -168,7 +154,7 @@ namespace SimpleSurvival
 
             Log("Adding current/max EVA LS of " + eva_max + " for " + name);
 
-            EvaInfo info = new EvaInfo(prop_max, prop_max , eva_max, eva_max);
+            EvaInfo info = new EvaInfo(eva_max, eva_max);
             evals_info.Add(name, info);
         }
 
@@ -202,33 +188,18 @@ namespace SimpleSurvival
                 return;
 
             bool updateMax = vessel.CanUpdateEVAStat(Config.EVA_MAX_UPDATE);
-            // If LS and prop modes are both IfHitchhiker, then can just use
-            // the updateMax result instead of calling CanUpateEVAStat a
-            // second time (which scans the whole vessel).
-            bool updateProp =
-                Config.EVA_PROP_REFILL == EVAUpdateMode.IfHitchhiker &&
-                updateMax && Config.EVA_MAX_UPDATE == EVAUpdateMode.IfHitchhiker ||
-                vessel.CanUpdateEVAStat(Config.EVA_PROP_REFILL);
 
             foreach (ProtoCrewMember kerbal in crew)
             {
                 AddKerbalToTracking(kerbal.name);
                 if (updateMax)
                 {
-                    double propmax = Util.MaxAllowedEVA(EVA_Resource.Propellant);
-                    double lsmax = Util.MaxAllowedEVA(EVA_Resource.LifeSupport);
+                    double lsmax = Util.MaxAllowedEvaLS();
 
                     Util.Log($"Updating Kerbal max values for: {kerbal.name}");
                     Util.Log($"  LS max -> {lsmax}");
-                    Util.Log($"  Prop max -> {propmax}");
 
-                    evals_info[kerbal.name].prop_max = Util.MaxAllowedEVA(EVA_Resource.Propellant);
-                    evals_info[kerbal.name].ls_max = Util.MaxAllowedEVA(EVA_Resource.LifeSupport);
-                }
-                if (updateProp)
-                {
-                    Util.Log($"Filling {kerbal.name}'s EVA prop to {evals_info[kerbal.name].prop_max}");
-                    evals_info[kerbal.name].prop_current = evals_info[kerbal.name].prop_max;
+                    evals_info[kerbal.name].ls_max = Util.MaxAllowedEvaLS();
                 }
             }
         }
@@ -317,19 +288,11 @@ namespace SimpleSurvival
         /// </summary>
         /// <param name="name">The Kerbal's name</param>
         /// <param name="amount">The current amount</param>
-        public static void SetCurrentAmount(string name, double amount, EVA_Resource choice)
+        public static void SetCurrentAmount(string name, double amount)
         {
             try
             {
-                switch(choice)
-                {
-                    case EVA_Resource.LifeSupport:
-                        evals_info[name].ls_current = amount;
-                        break;
-                    case EVA_Resource.Propellant:
-                        evals_info[name].prop_current = amount;
-                        break;
-                }
+                evals_info[name].ls_current = amount;
             }
             catch (KeyNotFoundException e)
             {
@@ -344,23 +307,13 @@ namespace SimpleSurvival
         /// <param name="name"></param>
         /// <param name="amount"></param>
         /// <returns>Returns the amount of EVA LS after adding</returns>
-        public static double AddEVAAmount(string name, double amount, EVA_Resource choice)
+        public static double AddEVALSAmount(string name, double amount)
         {
             try
             {
-                switch (choice)
-                {
-                    case EVA_Resource.LifeSupport:
-                        evals_info[name].ls_current =
-                            Math.Min(evals_info[name].ls_current + amount,
-                            evals_info[name].ls_max);
-                        break;
-                    case EVA_Resource.Propellant:
-                        evals_info[name].prop_current =
-                            Math.Min(evals_info[name].prop_current + amount,
-                            evals_info[name].prop_max);
-                        break;
-                }
+                evals_info[name].ls_current =
+                    Math.Min(evals_info[name].ls_current + amount,
+                    evals_info[name].ls_max);
             }
             catch (KeyNotFoundException e)
             {
@@ -433,24 +386,19 @@ namespace SimpleSurvival
                 .GetNode("SCENARIO", "name", "ScenarioUpgradeableFacilities")
                 .GetNode("SpaceCenter/AstronautComplex").GetValue("lvl");
 
-            double game_prop_max = Util.MaxAllowedEVA(EVA_Resource.Propellant, astro_lvl);
-            double game_ls_max = Util.MaxAllowedEVA(EVA_Resource.LifeSupport, astro_lvl);
+            double game_ls_max = Util.MaxAllowedEvaLS(astro_lvl);
 
             foreach (ConfigNode node in scenario_node.GetNodes(NODE_EVA_TRACK))
             {
                 string name = node.GetValue("name");
 
-                double prop_current = Convert.ToDouble(
-                    Util.GetConfigNodeValue(node, "propellant_amount", game_prop_max));
-                double prop_max = Convert.ToDouble(
-                    Util.GetConfigNodeValue(node, "propellant_maxAmount", game_prop_max));
                 double ls_current = Convert.ToDouble(
                     Util.GetConfigNodeValue(node, "lifesupport_amount", game_ls_max));
                 double ls_max = Convert.ToDouble(
                     Util.GetConfigNodeValue(node, "lifesupport_maxAmount", game_ls_max));
 
-                evals_info.Add(name, new EvaInfo(prop_current, prop_max, ls_current, ls_max));
-                Log("Adding " + name + ": [" + prop_current + ", " + prop_max + ", " + ls_current + ", " + ls_max + "]");
+                evals_info.Add(name, new EvaInfo(ls_current, ls_max));
+                Log("Adding " + name + ": [" + ls_current + ", " + ls_max + "]");
             }
         }
 
@@ -475,15 +423,11 @@ namespace SimpleSurvival
 
                 Log("Adding " + name + " to ConfigNode");
                 Log("  name      = " + name);
-                Log("  propellant_amount     = " + info.prop_current);
-                Log("  propellant_maxAmount  = " + info.prop_max);
                 Log("  lifesupport_amount    = " + info.ls_current);
                 Log("  lifesupport_maxAmount = " + info.ls_max);
 
                 ConfigNode node = scenario_node.AddNode(NODE_EVA_TRACK);
                 node.AddValue("name", name);
-                node.AddValue("propellant_amount", info.prop_current);
-                node.AddValue("propellant_maxAmount", info.prop_max);
                 node.AddValue("lifesupport_amount", info.ls_current);
                 node.AddValue("lifesupport_maxAmount", info.ls_max);
             }

@@ -30,17 +30,11 @@ namespace SimpleSurvival
                 Util.GetConfigNodeValue(node, "eva_ls_2", Config.EVA_LS_LVL_2));
             Config.EVA_LS_LVL_3 = Convert.ToDouble(
                 Util.GetConfigNodeValue(node, "eva_ls_3", Config.EVA_LS_LVL_3));
-            Config.EVA_PROP_LVL_2 = Convert.ToDouble(
-                Util.GetConfigNodeValue(node, "eva_prop_2", Config.EVA_PROP_LVL_2));
-            Config.EVA_PROP_LVL_3 = Convert.ToDouble(
-                Util.GetConfigNodeValue(node, "eva_prop_3", Config.EVA_PROP_LVL_3));
             Config.DEBUG_SHOW_EVA = Convert.ToBoolean(
                 Util.GetConfigNodeValue(node, "debug", false));
 
             string evaMax = Util.GetConfigNodeValue(node, "eva_max_upgrade", null);
             Config.EVA_MAX_UPDATE = (EVAUpdateMode)Enum.Parse(typeof(EVAUpdateMode), evaMax, true);
-            string evaProp = Util.GetConfigNodeValue(node, "eva_prop_refill", null);
-            Config.EVA_PROP_REFILL = (EVAUpdateMode)Enum.Parse(typeof(EVAUpdateMode), evaProp, true);
 
             string convReq = Util.GetConfigNodeValue(node, "converter_req", null);
             Config.CONV_REQ = (ConverterReq) Enum.Parse(typeof(ConverterReq), convReq, true);

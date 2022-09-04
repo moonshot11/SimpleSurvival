@@ -72,30 +72,14 @@ namespace SimpleSurvival
                     Util.PostUpperMessage(kerbal_name + " has " + (int)(ls_resource.amount / C.EVA_LS_DRAIN_PER_SEC) + " seconds to live!", 1);
             }
 
-            PartResource prop_resource = part.Resources[C.NAME_EVA_PROPELLANT];
-
             // Necessary to override game's default behavior, which refills
             // EVA Propellant automatically every time EVA Kerbal is reset
             var eva_info = EVALifeSupportTracker.GetEVALSInfo(kerbal_name);
-            prop_resource.maxAmount = eva_info.prop_max;
-            prop_resource.amount = eva_info.prop_current;
-
-            // Will this add safety Propellant on every load?
-            // Should only be added when Kerbal first leaves ship
-            //
-            // Confirmed (1.0.5). At the time of this comment, the Propellant
-            // threshold is brutally low (0.1), so it's okay,
-            // but this should be changed in the future.
-            if (prop_resource.amount < C.EVA_PROP_SAFE_MIN)
-                prop_resource.amount = C.EVA_PROP_SAFE_MIN;
 
             // If difficulty option "Immediate Level Up" is selected,
             // immediately set this Kerbal's EVA to new max
             if (this.vessel.CanUpdateEVAStat(Config.EVA_MAX_UPDATE))
-            {
-                ls_resource.maxAmount = Util.MaxAllowedEVA(EVA_Resource.LifeSupport);
-                prop_resource.maxAmount = Util.MaxAllowedEVA(EVA_Resource.Propellant);
-            }
+                ls_resource.maxAmount = Util.MaxAllowedEvaLS();
 
             base.OnStart(state);
         }
@@ -110,8 +94,7 @@ namespace SimpleSurvival
             // While Kerbal is in EVA, PartResource contains the "primary" value,
             // and tracking is only updated as a consequence.
             // It will be a frame behind, but that should be okay.
-            EVALifeSupportTracker.SetCurrentAmount(kerbal_name, initial_value, EVA_Resource.LifeSupport);
-            EVALifeSupportTracker.SetCurrentAmount(kerbal_name, part.Resources[C.NAME_EVA_PROPELLANT].amount, EVA_Resource.Propellant);
+            EVALifeSupportTracker.SetCurrentAmount(kerbal_name, initial_value);
 
             // If Kerbal is below this altitude in an atmosphere with oxygen,
             // LifeSupport is irrelevant

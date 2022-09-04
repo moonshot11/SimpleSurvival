@@ -42,10 +42,6 @@ namespace SimpleSurvival
         /// Name of stock electricity resource
         /// </summary>
         public const string NAME_ELECTRICITY = "ElectricCharge";
-        /// <summary>
-        /// Name of stock EVA propellant resource
-        /// </summary>
-        public const string NAME_EVA_PROPELLANT = "EVA Propellant";
 
         // -- Life Support Drain Rates --
 
@@ -80,14 +76,6 @@ namespace SimpleSurvival
         /// 30 seconds' worth of EVA LifeSupport, for warning messages
         /// </summary>
         public const double EVA_LS_30_SECONDS = EVA_LS_DRAIN_PER_SEC * 30;
-
-        // -- EVA Propellant values --
-
-        /// <summary>
-        /// If EVA Propellant is less than this, set to this to avoid cases
-        /// where player EVAs and consequently "bricks" a Kerbal
-        /// </summary>
-        public const double EVA_PROP_SAFE_MIN = 0.1;
 
         // -- Almost-out tweaking values --
 

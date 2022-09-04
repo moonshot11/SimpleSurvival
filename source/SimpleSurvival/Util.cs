@@ -95,7 +95,7 @@ namespace SimpleSurvival
         /// </summary>
         /// <param name="choice">Which resource to return</param>
         /// <returns></returns>
-        public static double MaxAllowedEVA(EVA_Resource choice, string astro_level = "")
+        public static double MaxAllowedEvaLS(string astro_level = "")
         {
             // Default astro_level value is "" instead of null
             // to capture the case where the input to this method
@@ -112,22 +112,12 @@ namespace SimpleSurvival
 
             // If Astronaut Complex is fully upgraded, EVA LS gets higher value
 
-            if (choice == EVA_Resource.Propellant)
-            {
-                if (lvl == 1.0f)
-                    return Config.EVA_PROP_LVL_3;
-                else
-                    return Config.EVA_PROP_LVL_2;
-            }
-            else if (choice == EVA_Resource.LifeSupport)
-            {
-                if (lvl == 0f)
-                    return Config.EVA_LS_LVL_1;
-                else if (lvl == 0.5f)
-                    return Config.EVA_LS_LVL_2;
-                else
-                    return Config.EVA_LS_LVL_3;
-            }
+            if (lvl == 0f)
+                return Config.EVA_LS_LVL_1;
+            else if (lvl == 0.5f)
+                return Config.EVA_LS_LVL_2;
+            else
+                return Config.EVA_LS_LVL_3;
 
             Util.Log("CheckThis -> Incorrect index, throwing exception");
             throw new ArgumentException("Index for SimpleSurvival Util.CurrentEVAMax must be [0,1].");

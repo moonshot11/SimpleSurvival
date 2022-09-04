@@ -59,24 +59,9 @@ namespace SimpleSurvival
         /// </summary>
         public static EVAUpdateMode EVA_MAX_UPDATE = EVAUpdateMode.IfHitchhiker;
         /// <summary>
-        /// Refill EVA prop without returning to KSC?
-        /// </summary>
-        public static EVAUpdateMode EVA_PROP_REFILL = EVAUpdateMode.IfHitchhiker;
-        /// <summary>
         /// Requirement for enabling Converter.
         /// </summary>
         public static ConverterReq CONV_REQ = ConverterReq.IfKerbalExpEnabled;
-
-        // -- EVA Propellant career values --
-
-        /// <summary>
-        /// Max amount of EVA Propellant w/ Astronaut Complex Level 2
-        /// </summary>
-        public static double EVA_PROP_LVL_2 = 5;
-        /// <summary>
-        /// Max amount of EVA Propellant w/ Astronaut Complex Level 3
-        /// </summary>
-        public static double EVA_PROP_LVL_3 = 5;
 
 
         // -- EVA LifeSupport career values --

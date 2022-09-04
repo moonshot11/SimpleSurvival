@@ -93,7 +93,6 @@ namespace SimpleSurvival
 
         private readonly int consID = PartResourceLibrary.Instance.GetDefinition(C.NAME_CONSUMABLES).id;
         private readonly int lsID = PartResourceLibrary.Instance.GetDefinition(C.NAME_LIFESUPPORT).id;
-        private readonly int evapropID = PartResourceLibrary.Instance.GetDefinition(C.NAME_EVA_PROPELLANT).id;
 
         private const int cellWidth = 100;
         // Also used as width for +/- buttons
@@ -505,7 +504,6 @@ namespace SimpleSurvival
                     {
                         var info = EVALifeSupportTracker.GetEVALSInfo(kerbal.name);
                         labelMap[kerbal.name].evaLS_Value.SetOptionText(info.ls_current.ToString());
-                        labelMap[kerbal.name].evaProp.SetOptionText(info.prop_current.ToString());
 
                     }
                 }
@@ -546,7 +544,6 @@ namespace SimpleSurvival
 
             if (FlightGlobals.ActiveVessel.isEVA)
             {
-                vessel.GetConnectedResourceTotals(evapropID, out curr, out max);
                 string prefix = "";
                 string suffix = "</color>";
                 if (curr < 0.5)
@@ -588,7 +585,7 @@ namespace SimpleSurvival
             Cons2LSModule module = FlightGlobals.ActiveVessel.FindPartModuleImplementing<Cons2LSModule>();
             double obtained = module.part.RequestResource(C.NAME_CONSUMABLES, C.CONS_PER_EVA_LS * eva_request);
             double add = obtained / C.CONS_PER_EVA_LS;
-            EVALifeSupportTracker.AddEVAAmount(kerbalName, add, EVA_Resource.LifeSupport);
+            EVALifeSupportTracker.AddEVALSAmount(kerbalName, add);
 
             Util.Log("    EVA Request  = " + eva_request);
             Util.Log("    Amt Obtained = " + obtained);
