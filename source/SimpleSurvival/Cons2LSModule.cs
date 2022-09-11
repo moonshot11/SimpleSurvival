@@ -114,11 +114,7 @@ namespace SimpleSurvival
         public List<PartResourceDefinition> GetConsumedResources()
         {
             PartResourceDefinition def = PartResourceLibrary.Instance.resourceDefinitions[C.NAME_CONSUMABLES];
-
-            List<PartResourceDefinition> list = new List<PartResourceDefinition>();
-            list.Add(def);
-
-            return list;
+            return new List<PartResourceDefinition> { def };
         }
 
         // These two functions are needed to redefine guiActiveUncommand,
