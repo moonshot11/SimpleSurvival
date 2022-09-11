@@ -35,7 +35,6 @@
 - [ ] When part runs out of LifeSupport, all contained Kerbals are KIA
   - [ ] Other Kerbals in vessel are unharmed
 - [ ] EVA LifeSupport is persistent across EVA excursions
-- [ ] EVA Propellant is persistent across EVA excursions
 - [ ] When part gets low on LifeSupport, warning message is displayed and timescale is set to 1
 - [ ] When EVA Kerbal gets low on EVA LifeSupport, warning message is displayed and timescale is set to 1
 - [ ] When Kerbal runs out of EVA LifeSupport, Kerbal is KIA
@@ -50,8 +49,8 @@
 ## Save/Load
 - [ ] Suit LifeSupport values are saved to persistent.sfs when Kerbals are inside a vessel
 - [ ] Suit LifeSupport values are loaded correctly when Kerbals are inside a vessel
-- [ ] EVA LifeSupport+Propellant values are properly saved to persistent.sfs
-- [ ] EVA LifeSupport+Propellant values are properly loaded
+- [ ] EVA LifeSupport values are properly saved to persistent.sfs
+- [ ] EVA LifeSupport values are properly loaded
 
 
 ## Contracts
@@ -60,12 +59,7 @@
 
 ## Config
 - [ ] Confirm that EVA LifeSupport values upgrade according to Astronaut Complex level
-- [ ] Confirm that EVA Propellant values upgrade according to Astronaut Complex level
 - [ ] Test EVA LifeSupport upgrade behavior:
-  - [ ] Recovered: Kerbal must be recovered to update
-  - [ ] IfHitchhiker (default): Kerbal can board any vessel with Hitchhiker module
-  - [ ] Aboard: Kerbal can board any vessel
-- [ ] Test EVA Propellant refill behavior:
   - [ ] Recovered: Kerbal must be recovered to update
   - [ ] IfHitchhiker (default): Kerbal can board any vessel with Hitchhiker module
   - [ ] Aboard: Kerbal can board any vessel
