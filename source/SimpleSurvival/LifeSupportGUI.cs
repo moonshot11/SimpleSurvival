@@ -444,8 +444,8 @@ namespace SimpleSurvival
             if (showgui && drewgui)
             {
                 position = gui.GetComponent<RectTransform>().position;
-                position.x = (position.x + posInitOffset.x) / Screen.width + 0.5f;
-                position.y = (position.y + posInitOffset.y) / Screen.height + 0.5f;
+                position.x = (position.x + posInitOffset.x) / Screen.width / GameSettings.UI_SCALE + 0.5f;
+                position.y = (position.y + posInitOffset.y) / Screen.height / GameSettings.UI_SCALE + 0.5f;
                 Util.Log("Save GUI pos: " + position.ToString());
             }
             showgui = false;
