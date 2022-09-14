@@ -428,6 +428,7 @@ namespace SimpleSurvival
                 UISkinManager.defaultSkin,
                 false,
                 "");
+            gui.GetComponent<DragPanel>().edgeOffset = 0;
 
             showgui = true;
             drewgui = false;
