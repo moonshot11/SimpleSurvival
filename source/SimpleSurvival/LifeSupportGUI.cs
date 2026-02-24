@@ -200,16 +200,12 @@ namespace SimpleSurvival
 
         public void AddToolbar()
         {
-            // Not sure why this is necessary in addition to the visibleInScenes
-            // arg below...
-            if (HighLogic.LoadedScene != GameScenes.FLIGHT)
-                return;
-
             Util.Log("LifeSupportGUI AddToolbar: " + HighLogic.LoadedScene.Description());
-            if (toolbarButton == null)
+            if (ApplicationLauncher.Ready && toolbarButton == null)
             {
                 Texture2D icon = GameDatabase.Instance.databaseTexture.Find(
                     a => a.name.EndsWith("/RD_node_icon_simplesurvivalbasic")).texture;
+                Util.Log("Found toolbar icon: " + icon.name);
                 toolbarButton = ApplicationLauncher.Instance.AddModApplication(
                     ButtonOnTrue, ButtonOnFalse,
                     null, null, null, null,
@@ -428,6 +424,7 @@ namespace SimpleSurvival
                 UISkinManager.defaultSkin,
                 false,
                 "");
+            gui.GetComponent<DragPanel>().edgeOffset = 0;
 
             showgui = true;
             drewgui = false;
